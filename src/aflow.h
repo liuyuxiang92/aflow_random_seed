@@ -5349,7 +5349,7 @@ namespace aflowMachL {  //CO20211111
   void writeCoordCECSV();
 } // namespace aflowMachL
 namespace aflowMachL {  //CO20211111
-  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111
+  void PrintIAPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111
 } // namespace aflowMachL
 //CO20201111 - END
 // ----------------------------------------------------------------------------

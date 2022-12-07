@@ -2190,46 +2190,31 @@ namespace aflowMachL {
 //CO20211111
 
 namespace aflowMachL {
-  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow){
-    bool LDEBUG=(1||FALSE || XHOST.DEBUG);
-
-    string alloy=vpflow.getattachedscheme("PFLOW::ALLOY");
-    vector<string> velements=aurostd::getElements(alloy,pp_string);
-    if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " alloy=\"" << alloy << "\"" << endl;
-      cerr << __AFLOW_FUNC__ << " elements=" << aurostd::joinWDelimiter(velements,",") << endl;
-      cerr << __AFLOW_FUNC__ << " nelements=" << velements.size() << endl;
-    }
-
-    stringstream output_ss;
-    string ROOT="/common/LIB"+aurostd::utype2string(velements.size())+"/LIB";
-    vector<string> vsystems,vprotos,vfiles,_velements;
-    aurostd::DirectoryLS(ROOT,vsystems);
-
+  /// @brief prints data for IAP in JSON format
+  /// @param vpflow flag containing the alloy name
+  /// @authors
+  /// @mod{CO,20211111,created function}
+  /// @mod{SD,20221207,rewritten using EntryLoader}
+  void PrintIAPCFGAlloy(const aurostd::xoption& vpflow){
+    aflowlib::EntryLoader el;
+    el.loadAlloy(vpflow.getattachedscheme("PFLOW::ALLOY"));
+    string path = "";
+    vector<string> vfiles;
     xOUTCAR xout;
-    uint isystem=0,iproto=0,ifile=0;
-    for(isystem=0;isystem<vsystems.size();isystem++){
-      _velements=aurostd::getElements(vsystems[isystem],pp_string);
-      if(velements==_velements){
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found " << vsystems[isystem] << endl;}
-        aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem],vprotos);
-        std::sort(vprotos.begin(),vprotos.end());
-        for(iproto=0;iproto<vprotos.size();iproto++){
-          aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto],vfiles);
-          for(ifile=0;ifile<vfiles.size();ifile++){
-            if(aurostd::substring2bool(vfiles[ifile],"OUTCAR.relax")){
-              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Found "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
-              xout.initialize(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile]);
-              if(!xout.GetIonicStepsData()){continue;}
-              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Processing "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
-              xout.WriteMTPCFG(output_ss,"LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],velements);
-            }
-          }
+    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
+      path = entry->getPathFile();
+      aurostd::DirectoryLS(path, vfiles);
+      for (size_t ifile=0; ifile < vfiles.size(); ifile++) {
+        if (aurostd::substring2bool(vfiles[ifile], "OUTCAR.relax")) {
+          path = path + "/" + vfiles[ifile];
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Found " + path, _LOGGER_MESSAGE_);
+          xout.initialize(path);
+          if(!xout.GetIonicStepsData()) {continue;}
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing " + path, _LOGGER_MESSAGE_);
+          //xout.WriteMTPCFG(output_ss,"LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],velements);
         }
       }
     }
-
-    aurostd::stringstream2file(output_ss,"aflow_MTP_"+alloy+".cfg");
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////

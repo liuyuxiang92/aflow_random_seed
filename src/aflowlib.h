@@ -299,6 +299,7 @@ namespace aflowlib {
       bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
+      string getPathFile(string filesystem_collection="LIB");                              //SD20221207
       vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
       vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
       //ML stoich features

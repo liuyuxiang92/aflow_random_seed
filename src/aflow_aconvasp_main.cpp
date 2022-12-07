@@ -636,6 +636,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("HKL_SEARCH_COMPLETE",aurostd::args2flag(argv,cmds,"--hkl_search_complete"));
   vpflow.args2addattachedscheme(argv,cmds,"HKL_SEARCH_COMPLETE","--hkl_search_complete=","");
 
+  vpflow.flag("IAP::INIT",aurostd::args2flag(argv,cmds,"--iap|--IAP"));  // initiate IAP writer
+
   vpflow.flag("ICSD",aurostd::args2flag(argv,cmds,"--icsd"));
   vpflow.flag("ICSD_ALLLESSTHAN",aurostd::args2flag(argv,cmds,"--icsd_alllessthan"));
   vpflow.flag("ICSD_ALLMORETHAN",aurostd::args2flag(argv,cmds,"--icsd_allmorethan"));
@@ -778,8 +780,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("MISCIBILITY",aurostd::args2flag(argv,cmds,"--MIX|--mix|--MISCIBILITY|--miscibility|--MISCIBILE|--miscibile"));
   vpflow.flag("MOM",aurostd::args2flag(argv,cmds,"--mom"));
   vpflow.flag("MSI",aurostd::args2flag(argv,cmds,"--msi"));
-
-  vpflow.flag("MTP::INIT",aurostd::args2flag(argv,cmds,"--mtp|--MTP"));  // initiate MTP writer
 
   vpflow.flag("MULTI=BZIP2",aurostd::args2flag(argv,cmds,"--multi=bzip2"));
   vpflow.flag("MULTI=BUNZIP2",aurostd::args2flag(argv,cmds,"--multi=bunzip2"));
@@ -1902,17 +1902,8 @@ namespace pflow {
       //[CO20190208 - OBSOLETE]if(vpflow.flag("HNFCELL")) {pflow::HNFCELL(vpflow,cin,cout); _PROGRAMRUN=true;} //CO20181226
       if(vpflow.flag("HNFCELL")) {pflow::POCC_COMMAND_LINE(vpflow,cin,cout); _PROGRAMRUN=true;} //CO20181226
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFCELL")) {pocc::HNFCELL(cin); _PROGRAMRUN=true;}
-      // K
-      if(vpflow.flag("KBAND")) {pflow::KBAND(argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPOINTS")) {pflow::KPOINTS(vpflow.getattachedscheme("KPOINTS"),cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("FLAG::XVASP_KPOINTS_DELTA")) {pflow::KPOINTS_DELTA(vpflow,cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("KILL")) {sflow::KILL(vpflow.getattachedscheme("KILL")); _PROGRAMRUN=true;} 
-      // J
-      if(vpflow.flag("JUSTAFTER")) {sflow::JUST(vpflow.getattachedscheme("JUSTAFTER"),cin,"JUSTAFTER"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JUSTBEFORE")) {sflow::JUST(vpflow.getattachedscheme("JUSTBEFORE"),cin,"JUSTBEFORE"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JUSTBETWEEN")) {sflow::JUST(vpflow.getattachedscheme("JUSTBETWEEN"),cin,"JUSTBETWEEN"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JMOL")) {pflow::JMOL(vpflow.getattachedscheme("JMOL"),cin); _PROGRAMRUN=true;}
       // I
+      if(vpflow.flag("IAP::INIT")) {aflowMachL::PrintIAPCFGAlloy(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD") || vpflow.flag("ICSD_CHEM") || vpflow.flag("ICSD_PROTO") || vpflow.flag("ICSD_ID") || vpflow.flag("ICSD_LESSTHAN") || vpflow.flag("ICSD_MORETHAN") ||
           vpflow.flag("ICSD_DENSLESSTHAN") || vpflow.flag("ICSD_DENSMORETHAN") || vpflow.flag("ICSD_SG") || vpflow.flag("ICSD_SGLESSTHAN") ||
           vpflow.flag("ICSD_SGMORETHAN") || vpflow.flag("ICSD_TRICLINIC") || vpflow.flag("ICSD_MONOCLINIC") || vpflow.flag("ICSD_ORTHORHOMBIC") ||
@@ -1940,6 +1931,16 @@ namespace pflow {
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(vpflow.getattachedscheme("INFLATE_VOLUME"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
+      // J
+      if(vpflow.flag("JUSTAFTER")) {sflow::JUST(vpflow.getattachedscheme("JUSTAFTER"),cin,"JUSTAFTER"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JUSTBEFORE")) {sflow::JUST(vpflow.getattachedscheme("JUSTBEFORE"),cin,"JUSTBEFORE"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JUSTBETWEEN")) {sflow::JUST(vpflow.getattachedscheme("JUSTBETWEEN"),cin,"JUSTBETWEEN"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JMOL")) {pflow::JMOL(vpflow.getattachedscheme("JMOL"),cin); _PROGRAMRUN=true;}
+      // K
+      if(vpflow.flag("KBAND")) {pflow::KBAND(argv); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPOINTS")) {pflow::KPOINTS(vpflow.getattachedscheme("KPOINTS"),cin,cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("FLAG::XVASP_KPOINTS_DELTA")) {pflow::KPOINTS_DELTA(vpflow,cin,cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("KILL")) {sflow::KILL(vpflow.getattachedscheme("KILL")); _PROGRAMRUN=true;} 
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
       //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
@@ -1953,7 +1954,6 @@ namespace pflow {
       if(vpflow.flag("LTCELL")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LTCELLFV")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELLFV"),cin); _PROGRAMRUN=true;}
       // M
-      if(vpflow.flag("MTP::INIT")) {aflowMachL::PrintMTPCFGAlloy(vpflow); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("MILLER")) {cout << pflow::MILLER(vpflow.getattachedscheme("MILLER"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BZIP2")) {AFLOW_PTHREADS::MULTI_compress("bzip2",argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BUNZIP2")) {AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);_PROGRAMRUN=true;}
