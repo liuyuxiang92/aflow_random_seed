@@ -3592,8 +3592,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
     void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
-    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
-    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
+    void WriteIAPCFG(aurostd::JSON::object& jo, aflowlib::_aflowlib_entry& entry);   //CO20211106 //SD20221207 - rewritten using JSON
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -5349,7 +5348,7 @@ namespace aflowMachL {  //CO20211111
   void writeCoordCECSV();
 } // namespace aflowMachL
 namespace aflowMachL {  //CO20211111
-  void PrintIAPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111
+  void PrintIAPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111 //SD20221207 - rewritten using EntryLoader and JSON
 } // namespace aflowMachL
 //CO20201111 - END
 // ----------------------------------------------------------------------------

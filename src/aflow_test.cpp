@@ -2196,11 +2196,18 @@ namespace aflowMachL {
   /// @mod{CO,20211111,created function}
   /// @mod{SD,20221207,rewritten using EntryLoader}
   void PrintIAPCFGAlloy(const aurostd::xoption& vpflow){
+    string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     aflowlib::EntryLoader el;
-    el.loadAlloy(vpflow.getattachedscheme("PFLOW::ALLOY"));
+    el.loadAlloy(alloy);
     string path = "";
     vector<string> vfiles;
     xOUTCAR xout;
+    aurostd::JSON::object jo(aurostd::JSON::object_types::DICTIONARY);
+    jo["generator"] = "AFLOW " + string(AFLOW_VERSION);
+    jo["date"] = TODAY;
+    jo["alloy"] = alloy;
+    std::map<string, string> units = {{"lattice", "Ang"}, {"position", "Ang"}, {"force", "eV/Ang"}, {"energy", "eV"}, {"stress", "kbar"}, {"enthalpy_formation_atom", "eV/atom"}};
+    jo["units"] = units;
     for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
       path = entry->getPathFile();
       aurostd::DirectoryLS(path, vfiles);
@@ -2211,10 +2218,11 @@ namespace aflowMachL {
           xout.initialize(path);
           if(!xout.GetIonicStepsData()) {continue;}
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing " + path, _LOGGER_MESSAGE_);
-          //xout.WriteMTPCFG(output_ss,"LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],velements);
+          xout.WriteIAPCFG(jo, *entry);
         }
       }
     }
+    jo.saveFile(aurostd::getPWD() + "/aflow_IAP_" + alloy + ".json");
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////

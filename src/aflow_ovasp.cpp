@@ -4319,59 +4319,24 @@ void xOUTCAR::populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string
   }
 }
 
-void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path){  //CO20211106
-  vector<string> velements;
-  return WriteMTPCFG(output_ss,outcar_path,velements);
-}
-void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& _velements){  //CO20211106
+void xOUTCAR::WriteIAPCFG(aurostd::JSON::object& jo, aflowlib::_aflowlib_entry& entry) {  //CO20211106
 
   if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
   if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
-
-  aflowlib::_aflowlib_entry data;
-  populateAFLOWLIBEntry(data,outcar_path);
-  vector<string> velements=_velements;
-  if(velements.empty()){velements=data.vspecies;}
   bool FORMATION_CALC=false;
+    
 
-  output_ss.setf(std::ios::fixed,std::ios::floatfield);
-  uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
-  output_ss.precision(_precision_);
 
-  string tab=" ";
-  uint istr,iatom,itype=0;
-  uint i=0,j=0;
-  int icoord=0;
-  bool found_itype=false;
-
-  for(istr=0;istr<vxstr_ionic.size();istr++){
-    const xstructure& a=vxstr_ionic[istr];
-    output_ss << "BEGIN_CFG" << endl;
-    output_ss << tab << "Size" << endl;
-    output_ss << tab << tab << a.atoms.size() << endl;
-    output_ss << tab << "Supercell" << endl;
-    for(i=1;i<=3;i++) {
-      for(j=1;j<=3;j++) {
-        output_ss << tab << tab << " ";
-        if(abs(a.lattice(i,j))<10.0) output_ss << " ";
-        if(!std::signbit(a.lattice(i,j))) output_ss << " ";
-        output_ss << a.lattice(i,j) << "";
-      }
-      output_ss << endl;
-    }
+  bool found_itype = false;
+  for(size_t istr = 0; istr < vxstr_ionic.size(); istr++) {
+    aurostd::JSON::object data(aurostd::JSON::object_types::DICTIONARY);
+    data["lattice"] = vxstr_ionic[istr].lattice;
     output_ss << tab << "AtomData: id type direct_x direct_y direct_z  fx fy fz" << endl;
-    for(iatom=0;iatom<a.atoms.size();iatom++){
+    for(size_t iatom = 0; iatom < a.atoms.size(); iatom++) {
       output_ss << tab << tab;
       if(iatom<10) output_ss << "  ";
       else if(iatom<100) output_ss << " ";
       output_ss << iatom << " ";
-      if(0){
-        //this assumes all of the OUTCARs have the species in the right order
-        //if we're looking at the CrMn alloy, some systems in LIB2 have Mn only
-        //itype==1, base it on input velements (if available)
-        if(abs(a.atoms[iatom].type)<10) output_ss << "  ";
-        else if(abs(a.atoms[iatom].type)<100) output_ss << " ";
-        output_ss << a.atoms[iatom].type << " ";
       }else{
         found_itype=false;
         for(itype=0;itype<velements.size()&&!found_itype;itype++){
@@ -4408,14 +4373,14 @@ void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,cons
       output_ss << vstresses_ionic[istr][icoord] << (icoord<vstresses_ionic[istr].urows?" ":"");
     }
     output_ss << endl;
-    data.enthalpy_cell=data.enthalpy_atom=venergy_ionic[istr];
-    data.enthalpy_atom/=a.atoms.size();
-    FORMATION_CALC=aflowlib::LIB2RAW_Calculate_FormationEnthalpy(data,a,__AFLOW_FUNC__);
-    if(FORMATION_CALC){
-      output_ss << tab << "Feature enthalpy_formation_atom " << data.enthalpy_formation_atom << endl;
-    }
+    //data.enthalpy_cell=data.enthalpy_atom=venergy_ionic[istr];
+    //data.enthalpy_atom/=a.atoms.size();
+    //FORMATION_CALC=aflowlib::LIB2RAW_Calculate_FormationEnthalpy(data,a,__AFLOW_FUNC__);
+    //if(FORMATION_CALC){
+    //  output_ss << tab << "Feature enthalpy_formation_atom " << data.enthalpy_formation_atom << endl;
+    //}
     output_ss << tab << "Feature EFS_by vasp" << endl;
-    output_ss << tab << "Feature from aflow.org:" << outcar_path << ":ionic_step=" << istr+1 << endl;
+    //output_ss << tab << "Feature from aflow.org:" << outcar_path << ":ionic_step=" << istr+1 << endl;
     output_ss << tab << "Feature elements ";
     for(itype=0;itype<a.species.size();itype++){output_ss << KBIN::VASP_PseudoPotential_CleanName(a.species[itype]);}
     output_ss << endl;
