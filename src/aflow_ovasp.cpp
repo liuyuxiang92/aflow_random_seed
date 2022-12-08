@@ -4308,7 +4308,7 @@ bool xOUTCAR::GetIonicStepsData(){
 /// @authors
 /// @mod{CO,20211106,created function}
 /// @mod{SD+HE,20221208,rewritten using JSON objects}
-void xOUTCAR::WriteIAPCFG(aurostd::JSON::object& jo, aflowlib::_aflowlib_entry& entry) {
+void xOUTCAR::AddStepsIAPCFG(aurostd::JSON::object& jo, aflowlib::_aflowlib_entry& entry) {
   if (vxstr_ionic.size() != venergy_ionic.size()) {throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "vxstr_ionic.size()!=venergy_ionic", _FILE_CORRUPT_);}
   if (vxstr_ionic.size() != vstresses_ionic.size()) {throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "vxstr_ionic.size()!=vstresses_ionic", _FILE_CORRUPT_);}
   //bool FORMATION_CALC = false;

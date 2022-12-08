@@ -2195,7 +2195,7 @@ namespace aflowMachL {
   /// @authors
   /// @mod{CO,20211111,created function}
   /// @mod{SD,20221207,rewritten using EntryLoader}
-  void PrintIAPCFGAlloy(const aurostd::xoption& vpflow){
+  void WriteFileIAPCFG(const aurostd::xoption& vpflow){
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     aflowlib::EntryLoader el;
     el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM_RAW);
@@ -2220,9 +2220,9 @@ namespace aflowMachL {
         if (aurostd::substring2bool(vfiles[ifile], "OUTCAR.relax")) {
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Found - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
           xout.initialize(path + vfiles[ifile]);
-          if(!xout.GetIonicStepsData()) {continue;}
+          if (!xout.GetIonicStepsData()) continue;
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
-          xout.WriteIAPCFG(jo, *entry);
+          xout.AddStepsIAPCFG(jo, *entry);
         }
       }
     }

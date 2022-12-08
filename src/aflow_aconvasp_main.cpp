@@ -1903,7 +1903,7 @@ namespace pflow {
       if(vpflow.flag("HNFCELL")) {pflow::POCC_COMMAND_LINE(vpflow,cin,cout); _PROGRAMRUN=true;} //CO20181226
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFCELL")) {pocc::HNFCELL(cin); _PROGRAMRUN=true;}
       // I
-      if(vpflow.flag("IAP::INIT")) {aflowMachL::PrintIAPCFGAlloy(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("IAP::INIT")) {aflowMachL::WriteFileIAPCFG(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD") || vpflow.flag("ICSD_CHEM") || vpflow.flag("ICSD_PROTO") || vpflow.flag("ICSD_ID") || vpflow.flag("ICSD_LESSTHAN") || vpflow.flag("ICSD_MORETHAN") ||
           vpflow.flag("ICSD_DENSLESSTHAN") || vpflow.flag("ICSD_DENSMORETHAN") || vpflow.flag("ICSD_SG") || vpflow.flag("ICSD_SGLESSTHAN") ||
           vpflow.flag("ICSD_SGMORETHAN") || vpflow.flag("ICSD_TRICLINIC") || vpflow.flag("ICSD_MONOCLINIC") || vpflow.flag("ICSD_ORTHORHOMBIC") ||
