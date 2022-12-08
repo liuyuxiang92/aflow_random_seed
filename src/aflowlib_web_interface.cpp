@@ -4230,15 +4230,14 @@ namespace aflowlib {
     path_full=server+"/"+path;
     return path_full;
   }
-  /// @brief get the full file path of the aflowlib entry
+  /// @brief get the full directory path of the aflowlib entry
   /// @param filesystem_collection filesystem collection (LIB, RAW, WEB)
-  /// @return file path
+  /// @return directory path
   /// @authors
   /// @mod{SD,20221207,created}
-  string _aflowlib_entry::getPathFile(string filesystem_collection) {
-    const std::regex m_re_aurl2file{"((?:(?:LIB\\d{1,})|(?:ICSD)))_(?:(?:RAW)|(?:LIB)|(?:WEB))\\/"};
+  string _aflowlib_entry::getPathDirectory(string filesystem_collection) {
     string path_full = DEFAULT_ENTRY_LOADER_FS_PATH + (*this).aurl.substr(28) + "/";
-    path_full = std::regex_replace(path_full, m_re_aurl2file, "$1/" + filesystem_collection + "/");
+    path_full = std::regex_replace(path_full, aurostd::regex_aurl2file, "$1/" + filesystem_collection + "/");
     return path_full;
   }
   vector<string> _aflowlib_entry::getSpeciesAURL(ostream& oss){ //CO20200404

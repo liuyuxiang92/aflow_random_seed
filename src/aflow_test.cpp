@@ -2198,7 +2198,11 @@ namespace aflowMachL {
   void PrintIAPCFGAlloy(const aurostd::xoption& vpflow){
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     aflowlib::EntryLoader el;
-    el.loadAlloy(alloy);
+    el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM_RAW);
+    el.loadAlloy(alloy, false);
+    if (el.m_entries_flat->empty()) {
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "No entries found for " + alloy, _RUNTIME_ERROR_);
+    }
     string path = "";
     vector<string> vfiles;
     xOUTCAR xout;
@@ -2206,18 +2210,18 @@ namespace aflowMachL {
     jo["generator"] = "AFLOW " + string(AFLOW_VERSION);
     jo["date"] = TODAY;
     jo["alloy"] = alloy;
-    std::map<string, string> units = {{"lattice", "Ang"}, {"position", "Ang"}, {"force", "eV/Ang"}, {"energy", "eV"}, {"stress", "kbar"}, {"enthalpy_formation_atom", "eV/atom"}};
+    std::map<string, string> units = {{"lattice", "Ang"}, {"position", "fractional"}, {"force", "eV/Ang"}, {"energy", "eV/cell"}, {"stress", "kbar"}, {"enthalpy_formation_atom", "eV/atom"}};
     jo["units"] = units;
+    jo["data"] = aurostd::JSON::object(aurostd::JSON::object_types::LIST);
     for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
-      path = entry->getPathFile();
+      path = entry->getPathDirectory();
       aurostd::DirectoryLS(path, vfiles);
-      for (size_t ifile=0; ifile < vfiles.size(); ifile++) {
+      for (size_t ifile = 0; ifile < vfiles.size(); ifile++) {
         if (aurostd::substring2bool(vfiles[ifile], "OUTCAR.relax")) {
-          path = path + "/" + vfiles[ifile];
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Found " + path, _LOGGER_MESSAGE_);
-          xout.initialize(path);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Found - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
+          xout.initialize(path + vfiles[ifile]);
           if(!xout.GetIonicStepsData()) {continue;}
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing " + path, _LOGGER_MESSAGE_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
           xout.WriteIAPCFG(jo, *entry);
         }
       }
