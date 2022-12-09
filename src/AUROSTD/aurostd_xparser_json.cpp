@@ -443,6 +443,12 @@ namespace aurostd {
   template void JSON::object::operator=(const std::vector<vector<float>> &);
   template void JSON::object::operator=(const std::vector<vector<double>> &);
   template void JSON::object::operator=(const std::vector<vector<std::string>> &);
+  template void JSON::object::operator=(const std::vector<xvector<int>> &);
+  template void JSON::object::operator=(const std::vector<xvector<unsigned int>> &);
+  template void JSON::object::operator=(const std::vector<xvector<long long>> &);
+  template void JSON::object::operator=(const std::vector<xvector<unsigned long long>> &);
+  template void JSON::object::operator=(const std::vector<xvector<float>> &);
+  template void JSON::object::operator=(const std::vector<xvector<double>> &);
 
   ///@brief assignment operator for map
   template<class utype> void JSON::object::operator=(const std::map<std::string, utype> & content){
