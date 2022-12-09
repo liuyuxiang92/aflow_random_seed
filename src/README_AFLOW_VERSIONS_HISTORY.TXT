@@ -1,5 +1,6 @@
 3.2.14 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
+        -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
         -- parallelized --chull --alloy (CO)
         -- fixed some logger, adding some QUIETs (CO)
         -- fixing --npmax and --np=max options (CO)
