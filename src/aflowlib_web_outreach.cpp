@@ -164,7 +164,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   string authors=_authors;
   vector<string> vfix;
   aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano,Ojeda Mota,Simmons Jr.,Mattos Jr.",vfix,",");
-  for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX
+  for(size_t i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix[i],string("{"+vfix[i]+"}")); // FIX
   aurostd::StringSubst(authors,".",".~"); 
   aurostd::StringSubst(authors,"~ "," "); 
   aurostd::StringSubst(authors,"~ "," "); 
@@ -208,8 +208,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
     // generate authors_json
     string authors_json;
     authors_json="[";
-    for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-      authors_json+="\""+outreach.vauthor.at(iauth)+"\"";
+    for(size_t iauth=0;iauth<outreach.vauthor.size();iauth++) {
+      authors_json+="\""+outreach.vauthor[iauth]+"\"";
       if(iauth!=outreach.vauthor.size()-1) authors_json+=",";
     }
     authors_json+="]";
@@ -217,8 +217,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
     // generate authors_txt
     string authors_txt;
     authors_txt="";
-    for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-        authors_txt+=outreach.vauthor.at(iauth);
+    for(size_t iauth=0;iauth<outreach.vauthor.size();iauth++) {
+        authors_txt+=outreach.vauthor[iauth];
         if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors_txt+=" and ";
         if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors_txt+=", and ";
         if(iauth!=outreach.vauthor.size()-2 && iauth!=outreach.vauthor.size()-1) authors_txt+=", ";
