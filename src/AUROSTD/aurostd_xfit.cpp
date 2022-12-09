@@ -228,7 +228,7 @@ namespace aurostd {
     // Iterate until the convergence criterion is reached:
     // f(middle) is sufficiently close to zero.
     // Meanwhile, do a sanity check that the function has opposite signs at the interval ends.
-    while ((sign(f_at_left_end) != sign(f_at_right_end)) && (std::abs(f_at_middle)>tol)){
+    while ((sign(f_at_left_end) != sign(f_at_right_end)) && (aurostd::abs(f_at_middle)>tol)){
       if (sign(f_at_left_end) == sign(f_at_middle)){
         std::swap(left_end, middle);
         std::swap(f_at_left_end, f_at_middle);
@@ -253,7 +253,7 @@ namespace aurostd {
     }
 
     // utype-check that the convergence criterion was reached
-    if (std::abs(f_at_middle) > tol) {
+    if (aurostd::abs(f_at_middle) > tol) {
       string message = "Bisection method did not converge";
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }

@@ -88,7 +88,7 @@ namespace qca {
       xmatrix<double> conc_cluster; ///< concentration of the clusters, UNIT: unitless | DIM: Nc, Ne
       xmatrix<double> num_elem_cluster; ///< number of each element of the clusters, UNIT: unitless | DIM: Nc, Ne
       xvector<double> excess_energy_cluster; ///< excess energy of the clusters, UNIT: eV | DIM: Nc
-      xvector<long int> degeneracy_cluster; ///< degeneracy of the clusters, DIM: Nc
+      xvector<unsigned long long int> degeneracy_cluster; ///< degeneracy of the clusters, DIM: Nc
       xmatrix<double> conc_macro; ///< macroscopic concentration of the alloy, UNIT: unitless | DIM: Nx, Ne
       xvector<double> temp; ///< temperature range, UNIT: K | DIM: Nt
       xmatrix<double> prob_ideal_cluster; ///< ideal (high-T) probability of the clusters as a function of concentration and temperature, DIM: Nx, Nc
