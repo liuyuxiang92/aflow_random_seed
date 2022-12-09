@@ -4921,7 +4921,7 @@ namespace aflowlib {
     // Performs AFLUX call based on summons input
     // switched to aurostd::xhttp //HE20220407
     bool LDEBUG=(false || XHOST.DEBUG);
-    string url = "https://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
+    string url = "http://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
     if(LDEBUG) {
       cerr << __AFLOW_FUNC__ << ": Summons = " << summons << endl;
       cerr << __AFLOW_FUNC__ << ": URL = " << url << endl;
