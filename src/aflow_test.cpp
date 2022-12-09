@@ -2190,46 +2190,43 @@ namespace aflowMachL {
 //CO20211111
 
 namespace aflowMachL {
-  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow){
-    bool LDEBUG=(1||FALSE || XHOST.DEBUG);
-
-    string alloy=vpflow.getattachedscheme("PFLOW::ALLOY");
-    vector<string> velements=aurostd::getElements(alloy,pp_string);
-    if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " alloy=\"" << alloy << "\"" << endl;
-      cerr << __AFLOW_FUNC__ << " elements=" << aurostd::joinWDelimiter(velements,",") << endl;
-      cerr << __AFLOW_FUNC__ << " nelements=" << velements.size() << endl;
+  /// @brief prints data for IAP in JSON format
+  /// @param vpflow flag containing the alloy name
+  /// @authors
+  /// @mod{CO,20211111,created function}
+  /// @mod{SD,20221207,rewritten using EntryLoader}
+  void WriteFileIAPCFG(const aurostd::xoption& vpflow){
+    string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
+    aflowlib::EntryLoader el;
+    el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM_RAW);
+    el.loadAlloy(alloy, false);
+    if (el.m_entries_flat->empty()) {
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "No entries found for " + alloy, _RUNTIME_ERROR_);
     }
-
-    stringstream output_ss;
-    string ROOT="/common/LIB"+aurostd::utype2string(velements.size())+"/LIB";
-    vector<string> vsystems,vprotos,vfiles,_velements;
-    aurostd::DirectoryLS(ROOT,vsystems);
-
+    string path = "";
+    vector<string> vfiles;
     xOUTCAR xout;
-    uint isystem=0,iproto=0,ifile=0;
-    for(isystem=0;isystem<vsystems.size();isystem++){
-      _velements=aurostd::getElements(vsystems[isystem],pp_string);
-      if(velements==_velements){
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found " << vsystems[isystem] << endl;}
-        aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem],vprotos);
-        std::sort(vprotos.begin(),vprotos.end());
-        for(iproto=0;iproto<vprotos.size();iproto++){
-          aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto],vfiles);
-          for(ifile=0;ifile<vfiles.size();ifile++){
-            if(aurostd::substring2bool(vfiles[ifile],"OUTCAR.relax")){
-              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Found "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
-              xout.initialize(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile]);
-              if(!xout.GetIonicStepsData()){continue;}
-              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Processing "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
-              xout.WriteMTPCFG(output_ss,"LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],velements);
-            }
-          }
+    aurostd::JSON::object jo(aurostd::JSON::object_types::DICTIONARY);
+    jo["generator"] = "AFLOW " + string(AFLOW_VERSION);
+    jo["date"] = TODAY;
+    jo["alloy"] = alloy;
+    std::map<string, string> units = {{"lattice", "Ang"}, {"position", "fractional"}, {"force", "eV/Ang"}, {"energy", "eV/cell"}, {"stress", "kbar"}, {"enthalpy_formation_atom", "eV/atom"}};
+    jo["units"] = units;
+    jo["data"] = aurostd::JSON::object(aurostd::JSON::object_types::LIST);
+    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
+      path = entry->getPathDirectory();
+      aurostd::DirectoryLS(path, vfiles);
+      for (size_t ifile = 0; ifile < vfiles.size(); ifile++) {
+        if (aurostd::substring2bool(vfiles[ifile], "OUTCAR.relax")) {
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Found - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
+          xout.initialize(path + vfiles[ifile]);
+          if (!xout.GetIonicStepsData()) continue;
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Processing - " + path + vfiles[ifile], _LOGGER_MESSAGE_);
+          xout.AddStepsIAPCFG(jo, *entry);
         }
       }
     }
-
-    aurostd::stringstream2file(output_ss,"aflow_MTP_"+alloy+".cfg");
+    jo.saveFile(aurostd::getPWD() + "/aflow_IAP_" + alloy + ".json");
   }
 }
 //////////////////////////////////////////////////////////////////////////////////////
