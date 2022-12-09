@@ -336,6 +336,10 @@ namespace aurostd {
     if(x<0) return (int) -1;
     return (int) 0;
   }
+  uint sign(uint x) {
+    if(x>0) return (uint) 1;
+    return (uint) 0;
+  }
   float sign(float x) {
     if(x>0) return (float) 1;
     if(x<0) return (float) -1;
@@ -355,6 +359,14 @@ namespace aurostd {
     if(x>0) return (long long int) 1;
     if(x<0) return (long long int) -1;
     return (long long int) 0;
+  }
+  unsigned long int sign(unsigned long int x) {
+    if(x>0) return (unsigned long int) 1;
+    return (unsigned long int) 0;
+  }
+  unsigned long long int sign(unsigned long long int x) {
+    if(x>0) return (unsigned long long int) 1;
+    return (unsigned long long int) 0;
   }
   long double sign(long double x) {
     if(x>0) return (long double) 1;
