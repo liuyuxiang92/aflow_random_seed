@@ -1,3 +1,27 @@
+3.2.14 - 2022/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
+        -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
+        -- parallelized --chull --alloy (CO)
+        -- fixed some logger, adding some QUIETs (CO)
+        -- fixing --npmax and --np=max options (CO)
+        -- fixed RDF function (CO)
+        -- added RDF to pocc (CO)
+        -- patching url2string to be robust to firewalls (CO)
+        -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
+        -- new JSON parser and writer added (HE)
+        -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
+        -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
+        -- added univariate polynomial solver (SD)
+        -- added univariate polynomial fit with weights (SD)
+        -- added LUP decomposition (SD)
+        -- updated aurostd::inverse function to be more robust (SD)
+        -- added aurostd::condition_number (SD)
+        -- added matrix pre-conditioner in aurostd::equilibrateMatrix (SD)
+        -- added linspace function (SD)
+        -- added simplistic JSON extractor for vectors and matrices (SD)
+        -- added Newton-Raphson method to solve nonlinear square systems (SD)
+        -- added deflation method to find multiple zeros in nonlinear square systems (SD)
+        -- added binodal construction module for n-ary alloys (SD)
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)

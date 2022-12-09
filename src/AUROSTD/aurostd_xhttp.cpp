@@ -127,6 +127,11 @@ namespace aurostd {
 
     return result;
   }
+  
+  string httpJoinURL(const xURL& url){  //CO20221209
+    return url.scheme+"://"+url.host+url.path+url.query;
+    //deal with port later... need a bool to tell if a port was there originally (:)
+  }
 
   /// @brief build a new xURL struct from a redirect location
   /// @param base_url url that initiated the redirection
@@ -187,6 +192,13 @@ namespace aurostd {
     pos_newline_border = response.find(delimiter + delimiter);
     header_raw = response.substr(0, pos_newline_border);
     response.erase(0, pos_newline_border + offset + offset);
+    if(pos_newline_border==string::npos){response.clear();} //CO20221209 - this means the response is null
+
+    if(LDEBUG){
+      cerr << __AFLOW_FUNC__ << " pos_newline_border=" << pos_newline_border << endl;
+      cerr << __AFLOW_FUNC__ << " header_raw=" << endl << "\"" << header_raw << "\"" << endl;
+      cerr << __AFLOW_FUNC__ << " response=" << endl << "\"" << response << "\"" << endl;
+    }
 
     // check if Transfer-Encoding is chunked
     bool isChunked = ( header_raw.find("chunked") != std::string::npos );
@@ -200,6 +212,8 @@ namespace aurostd {
     split = status_line.find(' ') + 1;
     pos_newline_border = status_line.find(' ', split + 1);
     status_code = aurostd::string2utype<uint>(status_line.substr(split, pos_newline_border - split));
+
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " status_code=" << status_code << endl;}
 
     // extract the header data
     std::string key = "";
@@ -318,6 +332,7 @@ namespace aurostd {
     // build request and save its length
     request_len = asprintf(&request, request_template, (url.path + url.query).c_str(), url.host.c_str(), AFLOW_VERSION);
 
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " request:" << endl << "---request begin---" << endl << request << endl << "---request end---" << endl;}
 
     // get the TCP protocol entry
     protocol_entry = getprotobyname("tcp");
@@ -342,6 +357,7 @@ namespace aurostd {
 
     ip_address = (*(struct in_addr *) *(host_entry->h_addr_list)).s_addr;
     ip_address_str = httpGetIP4String(ip_address);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " ip_address_str=" << ip_address_str << endl;}
 
     socket_entry.sin_addr.s_addr = ip_address;
     socket_entry.sin_family = AF_INET;
@@ -380,7 +396,10 @@ namespace aurostd {
       }
       response += std::string(buffer, nbytes_total);
     }
-    if (LDEBUG) cerr << soliloquy << " Finished reading response (" << loaded_bytes << " bytes)" << endl;
+    if (LDEBUG){
+      cerr << __AFLOW_FUNC__ << " Finished reading response (" << loaded_bytes << " bytes)" << endl;
+      cerr << __AFLOW_FUNC__ << " response:" << endl << "---response begin---" << endl << response << endl << "---response end---" << endl;
+    }
 
     if (nbytes_total == -1) {
       if (LDEBUG) cerr << soliloquy << " Failed to read response from " << url.host << "( " << ip_address_str << ":" << url.port << ")" << endl;
@@ -390,6 +409,15 @@ namespace aurostd {
 
     // close the socket
     close(socket_file_descriptor);
+
+    bool found_firewall=false;
+    found_firewall=(found_firewall||response.find("blocked due to malicious activity")!=string::npos);
+    //add other signatures
+    if(found_firewall){ //CO20221209 - curl both leverages certificates and gives raw output
+      aurostd::url2stringCUrl(aurostd::httpJoinURL(url),response);
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " response:" << endl << "---response begin---" << endl << response << endl << "---response end---" << endl;}
+    }
+
     return true;
   }
 

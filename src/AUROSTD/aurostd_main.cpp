@@ -1912,11 +1912,25 @@ namespace aurostd {
   // Function ProcessRenice
   // ***************************************************************************
   //CO20210315
-  void ProcessRenice(const string& process,int nvalue,bool user_specific){ //CO20210315
-    vector<string> vpids=ProcessPIDs(process,user_specific);
-    if(vpids.empty()){return;}
+  bool ProcessRenice(const string& process,int nvalue,bool user_specific,const string& pgid){ //CO20210315 //CO20221029 - void->bool to catch if renice worked and added pgid to renice executable-specific processes
+    vector<string> vpids;
+    if(pgid.empty()){vpids=ProcessPIDs(process,user_specific);} //CO20221028
+    else{string output_syscall="";vpids=ProcessPIDs(process,pgid,output_syscall,user_specific);}  //CO20221028
+    if(vpids.empty()){return false;}
     string command="renice "+aurostd::utype2string(nvalue)+" "+aurostd::joinWDelimiter(vpids," ");
-    aurostd::execute(command);
+    string err=aurostd::execute2string(command,stderr_fsio,true); //CO20221123 - true == no stdout
+    return err.empty();
+  }
+  
+  // ***************************************************************************
+  // Function ReniceAvailable
+  // ***************************************************************************
+  //CO20221029 - checks if renice up/down is allowed on the system
+  bool ReniceAvailable(void){
+    aurostd::execute("sleep 10 &"); //to background
+    if(!ProcessRenice("sleep",19,true,aurostd::utype2string(getpgrp()))){return false;}  //try making more nice, this should almost always work
+    if(!ProcessRenice("sleep",0,true,aurostd::utype2string(getpgrp()))){return false;}   //try making default nice, this may not always work: https://superuser.com/questions/88542/why-cant-unix-users-renice-downwards
+    return true;
   }
 
   // ***************************************************************************
@@ -3398,7 +3412,7 @@ namespace aurostd {
   // ***************************************************************************
   // Execute & Report Streams/Strings/C_strings
   // ***************************************************************************
-  string execute2string(const string& _command,FSIO fsio) { //CO20200624 - added file system IO mode
+  string execute2string(const string& _command,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     // bool INIT_VERBOSE=TRUE;
@@ -3412,9 +3426,9 @@ namespace aurostd {
 
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
-    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh; be careful with quotes within quotes, althought it seems to work
-    else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
-    else{cmdstream << command << " > " << file;} //CO20200624
+    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh; be careful with quotes within quotes, although it seems to work
+    else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file << (quiet?" 1> /dev/null":"");} //CO20200624
+    else{cmdstream << command << " > " << file << (quiet?" 2> /dev/null":"");} //CO20200624
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
     system(cmdstream.str().c_str());
     // command="";
@@ -3431,36 +3445,36 @@ namespace aurostd {
     return strout;
   }
 
-  string execute2string(ostringstream &command,FSIO fsio) { //CO20200624 - added file system IO mode
+  string execute2string(ostringstream &command,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     string command_str=command.str();
     aurostd::StringstreamClean(command);
-    return execute2string(command_str,fsio);  //CO20200624
+    return execute2string(command_str,fsio,quiet);  //CO20200624
   }
 
-  string execute2string(stringstream &command,FSIO fsio) { //CO20200624 - added file system IO mode
+  string execute2string(stringstream &command,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     string command_str=command.str();
     aurostd::StringstreamClean(command);
-    return execute2string(command_str,fsio);  //CO20200624
+    return execute2string(command_str,fsio,quiet);  //CO20200624
   }
 
-  vector<string> execute2string(const vector<string>& vcommand,FSIO fsio) { //CO20200624 - added file system IO mode
+  vector<string> execute2string(const vector<string>& vcommand,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     vector<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand[i],fsio));  //CO20200624
+      out.push_back(execute2string(vcommand[i],fsio,quiet));  //CO20200624
     return out;
   }
 
-  deque<string> execute2string(const deque<string>& vcommand,FSIO fsio) { //CO20200624 - added file system IO mode
+  deque<string> execute2string(const deque<string>& vcommand,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     deque<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand[i],fsio));  //CO20200624
+      out.push_back(execute2string(vcommand[i],fsio,quiet));  //CO20200624
     return out;
   }
 
 #ifdef _stringcharstar_
-  string execute2string(char* command,FSIO fsio) { //CO20200624 - added file system IO mode
+  string execute2string(char* command,FSIO fsio,bool quiet) { //CO20200624 - added file system IO mode
     string command_str=string(command);
-    return execute2string(command_str,fsio);  //CO20200624
+    return execute2string(command_str,fsio,quiet);  //CO20200624
   }
 #endif
 
@@ -4690,8 +4704,51 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     int return_code = aurostd::httpGetStatus(url, stringIN);
     if (verbose) cerr << __AFLOW_FUNC__ << " " << url << " returned " << return_code <<endl;
-    if(stringIN.empty()) return false;
-    else return true;
+    return (!stringIN.empty());
+  }
+  bool url2stringWGet(const string& url,string& stringIN,bool verbose) {  //CO20221209 - wget is more robust, can leverage certificates
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(!aurostd::IsCommandAvailable("wget")) {
+      cerr << "ERROR - " << __AFLOW_FUNC__ << " command \"wget\" is necessary" << endl;
+      return FALSE;
+    }
+    string _url=url;
+    aurostd::StringSubst(_url,"http://","");
+    aurostd::StringSubst(_url,"https://","");
+    aurostd::StringSubst(_url,"//","/");
+    string scheme="http";
+    if(url.find("aflow.org")!=string::npos){scheme="https";}
+#ifndef _MACOSX_
+    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true);
+#else
+    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true); // _MACOSX_
+#endif
+    if(!stringIN.empty()){return true;}
+    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
+#ifndef _MACOSX_
+    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true);
+#else
+    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true); // _MACOSX_
+#endif
+    return (!stringIN.empty());
+  }
+  bool url2stringCUrl(const string& url,string& stringIN,bool verbose) {  //CO20221209 - curl both leverages certificates and gives raw output
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(!aurostd::IsCommandAvailable("curl")) {
+      cerr << "ERROR - " << __AFLOW_FUNC__ << " command \"curl\" is necessary" << endl;
+      return FALSE;
+    }
+    string _url=url;
+    aurostd::StringSubst(_url,"http://","");
+    aurostd::StringSubst(_url,"https://","");
+    aurostd::StringSubst(_url,"//","/");
+    string scheme="http";
+    if(url.find("aflow.org")!=string::npos){scheme="https";}
+    stringIN=aurostd::execute2string("curl -ivs --raw "+scheme+"://"+_url,stdout_fsio,true);
+    if(!stringIN.empty()){return true;}
+    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
+    stringIN=aurostd::execute2string("curl -ivs --raw "+scheme+"://"+_url,stdout_fsio,true);
+    return (!stringIN.empty());
   }
 
   // ***************************************************************************

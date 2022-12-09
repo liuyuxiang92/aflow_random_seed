@@ -38,6 +38,7 @@ namespace aurostd{
   std::string httpPercentEncodingFull(std::string work_str);
 
   xURL httpParseURL(const std::string &url, const bool strict = false);
+  string httpJoinURL(const xURL& url);  //CO20221209 - get back URL
 }
 
 #endif //AFLOW_SRC_AUROSTD_XHTTP_H
