@@ -5182,7 +5182,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   bool flag_LIB2=FALSE,flag_LIB2U=FALSE,flag_LIB3=FALSE,flag_LIB4=FALSE; //[CO20191110]HTQC=FALSE is OBSOLETE variable
   if(!PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=FALSE;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=TRUE;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KEEP_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
 
   //CO20181226 START
 
@@ -6066,7 +6066,7 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   bool HTQC=FALSE,flag_LIB2U=FALSE,flag_LIB3=FALSE,flag_LIB2=FALSE;
   if(!PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=FALSE;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=TRUE;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KEEP_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
 
 
   uint nspecies=0;

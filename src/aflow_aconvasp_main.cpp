@@ -1165,8 +1165,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::NOLDAU")) vlist+="--noldau ";                                               // recursion is GNU's pleasure (SC2014)
     //[CO20181226 - OBSOLETE PROTO_AFLOW::RUN_RELAX_STATIC_BANDS]vpflow.flag("PROTO_AFLOW::BANDS_CALCULATION",aurostd::args2flag(argv,cmds,"--bands|--band"));
     //[CO20181226 - OBSOLETE PROTO_AFLOW::RUN_RELAX_STATIC_BANDS]if(vpflow.flag("PROTO_AFLOW::BANDS_CALCULATION")) vlist+="--bands ";                                     // recursion is GNU's pleasure (SC2014)
-    vpflow.flag("PROTO_AFLOW::NEGLECT_NOMIX",aurostd::args2flag(argv,cmds,"--neglect_nomix|--neglectnomix"));
-    if(vpflow.flag("PROTO_AFLOW::NEGLECT_NOMIX")) vlist+="--neglect_nomix ";                                 // recursion is GNU's pleasure (SC2014)
+    vpflow.flag("PROTO_AFLOW::KEEP_NOMIX",aurostd::args2flag(argv,cmds,"--neglect_nomix|--neglectnomix|--keep_nomix|--keepnomix")); //CO20221212 - neglect_nomix is a misnomer here, this flag should really keep-nomix (avoiding the determination that a calculation should not be run based on traditional mixing rules)
+    if(vpflow.flag("PROTO_AFLOW::KEEP_NOMIX")) vlist+="--keep_nomix ";                                 // recursion is GNU's pleasure (SC2014)
     vpflow.flag("PROTO_AFLOW::STDOUT",aurostd::args2flag(argv,cmds,"--stdout"));
     if(vpflow.flag("PROTO_AFLOW::STDOUT")) vlist+="--stdout ";                                               // recursion is GNU's pleasure (SC2014)
     vpflow.flag("PROTO_AFLOW::QE",aurostd::args2flag(argv,cmds,"--qe"));
@@ -2746,7 +2746,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --ediffg=XXX  (default: DEFAULT_VASP_PREC_EDIFFG in .aflow.rc)" << endl;
     strstream << tab << xspaces << " " << "              --ldau2" << endl;
     strstream << tab << xspaces << " " << "              --noldau2" << endl;
-    strstream << tab << xspaces << " " << "              --neglect_nomix" << endl;
+    strstream << tab << xspaces << " " << "              --keep_nomix" << endl;
     strstream << tab << xspaces << " " << "              --stdout" << endl;
     strstream << tab << xspaces << " " << "              --qe" << endl;
     strstream << tab << xspaces << " " << "              --abinit" << endl;
@@ -12766,7 +12766,7 @@ namespace pflow {
             "                --ediffg=XXX  (default: DEFAULT_VASP_PREC_EDIFFG in .aflow.rc) (VASP) ",
             "                --ldau2",
             "                --noldau2",
-            "                --neglect_nomix",
+            "                --keep_nomix",
             "                --stdout",
             "                --qe",
             "                --abinit",
@@ -12864,9 +12864,9 @@ namespace pflow {
     //[CO20181226 - OBSOLETE PROTO_AFLOW::RUN_RELAX_STATIC_BANDS]if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::BANDS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::BANDS") << endl;
 
     // check neglect_nomix
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK NEGLECT_NOMIX" << endl; 
-    PARAMS.vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX",vpflow.flag("PROTO_AFLOW::NEGLECT_NOMIX"));
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::NEGLECT_NOMIX\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK KEEP_NOMIX" << endl; 
+    PARAMS.vparams.flag("AFLOWIN_FLAG::KEEP_NOMIX",vpflow.flag("PROTO_AFLOW::KEEP_NOMIX"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::KEEP_NOMIX\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::KEEP_NOMIX") << endl;
 
     // check stdout
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK STDOUT" << endl; 
@@ -13230,7 +13230,7 @@ namespace pflow {
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::POCC_TOL\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::POCC_TOL") << endl; //CO20181226
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.getattachedscheme((\"AFLOWIN_FLAG::LIST_VCMD\")=" << PARAMS.vparams.getattachedscheme("AFLOWIN_FLAG::LIST_VCMD") << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::HTQC_ICSD\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::HTQC_ICSD") << endl;
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::NEGLECT_NOMIX\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::KEEP_NOMIX\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::KEEP_NOMIX") << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::VASP\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::VASP") << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ITC\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ITC") << endl; //CO20220613
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABINIT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT") << endl;
