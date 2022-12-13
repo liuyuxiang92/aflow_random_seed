@@ -2160,23 +2160,12 @@ void AFLOW_monitor_VASP(){  //CO20210601
             if(LDEBUG){cerr << __AFLOW_FUNC__ << " already ran this directory, waiting...: dir=" << directory << endl;}
             continue;
           }
-<<<<<<< Updated upstream
-||||||| constructed merge base
-          if(!aurostd::getenv2string("HOME_AFLOW").empty()&&!aurostd::getenv2string("WORK_AFLOW").empty()){ //CO20221123 - run scheme which copies aflow.in from HOME_AFLOW to WORK_AFLOW to run
-            if(directory.find(aurostd::getenv2string("HOME_AFLOW"))!=string::npos){ //increment, only wait 10 minute for a directory NOT in HOME_AFLOW
-              if(LDEBUG){cerr << __AFLOW_FUNC__ << " trying to run inside HOME_AFLOW, avoid dir=" << directory << endl;}
-              nsuccesses++;
-              continue;
-            }
-          }
-=======
           if(!aurostd::getenv2string("HOME_AFLOW").empty()&&!aurostd::getenv2string("WORK_AFLOW").empty()){ //CO20221123 - run scheme which copies aflow.in from HOME_AFLOW to WORK_AFLOW to run
             if(directory.find(aurostd::getenv2string("HOME_AFLOW"))!=string::npos){ //increment, only wait 10 minute for a directory NOT in HOME_AFLOW
               if(LDEBUG){cerr << __AFLOW_FUNC__ << " trying to run inside HOME_AFLOW, avoid dir=" << directory << endl;}
               continue;
             }
           }
->>>>>>> Stashed changes
           if(LDEBUG){cerr << __AFLOW_FUNC__ << " found directory to run: dir=" << directory << endl;}
           directory_old=directory;
           nsuccesses=0; //reset
