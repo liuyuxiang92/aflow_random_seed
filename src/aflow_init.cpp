@@ -2123,9 +2123,17 @@ void AFLOW_monitor_VASP(){  //CO20210601
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
   string directory="";
+  stringstream message;
+  ofstream FileMESSAGE;
+  bool oss_silent=true;
+  ostream& oss=cout;if(oss_silent){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
 
   if(XHOST.vflag_control.flag("FILE")){
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " found FILE input: " << XHOST.vflag_control.getattachedscheme("FILE") << endl;}
+    string FileNameLOCKmonitor=XHOST.vflag_control.getattachedscheme("FILE")+".monitor_vasp";
+    FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios::out);
+    message << aflow::Banner("BANNER_NORMAL");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "Reading from FILE input: " << XHOST.vflag_control.getattachedscheme("FILE");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
     uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
     string file=XHOST.vflag_control.getattachedscheme("FILE");
     string file_dir=aurostd::dirname(file);
@@ -2134,39 +2142,42 @@ void AFLOW_monitor_VASP(){  //CO20210601
     bool found=false;
     string search_str="[dir=";
     string directory_old="";
+    message << "NCOUNTS_WAIT_MONITOR=" << NCOUNTS_WAIT_MONITOR;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
     while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
+      message << "TOP OF WHILE LOOP: nfailures=" << nfailures << "; nsuccesses=" << nsuccesses;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
       if(!aurostd::FileExist(file)){
+        message << "FILE not yet found, waiting...: FILE=" << file;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " FILE not yet found, waiting...: FILE=" << file << endl;}
         nfailures++;  //increment, only wait 10 minutes for a file to be written
         aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
         continue;
       }
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " FILE found: FILE=" << file << endl;}
+      message << "FILE found: FILE=" << file << ", now reading";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
       nfailures=0;  //reset
       vlines_size=aurostd::file2vectorstring(file,vlines);
       found=false;
       for(i=vlines_size-1;i<vlines_size&&!found;i--){ //go backwards
         //looking for "... - [dir=.] - [user=aflow] ..."
         if(vlines[i].find(search_str)==string::npos){continue;}
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found line containing \"" << search_str << "\": " << vlines[i] << endl;}
+        message << "Found line containing \"" << search_str << "\": " << vlines[i];pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
         vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
         for(j=0;j<vtokens_size&&!found;j++){
           if(vtokens[j].find(search_str)==string::npos){continue;}
           directory=vtokens[j];
           aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
           found=true;
-          if(LDEBUG){cerr << __AFLOW_FUNC__ << " dir=" << directory << endl;}
+          message << "dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
           if(directory==directory_old){ //increment, only wait 10 minutes for a new directory to be found
-            if(LDEBUG){cerr << __AFLOW_FUNC__ << " already ran this directory, waiting...: dir=" << directory << endl;}
+            message << "Already ran this directory, waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
             continue;
           }
           if(!aurostd::getenv2string("HOME_AFLOW").empty()&&!aurostd::getenv2string("WORK_AFLOW").empty()){ //CO20221123 - run scheme which copies aflow.in from HOME_AFLOW to WORK_AFLOW to run
             if(directory.find(aurostd::getenv2string("HOME_AFLOW"))!=string::npos){ //increment, only wait 10 minute for a directory NOT in HOME_AFLOW
-              if(LDEBUG){cerr << __AFLOW_FUNC__ << " trying to run inside HOME_AFLOW, avoid dir=" << directory << endl;}
+              message << "Trying to run inside HOME_AFLOW, avoid dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
               continue;
             }
           }
-          if(LDEBUG){cerr << __AFLOW_FUNC__ << " found directory to run: dir=" << directory << endl;}
+          message << "Found directory to run: dir=" << directory << ", passing off to run-specific logger";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
           directory_old=directory;
           nsuccesses=0; //reset
           AFLOW_monitor_VASP(directory);
@@ -2174,14 +2185,28 @@ void AFLOW_monitor_VASP(){  //CO20210601
       }
       nsuccesses++;
       //if --FILE=LOCK, this will be useful
-      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
+      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){
+        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        break;
+      }
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){
+        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);
+        break;
+      }
 
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
 
       //if --FILE=LOCK, this will be useful
-      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
+      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){
+        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        break;
+      }
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){
+        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);
+        break;
+      }
     }
   }
   else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
@@ -2190,6 +2215,27 @@ void AFLOW_monitor_VASP(){  //CO20210601
     return AFLOW_monitor_VASP(directory);
   }
   else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no directory input provided",_INPUT_ILLEGAL_);}
+  
+  //CO+SD20220602 - if monitor does not find a directory at all, kill the startup script
+  if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT")){
+    string vasp_pgid=XHOST.ostrPGID.str();
+    uint n_running=0;
+    stringstream message;
+    string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
+    uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
+    uint sleep_seconds_afterkill=sleep_seconds;
+    if(aurostd::ProcessRunning(startup_script_name,vasp_pgid)){aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);} //sleep to wait for the script to finish naturally
+    if(aurostd::ProcessRunning(startup_script_name,vasp_pgid)){
+      aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
+      while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
+        message << "initial launch of vasp did not produce an OUTCAR file; killing the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
+        aurostd::ProcessKill(startup_script_name,vasp_pgid); //send SIGKILL
+        aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
+      }
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Initial launch of vasp did not produce an OUTCAR file, tried killing the whole AFLOW startup script",_RUNTIME_ERROR_);
+    }
+  }
+
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
 }
 
