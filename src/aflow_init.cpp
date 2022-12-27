@@ -2132,7 +2132,7 @@ void AFLOW_monitor_VASP(){  //CO20210601
   if(XHOST.vflag_control.flag("FILE")){
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " found FILE input: " << XHOST.vflag_control.getattachedscheme("FILE") << endl;}
     string FileNameLOCKmonitor=XHOST.vflag_control.getattachedscheme("FILE")+".monitor_vasp";
-    FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios::out);
+    FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app|std::ios::out);
     message << aflow::Banner("BANNER_NORMAL");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
     message << "Reading from FILE input: " << XHOST.vflag_control.getattachedscheme("FILE");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
@@ -2174,6 +2174,7 @@ void AFLOW_monitor_VASP(){  //CO20210601
           }
           if(directory==directory_old){ //increment, only wait 10 minutes for a new directory to be found
             message << "Already ran this directory (directory_old), waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            directory_old=""; //CO20221226 - reset just in case the monitor throws and we need to re-enter the same directory
             break;  //will break out of both for loops since found==true
           }
           if(aurostd::EFileExist(directory+"/"+DEFAULT_AFLOW_END_OUT)){ //increment, only wait 10 minutes for a new directory to be found
@@ -2197,12 +2198,12 @@ void AFLOW_monitor_VASP(){  //CO20210601
           //
           try{AFLOW_monitor_VASP(directory);}
           catch(aurostd::xerror& err){
-            FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app);
+            FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app|std::ios::out);
             pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), FileMESSAGE, oss, _LOGGER_ERROR_);
             FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
           }
           //
-          FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app);
+          FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app|std::ios::out);
           message << "Finished directory-specific monitoring: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           message << "Looking for the next run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           directory_old=directory;
@@ -2282,7 +2283,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   //output objects
   ofstream FileMESSAGE,FileMESSAGE_devnull;
   string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR;
-  FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
+  FileMESSAGE.open(FileNameLOCK.c_str(),std::ios_base::app|std::ios::out);
   bool oss_silent=true;
   ostream& oss=cout;if(oss_silent){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
 
