@@ -2409,6 +2409,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     //check vasp output file here
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
+    if(VERBOSE){message << "finished KBIN::VASP_ProcessWarnings()";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
 
     //check memory again, it's possible it floated above the threshold only for a second
     usage_percentage_ram=0.0;usage_percentage_swap=0.0;
@@ -2428,8 +2429,10 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       }
     }
 
+    if(VERBOSE){message << "checking if warnings were found";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     bool kill_vasp=false;
     if(xwarning.flag()){  //if any flag is on
+      if(VERBOSE){message << "found warnings";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
       kill_vasp=true;
       //the --monitor_vasp instance will not have the right ncpus set, so grab it from the LOCK
       GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);  //grab ncpus and set to kflags.KBIN_MPI_NCPUS
@@ -2451,6 +2454,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
     //double check that there isn't a new instance of vasp running
+    if(VERBOSE){message << "checking for new instance of vasp";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     nexecuting=0;
     vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
     for(i=0;i<vlines_lock_size;i++){
@@ -2463,6 +2467,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       nexecuting_old=nexecuting;
     }
 
+    if(VERBOSE){message << "checking if we need to kill vasp";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     if(kill_vasp){
       vasp_running=VASP_instance_running(vasp_bin,vasp_pgid);
       if(vasp_running){
