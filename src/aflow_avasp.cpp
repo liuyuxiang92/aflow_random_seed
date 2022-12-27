@@ -55,7 +55,8 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 
-#define _ICSD_DIRBASE_ "ICSD"
+#define _ICSD_DIRBASE_ "./ICSD" //CO20221024
+#define _AFLOWDATA_DIRBASE_ "./AFLOWDATA" //CO20221024
 
 #define _incarpad_ 48  //ME20181024
 
@@ -4842,7 +4843,7 @@ bool AVASP_MakeSinglePOSCAR(_xvasp& xvasp) {
 // ***************************************************************************
 bool AVASP_DefaultValuesBinary_AFLOWIN(_xvasp &xvasp) {
   xvasp.clear();
-  xvasp.AVASP_dirbase="./AFLOWDATA";
+  xvasp.AVASP_dirbase=_AFLOWDATA_DIRBASE_;  //CO20221024
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
   xvasp.AVASP_alpha_fix=FALSE;
   xvasp.AVASP_prototype_from_library_=TRUE;
@@ -5691,6 +5692,9 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
                 // if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")){AVASP_ADD_LDAU(xaus);}
                 if(1){AVASP_ADD_LDAU(xaus);}
                 if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")){AVASP_REMOVE_LDAU(xaus);}
+              }
+              if(XHOST.vflag_control.flag("AFLOW_DB_RUN")&&xaus.str.species.size()>0){  //CO20221024 - create database structure
+                aurostd::StringSubst(xaus.AVASP_dirbase,_AFLOWDATA_DIRBASE_,"./LIB"+aurostd::utype2string(xaus.str.species.size())+"/LIB");
               }
               if(!PARAMS->vparams.flag("AFLOWIN_FLAG::LIST")) {
                 if(!MULTITHREAD) {AVASP_MakeSingleAFLOWIN(xaus,!PARAMS->vparams.flag("AFLOWIN_FLAG::STDOUT"));}   // SINGLE_THREAD

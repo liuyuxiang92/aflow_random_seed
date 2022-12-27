@@ -1207,9 +1207,10 @@ namespace KBIN {
     // create lock immediately // CO20210901
     //[SD20220224 - OBSOLETE]aus << "touch " << aflags.Directory << "/" << _AFLOWLOCK_;
     if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_,false)){return FALSE;} // create LOCK link //SD20220224
-    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
-    aurostd::execute(aus);
-    aus.clear();aus.str(std::string());
+    //[CO20221024 - OBSOLETE as above]message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
+    //[CO20221024 - OBSOLETE as above]aurostd::execute(aus);
+    //[CO20221024 - OBSOLETE as above]aus.clear();aus.str(std::string());
+    aurostd::StringstreamClean(aus);
 
     // ---------------------------------------------------------------------------
     //Changing the run directory from the "original" to a "new" directory
@@ -1227,7 +1228,7 @@ namespace KBIN {
 
     // ---------------------------------------------------------------------------
     // copy aflow.in to new directory
-    aus << "cp " << directory_orig << "/"+_AFLOWIN_+" " << aflags.Directory;
+    aus << "cp " << aurostd::CleanFileName(directory_orig+"/"+_AFLOWIN_) << " " << aflags.Directory;
     message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
 
     if(LDEBUG){ cerr << __AFLOW_FUNC__ << " new full directory " << aflags.Directory << endl; }
@@ -1250,10 +1251,21 @@ namespace KBIN {
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||  //CO20221027
+        FALSE){
+      //CO20221027 - $HOME and $WORKDIR are for very specific environments
+      //$HOME_AFLOW and $WORK_HOME can be generalized for any system
+      string subdirectory_orig = aurostd::getenv2string("HOME_AFLOW");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)
+      string subdirectory_new = aurostd::getenv2string("WORK_AFLOW"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003/004)
+      if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+          aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
+          aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004")){
-
-      string subdirectory_orig = aurostd::execute2string("echo $HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003)
-      string subdirectory_new = aurostd::execute2string("echo $WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003)
+        subdirectory_orig = aurostd::getenv2string("HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)
+        subdirectory_new = aurostd::getenv2string("WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003/004)
+      }
+      if(subdirectory_orig.empty()||subdirectory_new.empty()){return;}  //CO20221027
       if(!KBIN::MoveRun2NewDirectory(aflags, subdirectory_orig, subdirectory_new)){return;}
     }
 

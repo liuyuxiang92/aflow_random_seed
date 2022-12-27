@@ -733,7 +733,6 @@ namespace init {
     if(XHOST.vflag_control.flag("FILE")) XHOST.vflag_control.push_attached("FILE",file);
     if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl;
 
-
     // VFILES NEEDS A SPECIAL TREATMENT
     string dirs_default="xxxx",dirs=dirs_default;
     vector<string> vdir;
@@ -893,6 +892,8 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"REMOVE\")=" << XHOST.vflag_control.flag("REMOVE") << endl;
     XHOST.vflag_control.flag("ZIP",aurostd::args2flag(XHOST.argv,cmds,"--zip")); 
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ZIP\")=" << XHOST.vflag_control.flag("ZIP") << endl;
+    XHOST.vflag_control.flag("AFLOW_DB_RUN",aurostd::args2flag(XHOST.argv,cmds,"--aflow_db_run|--aflowdbrun"));   //CO20221024 - creates ./LIB4/LIB instead of ./AFLOWDATA dir_base
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_DB_RUN\")=" << XHOST.vflag_control.flag("AFLOW_DB_RUN") << endl;  //CO20221024
 
     //  XHOST.vflag_control.flag("PRINT_MODE::EPS",aurostd::args2flag(XHOST.argv,cmds,"--print=eps|--print=eps"));
     XHOST.vflag_control.flag("PRINT_MODE::EPS",TRUE); // default
@@ -1992,7 +1993,7 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){
 // processFlagsFromLOCK
 // ***************************************************************************
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed){  //CO20210315
-  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || XHOST.DEBUG);
 
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
@@ -2118,7 +2119,7 @@ void AFLOW_monitor_VASP(){  //CO20210601
   //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
   //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
   //this function will keep reading the --FILE input for new directories
-  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || XHOST.DEBUG);
 
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
@@ -2133,7 +2134,7 @@ void AFLOW_monitor_VASP(){  //CO20210601
     string FileNameLOCKmonitor=XHOST.vflag_control.getattachedscheme("FILE")+".monitor_vasp";
     FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios::out);
     message << aflow::Banner("BANNER_NORMAL");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
-    message << "Reading from FILE input: " << XHOST.vflag_control.getattachedscheme("FILE");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "Reading from FILE input: " << XHOST.vflag_control.getattachedscheme("FILE");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
     string file=XHOST.vflag_control.getattachedscheme("FILE");
     string file_dir=aurostd::dirname(file);
@@ -2142,55 +2143,81 @@ void AFLOW_monitor_VASP(){  //CO20210601
     bool found=false;
     string search_str="[dir=";
     string directory_old="";
-    message << "NCOUNTS_WAIT_MONITOR=" << NCOUNTS_WAIT_MONITOR;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "NCOUNTS_WAIT_MONITOR=" << NCOUNTS_WAIT_MONITOR;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
-      message << "TOP OF WHILE LOOP: nfailures=" << nfailures << "; nsuccesses=" << nsuccesses;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+      message << "TOP OF WHILE LOOP: nfailures=" << nfailures << "; nsuccesses=" << nsuccesses;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       if(!aurostd::FileExist(file)){
-        message << "FILE not yet found, waiting...: FILE=" << file;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "FILE not yet found, waiting...: FILE=" << file;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " FILE not yet found, waiting...: FILE=" << file << endl;}
         nfailures++;  //increment, only wait 10 minutes for a file to be written
         aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
         continue;
       }
-      message << "FILE found: FILE=" << file << ", now reading";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+      message << "FILE found: FILE=" << file << ", now reading";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       nfailures=0;  //reset
       vlines_size=aurostd::file2vectorstring(file,vlines);
       found=false;
       for(i=vlines_size-1;i<vlines_size&&!found;i--){ //go backwards
         //looking for "... - [dir=.] - [user=aflow] ..."
         if(vlines[i].find(search_str)==string::npos){continue;}
-        message << "Found line containing \"" << search_str << "\": " << vlines[i];pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "Found line containing \"" << search_str << "\": " << vlines[i];pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
         for(j=0;j<vtokens_size&&!found;j++){
           if(vtokens[j].find(search_str)==string::npos){continue;}
           directory=vtokens[j];
           aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
-          found=true;
-          message << "dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+          found=true; //found does NOT mean run, it means it found a legitimate directory, and if this directory does not pass the following tests, we need to issue sleep and wait for aflow to find a good directory
+          message << "Parsed out dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          if(!aurostd::FileExist(directory+"/"+_AFLOWIN_)){ //increment, only wait 10 minutes for a new directory to be found
+            message << "No " << _AFLOWIN_ << " found, waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            break;  //will break out of both for loops since found==true
+          }
           if(directory==directory_old){ //increment, only wait 10 minutes for a new directory to be found
-            message << "Already ran this directory, waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
-            continue;
+            message << "Already ran this directory (directory_old), waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            break;  //will break out of both for loops since found==true
+          }
+          if(aurostd::EFileExist(directory+"/"+DEFAULT_AFLOW_END_OUT)){ //increment, only wait 10 minutes for a new directory to be found
+            message << "Already ran this directory (" << DEFAULT_AFLOW_END_OUT << "), waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            break;  //will break out of both for loops since found==true
+          }
+          if(aurostd::EFileExist(directory+"/"+_STOPFLOW_)){  //increment, only wait 10 minutes for a new directory to be found
+            aurostd::RemoveFile(directory+"/"+_STOPFLOW_);
+            message <<  _STOPFLOW_ << " file issued, removing and skipping this directory, waiting...: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            break;  //will break out of both for loops since found==true
           }
           if(!aurostd::getenv2string("HOME_AFLOW").empty()&&!aurostd::getenv2string("WORK_AFLOW").empty()){ //CO20221123 - run scheme which copies aflow.in from HOME_AFLOW to WORK_AFLOW to run
             if(directory.find(aurostd::getenv2string("HOME_AFLOW"))!=string::npos){ //increment, only wait 10 minute for a directory NOT in HOME_AFLOW
-              message << "Trying to run inside HOME_AFLOW, avoid dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
-              continue;
+              message << "Avoiding runs inside HOME_AFLOW, waiting...: dir==" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+              break;  //will break out of both for loops since found==true
             }
           }
-          message << "Found directory to run: dir=" << directory << ", passing off to run-specific logger";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+          message << "Found directory to run: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          message << "Passing off to directory-specific monitor";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
+          //
+          try{AFLOW_monitor_VASP(directory);}
+          catch(aurostd::xerror& err){
+            FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app);
+            pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), FileMESSAGE, oss, _LOGGER_ERROR_);
+            FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
+          }
+          //
+          FileMESSAGE.open(FileNameLOCKmonitor.c_str(),std::ios_base::app);
+          message << "Finished directory-specific monitoring: dir=" << directory;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          message << "Looking for the next run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           directory_old=directory;
-          nsuccesses=0; //reset
-          AFLOW_monitor_VASP(directory);
+          nsuccesses=-1; //reset - -1 ensures the ++ below goes to 0, not 1
+          break;  //will break out of both for loops since found==true
         }
       }
       nsuccesses++;
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){
-        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         break;
       }
       if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){
-        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);
         break;
       }
@@ -2199,15 +2226,16 @@ void AFLOW_monitor_VASP(){  //CO20210601
 
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){
-        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "Found " << DEFAULT_AFLOW_END_OUT << " in dir=" << file_dir << ", breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         break;
       }
       if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){
-        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_RAW_);
+        message << "Found " << _STOPFLOW_ << " in dir=" << file_dir << ", removing " << _STOPFLOW_ << " and breaking out of while-loop";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);
         break;
       }
     }
+    FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
   }
   else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " found DIRECTORY input: " << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << endl;}
@@ -2287,7 +2315,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
-  bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
+  bool VERBOSE=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || XHOST.DEBUG);
   bool vasp_running=false;
   uint vlines_lock_size=0;
   vector<string> vlines_lock;

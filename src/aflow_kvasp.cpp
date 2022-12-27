@@ -3126,7 +3126,7 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 
 namespace KBIN {
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){ //CO20210315
-    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
 
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " xRequiresAccuracy.flag(\"" << scheme << "\")=" << xRequiresAccuracy.flag(scheme) << endl;
@@ -3148,35 +3148,16 @@ namespace KBIN {
     return VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE) { //CO20210315
-    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     stringstream aus;
     bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
 
-    if(!aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_VASP_OUT)){return;}
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
     bool vasp_monitor_running=AFLOW_MONITOR_instance_running(aflags);
 
-    long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
-    unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
-    if(VERBOSE){
-      aus << "00000  MESSAGE time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(__AFLOW_FILE__,aflags) << endl;
-      if(LDEBUG){cerr << aus.str();}
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << "00000  MESSAGE size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(__AFLOW_FILE__,aflags) << endl;
-      if(LDEBUG){cerr << aus.str();}
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    }
-
-    //CO20210315 - reading the full vasp.out does not work
-    //vasp can spit out so many warnings that the file can be >50GB, killing aflow's memory
-    //the subprocess is really the fastest way to grep (regex support)
-    //even better than reading the file line by line and processing string (toupper, remove white spaces, etc.)
-    //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
-    //better to read file in once
-    //[CO20210315 - does not work for big files]string content_vasp_out=aurostd::file2string(xvasp.Directory+"/"+DEFAULT_VASP_OUT);  //no "comments" to remove in this output file
-    //[CO20210315 - does not work for big files]content_vasp_out=aurostd::RemoveWhiteSpaces(content_vasp_out);  //remove whitespaces
-    //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //DO BEFORE PROCESSING OUTPUT FILES - START
 
     //do memory check
     double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
@@ -3254,6 +3235,37 @@ namespace KBIN {
     unsigned long long int grep_stop_condition=AUROSTD_MAX_ULLINT;
     if(vasp_monitor_running && vasp_still_running){grep_stop_condition=BYTES_MAX_VASP_OUT;} //no stop condition when vasp is not running, we must process the errors
 
+    //DO BEFORE PROCESSING OUTPUT FILES - STOP
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    if(aurostd::FileEmpty(xvasp.Directory+"/"+DEFAULT_VASP_OUT)||aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")){  //failed to start
+      xwarning.clear(); //CO20210315 - very important to clear!
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " failed start" << Message(__AFLOW_FILE__,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      xwarning.flag("FAILED_START",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
+      return;
+    }
+
+    long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
+    unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    if(VERBOSE){
+      aus << "00000  MESSAGE time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(__AFLOW_FILE__,aflags) << endl;
+      if(LDEBUG){cerr << aus.str();}
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(__AFLOW_FILE__,aflags) << endl;
+      if(LDEBUG){cerr << aus.str();}
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
+    
+    //CO20210315 - reading the full vasp.out does not work
+    //vasp can spit out so many warnings that the file can be >50GB, killing aflow's memory
+    //the subprocess is really the fastest way to grep (regex support)
+    //even better than reading the file line by line and processing string (toupper, remove white spaces, etc.)
+    //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
+    //better to read file in once
+    //[CO20210315 - does not work for big files]string content_vasp_out=aurostd::file2string(xvasp.Directory+"/"+DEFAULT_VASP_OUT);  //no "comments" to remove in this output file
+    //[CO20210315 - does not work for big files]content_vasp_out=aurostd::RemoveWhiteSpaces(content_vasp_out);  //remove whitespaces
+    //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
+    
     //CO20210315 - might consider "renice 20 -p VASP_PIDs" to give greps below priority
 
     bool renice=false;
@@ -3841,7 +3853,7 @@ namespace KBIN {
     return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_Error2Fix(const string& error,const string& mode,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     stringstream aus;
 
     if(LDEBUG){aus << __AFLOW_FUNC__ << " [CHECK " << error << " PROBLEMS]" << Message(__AFLOW_FILE__,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -3897,6 +3909,9 @@ namespace KBIN {
     for(i=0;i<2&&fixed_applied==false;i++){ //for loop goes twice, once with try_last_ditch_efforts==false, then again with ==true
       try_last_ditch_efforts=(i==1);
 
+      //CO20221217 - fix this first as there is no data to analyze otherwise
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("FAILED_START","RESTART_CALC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      
       //check NBANDS/LRF_COMMUTATOR problems immediately
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NBANDS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -4131,6 +4146,7 @@ namespace KBIN {
           aus_exec << "cd " << xvasp.Directory << endl;
           aus_exec << "rm -f " << DEFAULT_VASP_OUT << endl;
           if(kflags.KBIN_MPI==FALSE) {
+            if(!aurostd::FileExist(kflags.KBIN_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, kflags.KBIN_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
             aus << "00000  MESSAGE SERIAL job - [" << xvasp.str.atoms.size() << "atoms]" << Message(__AFLOW_FILE__,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             aus_exec << kflags.KBIN_BIN << " > " << DEFAULT_VASP_OUT << endl;
@@ -4149,6 +4165,7 @@ namespace KBIN {
             }
             // NO HOST ------------------------------------------------------------------------
             if(!aflags.AFLOW_MACHINE_LOCAL.flag()) {
+              if(!aurostd::FileExist(kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               aus << "00000  MESSAGE" << VASP_KEYWORD_EXECUTION;
               if(!kflags.KBIN_MPI_OPTIONS.empty()){
                 aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -4170,6 +4187,7 @@ namespace KBIN {
             }
             // HOST DUKE_BETA_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_BETA_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_MPICH << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4184,6 +4202,7 @@ namespace KBIN {
             // HOST DUKE_BETA_OPENMPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {
               if(!aurostd::substring2bool(kflags.KBIN_MPI_BIN,"_openmpi")) kflags.KBIN_MPI_BIN=kflags.KBIN_MPI_BIN+"_openmpi"; // fix the OPENMPI
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_BETA_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_OPENMPI << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4197,6 +4216,7 @@ namespace KBIN {
             }
             // HOST DUKE_QRATS_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_QRATS_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QRATS_MPICH << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4210,6 +4230,7 @@ namespace KBIN {
             }
             // HOST DUKE_QFLOW_OPENMPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_QFLOW_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4224,6 +4245,7 @@ namespace KBIN {
             //CO20201220 X START
             // HOST DUKE_X_X ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_X")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_X_X+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_X_X+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_X_X << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_X_X << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4236,6 +4258,7 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_CRAY")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_X_CRAY+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_X_CRAY+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_X_CRAY << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_X_CRAY << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4248,6 +4271,7 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_OLDCRAY")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_X_OLDCRAY+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_X_OLDCRAY+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_X_OLDCRAY << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_X_OLDCRAY << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4260,6 +4284,7 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_SMB")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_X_SMB+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_X_SMB+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_X_SMB << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_X_SMB << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4275,6 +4300,7 @@ namespace KBIN {
             //CO20220818 JHU_ROCKFISH START
             // HOST JHU_ROCKFISH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_JHU_ROCKFISH+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_JHU_ROCKFISH+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_JHU_ROCKFISH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_JHU_ROCKFISH << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4289,6 +4315,7 @@ namespace KBIN {
             //CO20220818 JHU_ROCKFISH STOP
             // HOST MPCDF_EOS_MPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               int local_NCPUS=kflags.KBIN_MPI_NCPUS;
               if(MPI_NCPUS_MPCDF_EOS>0) {
@@ -4319,6 +4346,7 @@ namespace KBIN {
             }
             // HOST MPCDF_DRACO_MPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               int local_NCPUS=kflags.KBIN_MPI_NCPUS;
               if(MPI_NCPUS_MPCDF_DRACO>0) {
@@ -4349,6 +4377,7 @@ namespace KBIN {
             }
             // HOST MPCDF_COBRA_MPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization 
               int local_NCPUS=kflags.KBIN_MPI_NCPUS;
               if(MPI_NCPUS_MPCDF_COBRA>0) {
@@ -4379,6 +4408,7 @@ namespace KBIN {
             }
             // HOST MPCDF_HYDRA_MPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization 
               int local_NCPUS=kflags.KBIN_MPI_NCPUS;
               if(MPI_NCPUS_MPCDF_HYDRA>0) {
@@ -4412,6 +4442,7 @@ namespace KBIN {
             //DX20190509 - MACHINE001 - START
             // HOST MACHINE001_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE001 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE001 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4426,6 +4457,7 @@ namespace KBIN {
             //DX20190509 - MACHINE002 - START
             // HOST MACHINE002_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE002 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE002 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4440,6 +4472,7 @@ namespace KBIN {
             //DX20201005 - MACHINE003 - START
             // HOST MACHINE003_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE003 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE003 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4454,6 +4487,7 @@ namespace KBIN {
             //DX20211011 - MACHINE004 - START
             // HOST MACHINE004_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE004+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE004+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE004 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE004 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4467,6 +4501,7 @@ namespace KBIN {
             //DX20211011 - MACHINE004 - END
             // HOST DUKE_MATERIALS ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_MATERIALS << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_MATERIALS << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4479,6 +4514,7 @@ namespace KBIN {
             }
             // HOST DUKE_AFLOWLIB ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_AFLOWLIB << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_AFLOWLIB << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4491,6 +4527,7 @@ namespace KBIN {
             }
             // HOST DUKE_HABANA ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_DUKE_HABANA << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_HABANA << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4503,6 +4540,7 @@ namespace KBIN {
             }
             // HOST FULTON_MARYLOU ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_FULTON_MARYLOU << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_FULTON_MARYLOU << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name
@@ -4517,6 +4555,7 @@ namespace KBIN {
             }
             // HOST CMU_EULER ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_CMU_EULER << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_CMU_EULER << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4529,6 +4568,7 @@ namespace KBIN {
             }
             // HOST OL ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE2 << " " << MPI_BINARY_DIR_MACHINE2 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4541,6 +4581,7 @@ namespace KBIN {
             }
             // HOST HOST1 ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE1 << " " << MPI_BINARY_DIR_MACHINE1 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
@@ -4588,10 +4629,12 @@ namespace KBIN {
       KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,false);  //CO20201111 - try twice and NO verbose, we verbose in bigger VASP_Run() loop
       if(LDEBUG){aus << __AFLOW_FUNC__ << " [2]" << Message(__AFLOW_FILE__,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
+      if(false){  //CO20221217 - attempting to RESTART_CALC first, perhaps NFS didn't catch up with the run
       if(aurostd::FileEmpty(xvasp.Directory+"/"+DEFAULT_VASP_OUT))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty "+DEFAULT_VASP_OUT+Message(__AFLOW_FILE__,aflags));return FALSE;}
       if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty OUTCAR"+Message(__AFLOW_FILE__,aflags));return FALSE;}
       // DONT CHECK CONTCAR it can be empty
       // DONT CHECK OSZICAR it can be empty
+      }
 
       // update kpoints table
 
@@ -4605,10 +4648,12 @@ namespace KBIN {
       xmessage.clear(); //CO20210315
 
       // check VASP version
+      if(!aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")){
       string SVERSION=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR"); //CO20210315
       double DVERSION=KBIN::VASPVersionString2Double(SVERSION); //CO20210315
       xmessage.push_attached("SVERSION",SVERSION);  //CO20210315 - put to xmessage
       xmessage.push_attached("DVERSION",aurostd::utype2string(DVERSION)); //CO20210315 - put to xmessage
+      }
 
       //get algo_current - START
       KBIN::VASP_Reread_INCAR(xvasp);
@@ -5216,7 +5261,7 @@ namespace KBIN {
     return NELM;
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
-    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     ifstream FileOSZICAR;
     FileOSZICAR.open(oszicar.c_str(),std::ios::in);
     string tmp=aurostd::kvpair2string(FileOSZICAR,"DAV",":",-1);
@@ -5286,7 +5331,7 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {  //CO20210601
     //this function only looks at the last electronic SC step (different than VASP_OSZICARUnconverging, good for STATIC calcs)
     //if it is unconverged, return true
-    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     uint NELM=KBIN::VASP_getNELM(outcar);
     uint NSTEPS=KBIN::VASP_getNSTEPS(oszicar);
     if(LDEBUG){
