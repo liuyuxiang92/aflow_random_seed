@@ -1261,7 +1261,7 @@ namespace KBIN {
       if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
-        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004")){
+          aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004")){
         subdirectory_orig = aurostd::getenv2string("HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)
         subdirectory_new = aurostd::getenv2string("WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003/004)
       }

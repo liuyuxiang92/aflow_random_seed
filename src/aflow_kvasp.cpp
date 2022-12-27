@@ -428,7 +428,7 @@ namespace KBIN {
     kflags.KBIN_POCC=FALSE;
     kflags.KBIN_POCC_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC",TRUE) && (aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE",TRUE) && aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",TRUE)); //CO20180419
     if(kflags.KBIN_POCC_CALCULATION) {
-      aus << "00000  MESSAGE POCC_CALCULATION "  << Message(__AFLOW_FILE__,aflags) << endl;
+      aus << "00000  MESSAGE POCC_CALCULATION " << Message(__AFLOW_FILE__,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
     }
     if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} //CO20180419
@@ -4630,10 +4630,10 @@ namespace KBIN {
       if(LDEBUG){aus << __AFLOW_FUNC__ << " [2]" << Message(__AFLOW_FILE__,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
       if(false){  //CO20221217 - attempting to RESTART_CALC first, perhaps NFS didn't catch up with the run
-      if(aurostd::FileEmpty(xvasp.Directory+"/"+DEFAULT_VASP_OUT))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty "+DEFAULT_VASP_OUT+Message(__AFLOW_FILE__,aflags));return FALSE;}
-      if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty OUTCAR"+Message(__AFLOW_FILE__,aflags));return FALSE;}
-      // DONT CHECK CONTCAR it can be empty
-      // DONT CHECK OSZICAR it can be empty
+        if(aurostd::FileEmpty(xvasp.Directory+"/"+DEFAULT_VASP_OUT))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty "+DEFAULT_VASP_OUT+Message(__AFLOW_FILE__,aflags));return FALSE;}
+        if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty OUTCAR"+Message(__AFLOW_FILE__,aflags));return FALSE;}
+        // DONT CHECK CONTCAR it can be empty
+        // DONT CHECK OSZICAR it can be empty
       }
 
       // update kpoints table
@@ -4649,10 +4649,10 @@ namespace KBIN {
 
       // check VASP version
       if(!aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")){
-      string SVERSION=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR"); //CO20210315
-      double DVERSION=KBIN::VASPVersionString2Double(SVERSION); //CO20210315
-      xmessage.push_attached("SVERSION",SVERSION);  //CO20210315 - put to xmessage
-      xmessage.push_attached("DVERSION",aurostd::utype2string(DVERSION)); //CO20210315 - put to xmessage
+        string SVERSION=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR"); //CO20210315
+        double DVERSION=KBIN::VASPVersionString2Double(SVERSION); //CO20210315
+        xmessage.push_attached("SVERSION",SVERSION);  //CO20210315 - put to xmessage
+        xmessage.push_attached("DVERSION",aurostd::utype2string(DVERSION)); //CO20210315 - put to xmessage
       }
 
       //get algo_current - START
