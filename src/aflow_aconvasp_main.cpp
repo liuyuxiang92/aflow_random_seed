@@ -14649,9 +14649,15 @@ namespace pflow {
       init::ErrorOption(options,__AFLOW_FUNC__,"aflow --volume[|*|+]=x < POSCAR");
     }
     xstructure a(input,IOAFLOW_AUTO);
-    if(tokens.at(0)=="VOLUME::EQUAL") a=SetVolume(a,aurostd::string2utype<double>(tokens.at(1)));
-    if(tokens.at(0)=="VOLUME::MULTIPLY_EQUAL") a=SetVolume(a,a.Volume()*aurostd::string2utype<double>(tokens.at(1)));
-    if(tokens.at(0)=="VOLUME::PLUS_EQUAL") a=SetVolume(a,a.Volume()+aurostd::string2utype<double>(tokens.at(1)));
+    //CO20221228 - adding auto setting
+    const string& key=tokens[0];
+    const string& value=tokens[1];
+    double coef=1.0;
+    if(aurostd::isfloat(value)){coef=aurostd::string2utype<double>(value);}
+    if(key=="VOLUME::EQUAL") a=SetVolume(a,coef);
+    if(key=="VOLUME::MULTIPLY_EQUAL") a=SetVolume(a,a.Volume()*coef);
+    if(key=="VOLUME::PLUS_EQUAL") a=SetVolume(a,a.Volume()+coef);
+    if(aurostd::toupper(value)=="AUTO") a.SetAutoVolume(true);
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;  
     return a;
   }
