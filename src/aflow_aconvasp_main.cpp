@@ -1472,9 +1472,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.push_attached("ADISP::DIRECTORY", XHOST.vflag_control.getattachedscheme("DIRECTORY"));
   }
 
-  vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");
-  vpflow.args2addattachedscheme(argv,cmds,"VOLUME::MULTIPLY_EQUAL","--volume*=","");
-  vpflow.args2addattachedscheme(argv,cmds,"VOLUME::PLUS_EQUAL","--volume+=","");
+  vpflow.flag("VOLUME::GET", aurostd::args2flag(argv,cmds,"--volume|--vol"));  //CO20221228 - just return back volume of structure
+  if(!vpflow.flag("VOLUME::GET")){  //CO20221228
+    vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");
+    vpflow.args2addattachedscheme(argv,cmds,"VOLUME::MULTIPLY_EQUAL","--volume*=","");
+    vpflow.args2addattachedscheme(argv,cmds,"VOLUME::PLUS_EQUAL","--volume+=","");
+  }
 
   //[CO20200404 - refer to XHOST]vpflow.flag("WWW",aurostd::args2flag(argv,cmds,"--web|--www|--http"));
   vpflow.flag("WYCKOFF",aurostd::args2flag(argv,cmds,"--wyckoff|--wy"));
@@ -2159,6 +2162,7 @@ namespace pflow {
       // V
       //[CO20220614 - moved up]if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
+      if(vpflow.flag("VOLUME::GET")) {xstructure a(cin,IOAFLOW_AUTO);cout << a.GetVolume() << endl; _PROGRAMRUN=true;}  //CO20221228
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 
