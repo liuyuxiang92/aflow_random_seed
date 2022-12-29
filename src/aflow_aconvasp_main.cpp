@@ -2162,7 +2162,7 @@ namespace pflow {
       // V
       //[CO20220614 - moved up]if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
-      if(vpflow.flag("VOLUME::GET")) {xstructure a(cin,IOAFLOW_AUTO);cout << a.GetVolume() << endl; _PROGRAMRUN=true;}  //CO20221228
+      if(vpflow.flag("VOLUME::GET")) {xstructure a(cin,IOAFLOW_AUTO);cout << a.GetVolume() << " \\AA" << endl; _PROGRAMRUN=true;}  //CO20221228
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 
