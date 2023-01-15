@@ -2353,6 +2353,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
   //SD20220602 - check that an OUTCAR is produced on the initial launch of vasp
   if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
+    //be patient, might be issue of NFS
+    if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds, waiting for \"" << vasp_bin << "\" to start running and create a new OUTCAR file";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    aurostd::Sleep(sleep_seconds); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
+  }
+  if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
+    //we were patient, now we have a problem
     string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
     if(VERBOSE){message << "ls:" << endl << aurostd::execute2string("ls -l "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     message << "initial launch of vasp did not produce an OUTCAR file; killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
