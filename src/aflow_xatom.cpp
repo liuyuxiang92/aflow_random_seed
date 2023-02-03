@@ -3278,7 +3278,23 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOVASP_AUTO)    oss << a.title <<endl; // << " (AUTO) " << endl;
     if(a_iomode==IOVASP_POSCAR)  oss << a.title <<endl; // << " (POSCAR) " << endl;
     if(a_iomode==IOVASP_ABCCAR)  oss << a.title <<endl; // << " (ABCCAR) " << endl;
-    if(a_iomode==IOVASP_WYCKCAR) oss << a.title << "| SG: " << GetSpaceGroupName(a.space_group_ITC,a.directory) << " " << a.space_group_ITC << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
+    //DX20221128 - START
+    if(a_iomode==IOVASP_WYCKCAR) {
+      oss << a.title << "| SG: ";
+      // check if space group has been calculated, otherwise GetSpaceGroupName() could fail //DX20221128
+      try {
+        oss << GetSpaceGroupName(a.space_group_ITC,a.directory) << " " << a.space_group_ITC << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
+      }
+      catch(aurostd::xerror& re){ 
+        try {
+          oss << GetSpaceGroupName(a.spacegroupnumber,a.directory) << " " << a.spacegroupnumber << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
+        }
+        catch(aurostd::xerror& re){ 
+          if(LDEBUG){ message << "Cannot determine space group name" << endl; }
+        }
+      }
+    }
+    //DX20221128 - STOP
     if(a.neg_scale==FALSE || a_iomode==IOVASP_WYCKCAR) { //DX20210708 - wyccar should always use scale factor
       oss.precision(6);  //DM
       oss << a.scale; // << endl; //CO20170630
@@ -4269,6 +4285,10 @@ bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b) {
   // if types the same, sort by letter
   else if(a.type==b.type){
     if(a.letter<b.letter){ return true; }
+    else if(a.letter==b.letter){ //DX20230129 - if the letter is the same
+      if(a.parameter_index<b.parameter_index) { return true; } //DX20230130 - check the parameter index
+      else { return false; } //DX20230130 - otherwise do not change order
+    }
     else { return false; }
   }
   return false;

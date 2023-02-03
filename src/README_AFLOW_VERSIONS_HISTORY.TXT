@@ -10,6 +10,8 @@
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
         -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
+        -- fixed printing of Wyccar to check if the space group has been calculated (DX)
+        -- added tie-breaker scheme to choose AFLOW prototype that is most alphabetical from left-to-right (DX)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)
