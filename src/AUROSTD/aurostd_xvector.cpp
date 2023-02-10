@@ -3288,6 +3288,85 @@ namespace aurostd {
       return (utype)1.4826*q2;  //b = 1/Q(0.75), where Q(0.75) is the 0.75 quantile of that underlying distribution, this assumes NORMAL
     }
 }
+<<<<<<< Updated upstream
+=======
+
+// ***************************************************************************
+// binning vector 
+// ----------------------------------------------------------------------------
+
+namespace aurostd {
+  /// @brief generates histogram of vector 
+  ///
+  /// it is implemented in the style of numpy where the min and max is used to calculate
+  /// a linear range of bins and the bins are closed on the left and open on the right,
+  /// meaning the bins can be expressed as the half open interval [left_edge, right_edge)
+  /// or if (left_edge <= x < right_edge) == x_is_in_bin == true. The exception to this
+  /// is the endpoints where the right edge is included. One can also pass a min and max
+  /// value into the function and the function will use those values to calculate the bins
+  /// 
+  /// @param number of bins 
+  ///
+  /// @return xvector of bin edges and counts 
+  ///
+  /// @authors
+  /// @mod{AZ,2023,created function}
+  template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins, double minimum_data, double maximum_data) {
+    if (bins <= 0) {
+      string message = "Number of bins must be greater than zero";
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    xvector<double> edges(bins); // edges
+    xvector<double> counts(bins); // counts in bin
+    int bincount; // min data point
+    int bin_index; // min data point
+    double left_edge;// left edge of bin
+    double right_edge;// right edge of bin 
+    double data_point;// data point
+    edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
+							        
+    cerr << "first edge" << endl;
+    cerr << edges[0] << endl;
+    cerr << "second edge" << endl;
+    cerr << edges[1] << endl;
+    double width = edges[1]-edges[0];
+
+    for(int j = 1; j < data.rows; j++){
+	cerr << "data point"<< endl;
+	cerr << data[j] << endl;
+	cerr << "width"<< endl;
+	cerr << width << endl;
+	cerr << bin_index << endl;
+        bin_index = std::floor(data[j]/width);
+	// convert to double
+	cerr << bin_index << endl;
+	counts[bin_index]++; 
+    }
+    vector<xvector<double> > v;
+    v.push_back(counts);
+    v.push_back(edges);
+    return v;
+  }
+  template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
+    if (bins <= 0) {
+      string message = "Number of bins must be greater than zero";
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    double minimum_data = min(data); // min data point
+    double maximum_data = max(data); // min data point
+    vector<xvector<double> > v;
+    cerr << "here" << endl;
+    v = histogram(data, bins, minimum_data, maximum_data);
+    return v;
+}
+
+template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);
+//template vector<xvector<double> > histogram(const xvector<utype>& data, uint bins, double min, double max);
+//template vector<xvector <float> > histogram(const xvector<float>& data, uint bins);
+}
+
+
+>>>>>>> Stashed changes
 // ----------------------------------------------------------------------------
 // ----------------------------------------- implementation for extra data type
 #define DEBUG_CONVOLUTION 0
