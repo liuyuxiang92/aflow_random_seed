@@ -314,10 +314,6 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<uint> vii; //CO20190622
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
-<<<<<<< Updated upstream
-=======
-  //histogram(xvd,2);  //AZ20230205
->>>>>>> Stashed changes
   aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  //ME20200327
   vxu=aurostd::mod_floored(vxu,(utype)1); //SD20220117
 

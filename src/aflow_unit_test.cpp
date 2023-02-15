@@ -896,6 +896,19 @@ namespace unittest {
     expected_xvecdbl = {1.0, 1.375, 1.75, 2.125, 2.5};
     calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | histogram //AZ20230213
+    // ---------------------------------------------------------------------------
+    vector<xvector<double> > out_xvecdbl;
+    
+    xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
+
+    out_xvecdbl = aurostd::histogram(in_xvecdbl, 5);
+//    for (auto i: out_xvecdbl){
+//        cerr << i << endl;
+//    }
+    out_xvecdbl = aurostd::histogram(in_xvecdbl, 10000, 1);
   }
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
@@ -1108,18 +1121,6 @@ namespace unittest {
       checkEqual(smat, hsmat, check_function, check_description, passed_checks, results);
     }
 
-    // ---------------------------------------------------------------------------
-    // Check | histogram //AZ20230213
-    // ---------------------------------------------------------------------------
-    vector<xvector<double> > out_xvecdbl;
-    
-    xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
-
-    out_xvecdbl = aurostd::histogram(in_xvecdbl, 5);
-//    for (auto i: out_xvecdbl){
-//        cerr << i << endl;
-//    }
-    out_xvecdbl = aurostd::histogram(in_xvecdbl, 10000, 1);
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
