@@ -870,7 +870,7 @@ namespace xthread {
   template void xthread::xThread::run<
     std::function<void (
         uint,
-        vector<string>&,
+        const vector<string>&,
         const aurostd::xoption&,
         const _aflags&,
         vector<uint>&,
@@ -884,7 +884,7 @@ namespace xthread {
       >(uint,
           std::function<void (
             uint,
-            vector<string>&,
+            const vector<string>&,
             const aurostd::xoption&,
             const _aflags&,
             vector<uint>&,

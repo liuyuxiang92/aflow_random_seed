@@ -210,6 +210,7 @@ namespace chull {
 
       //for organization of points
       uint m_i_coord_group;
+      bool m_found_icsd;
       uint m_i_icsd;                    //index of equivalent icsd in m_points
 
       //stoich_coords only!
@@ -218,6 +219,8 @@ namespace chull {
       xvector<int> m_elements_present;  //1 if s_coords[i]>ZERO_TOL, zero otherwise, that way, nary=sum(m_elements_present)
 
       //calculate per hull
+      bool m_calculated_equivalent_entries; //equivalent entries have been calculated
+      vector<uint> m_equivalent_entries;    //equivalent entries
       bool m_is_on_hull;  //one max per coordgroup
       bool m_is_g_state;  //one max per coordgroup, must have m_entry (artificialMap())
       bool m_is_equivalent_g_state; //can be many, includes original g_state
@@ -336,6 +339,27 @@ namespace chull {
     bool m_sort_energy_ascending; //good for sorting points in facets (lower vs. upper hulls), if lower hull, then sort ascending (ground state is always first)
     bool operator() (const FacetPoint& fpi,const FacetPoint& fpj) const;
     bool operator() (const ChullPointLight& ci,const ChullPointLight& cj) const;  //upcasting is allowed, works for ChullPointLight and ChullPoint
+  };
+  //[CO20221111 - VERY SLOW]struct sortLIB2Entries: public xStream { //fixes issue with AFLUX
+  //[CO20221111 - VERY SLOW]  sortLIB2Entries(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_velements(velements) {;}
+  //[CO20221111 - VERY SLOW]  ~sortLIB2Entries() {xStream::free();}
+  //[CO20221111 - VERY SLOW]  const vector<string>& m_velements;
+  //[CO20221111 - VERY SLOW]  bool operator() (const aflowlib::_aflowlib_entry i_entry,const aflowlib::_aflowlib_entry j_entry) const;
+  //[CO20221111 - VERY SLOW]};
+  struct _aflowlib_entry_LIB2sorting: public xStream {  //for sorting LIB2 unaries
+    _aflowlib_entry_LIB2sorting(aflowlib::_aflowlib_entry& entry,uint index,vector<string>& velements_chull,ofstream& FileMESSAGE,ostream& oss);
+    ~_aflowlib_entry_LIB2sorting();
+    //
+    //[CO20221112 - no pointers]aflowlib::_aflowlib_entry* m_entry; //BE CAREFUL: this is a pointer, do not use out of scope
+    string m_auid;
+    string m_aurl;
+    string m_catalog;
+    string m_prototype;
+    uint m_nspecies;
+    uint m_index;
+    vector<string> m_velements_chull;  //BE CAREFUL: this is a pointer, do not use out of scope
+    vector<string> m_species_AURL;
+    bool operator<(const _aflowlib_entry_LIB2sorting& other) const;
   };
 } // namespace chull
 
@@ -500,8 +524,8 @@ namespace chull {
       vector<uint> m_sym_equivalent_g_states; //structure comparison
       double m_stability_criterion; //g-states only
       double m_n_plus_1_enthalpy_gain;     //g-states only
-      bool m_icsd_g_state;          //whether icsd exists among equivalent states
-      uint m_i_canonical_icsd;      //canonical icsd entry (lowest number)
+      bool m_found_icsd_g_state;          //whether icsd exists among equivalent states
+      uint m_i_icsd_g_state;      //canonical icsd entry (lowest number)
 
       friend class ConvexHull;  //ConvexHull defines everything!
     private:
@@ -737,7 +761,7 @@ namespace chull {
       xvector<double> getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred=frac_vrt) const;
       vector<uint> getAdjacentFacets(uint hull_member,bool ignore_hypercollinear=true,bool ignore_vertical=true,bool ignore_artificial=true) const;
       vector<vector<uint> > getEquilibriumPhases(uint hull_member) const;
-      vector<uint> getEquivalentGStates(uint g_state) const;
+      vector<uint> getEquivalentEntries(uint i_point) const;
       vector<uint> getSymEquivalentGStates(uint g_state) const;
       double getStabilityCriterion(const string& cauid) const;
       double getStabilityCriterion(uint cpoint) const;
@@ -874,8 +898,9 @@ namespace chull {
       bool energiesDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool spacegroupsDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool structuresEquivalent(uint i_point1,uint i_point2) const;
-      bool isICSD(uint i_point) const;
+      bool isICSD(uint i_point,uint& i_point_icsd) const;
       void setEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group);
+      void setEquivalentStates(uint i_nary,uint i_alloy,uint i_coord_group);
       void setSymEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group);
       void setOnHullProperties(uint i_nary,uint i_alloy);
       void storeHullData(uint i_nary,uint i_alloy);

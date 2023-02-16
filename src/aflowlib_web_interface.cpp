@@ -1402,6 +1402,12 @@ namespace aflowlib {
     stoich_a=AUROSTD_MAX_DOUBLE;stoich_b=AUROSTD_MAX_DOUBLE;
     bond_aa=AUROSTD_MAX_DOUBLE;bond_ab=AUROSTD_MAX_DOUBLE;bond_bb=AUROSTD_MAX_DOUBLE;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
+    //fixing species
+    if((species.empty()||vspecies.empty())&&!vspecies_pp.empty()){  //CO+HE20221110 - sometimes species is empty
+      species.clear();vspecies.clear();
+      for(uint i=0;i<vspecies_pp.size();i++){vspecies.push_back(vspecies_pp[i]);aurostd::VASP_PseudoPotential_CleanName_InPlace(vspecies.back());}
+      species=aurostd::joinWDelimiter(vspecies,",");
+    }
     // DONE
   }
 
@@ -4168,11 +4174,11 @@ namespace aflowlib {
 } // namespace aflowlib
 
 namespace aflowlib {
-  string _aflowlib_entry::getPathAURL(ostream& oss, bool load_from_common){ //CO20200404
+  string _aflowlib_entry::getPathAURL(ostream& oss, bool load_from_common) const { //CO20200404
     ofstream FileMESSAGE;
     return getPathAURL(FileMESSAGE, oss, load_from_common);
   }
-  string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common){  //CO20200404
+  string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common) const {  //CO20200404
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
     string path = "";
@@ -4235,54 +4241,96 @@ namespace aflowlib {
   /// @return directory path
   /// @authors
   /// @mod{SD,20221207,created}
-  string _aflowlib_entry::getPathDirectory(string filesystem_collection) {
+  string _aflowlib_entry::getPathDirectory(const string& filesystem_collection) {
     string path_full = DEFAULT_ENTRY_LOADER_FS_PATH + (*this).aurl.substr(28) + "/";
     path_full = std::regex_replace(path_full, aurostd::regex_aurl2file, "$1/" + filesystem_collection + "/");
     return path_full;
   }
-  vector<string> _aflowlib_entry::getSpeciesAURL(ostream& oss){ //CO20200404
-    ofstream FileMESSAGE;
-    return getSpeciesAURL(FileMESSAGE, oss);
+  vector<string> _aflowlib_entry::getSpecies() const{ //CO20221110
+    if(!vspecies.empty()){return vspecies;}
+    vector<string> vspecies_tmp;
+    uint i=0;
+    if(!vspecies_pp.empty()){
+      vspecies_tmp.clear();
+      for(i=0;i<vspecies_pp.size();i++){
+        vspecies_tmp.push_back(vspecies_pp[i]);
+        aurostd::VASP_PseudoPotential_CleanName_InPlace(vspecies_tmp.back());
+      }
+      return vspecies_tmp;
+    }
+    //use REST-API
+    if(aurl.empty()){return vspecies_tmp;}
+    string url(aurl);
+    aurostd::StringSubst(url,":AFLOWDATA","/AFLOWDATA");
+    string species_restapi="";
+    if(species_restapi.empty()){aurostd::url2string(url+"/?species",species_restapi);}
+    if(species_restapi.empty()){aurostd::url2string(url+"/?species_pp",species_restapi);}
+    if(species_restapi.empty()){return vspecies_tmp;}
+    aurostd::string2tokens(species_restapi,vspecies_tmp,",");
+    for(i=0;i<vspecies_tmp.size();i++){aurostd::VASP_PseudoPotential_CleanName_InPlace(vspecies_tmp.back());}
+    return vspecies_tmp;
   }
-  vector<string> _aflowlib_entry::getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss){  //CO20200404
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    stringstream message;
+  //NOTE: getSpeciesAURL() does not work for LIB2 unaries
+  vector<string> _aflowlib_entry::getSpeciesAURL(ostream& oss) const{ofstream FileMESSAGE;return getSpeciesAURL(FileMESSAGE, oss);} //CO20200404
+  vector<string> _aflowlib_entry::getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss) const {  //CO20200404
+    bool LDEBUG=(false || XHOST.DEBUG);
 
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
-
-    vector<string> vspecies;
-    if(aurl.empty()){return vspecies;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " aurl=" << aurl << endl;}
+    vector<string> vspecies_aurl;
+    if(aurl.empty()){return vspecies_aurl;}
+    string path=aurl.substr(aurl.find(":")+1,string::npos);
     vector<string> tokens;
-    aurostd::string2tokens(aurl,tokens,":");
-
-    //erase first item (aflowlib.duke.edu), join others, assume we're okay...
-    tokens.erase(tokens.begin());
-    string path=aurostd::joinWDelimiter(tokens,":");
+    //[CO20221111 - slow]aurostd::string2tokens(aurl,tokens,":");
+    //[CO20221111 - slow]//erase first item (aflowlib.duke.edu), join others, assume we're okay...
+    //[CO20221111 - slow]tokens.erase(tokens.begin());
+    //[CO20221111 - slow]string path=aurostd::joinWDelimiter(tokens,":");
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
 
-    //split by /
-    aurostd::string2tokens(path,tokens,"/");
-    if(tokens.size()<4){
-      message << "Odd AURL format for entry " << auid << ": " << aurl;
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
-      return vspecies;
-    }
-    string species_string="";
-    if(path.find("_ICSD_")!=string::npos){  //if ICSD: AFLOWDATA/ICSD_WEB/HEX/Te2Zr1_ICSD_653213
-      species_string=tokens[3];
-      string::size_type loc;loc=species_string.find("_ICSD_");
-      species_string=species_string.substr(0,loc);
-    }
-    else{ //otherwise: AFLOWDATA/LIB2_RAW/TeZr_sv/10
-      species_string=tokens[2];
-      //fix LIB1: Zr_sv:PAW_PBE:07Sep2000
-      string::size_type loc;loc=species_string.find(":");
-      species_string=species_string.substr(0,loc);
+    bool isICSD=false;
+    string::size_type nth_slash=2;  //AFLOWDATA/LIB2_RAW/TeZr_sv/10
+    elements_string_type e_str_type=pp_string;
+    if(path.find("_ICSD_")!=string::npos){nth_slash=3;e_str_type=composition_string;isICSD=true;} //AFLOWDATA/ICSD_WEB/HEX/Te2Zr1_ICSD_653213
+    string::size_type n=0,start=0;
+    while(n++<nth_slash){start=path.find("/",start+1);}
+    string::size_type end=path.find("/",start+1);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " start=" << start << " end=" << end << endl;}
+    
+    string species_string=path.substr(start+1,end-start-1);
+    if(isICSD){start=0;end=species_string.find("_ICSD_");species_string=species_string.substr(start,end);}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " species_string=" << species_string << endl;}
+    if(species_string.empty()){
+      stringstream message;
+      message << "Odd AURL format for entry " << auid << ": " << aurl;pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      return vspecies_aurl;
     }
 
-    vspecies=aurostd::getElements(species_string);
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
-    return vspecies;
+    //[CO20221111 - slow]//split by /
+    //[CO20221111 - slow]aurostd::string2tokens(path,tokens,"/");
+    //[CO20221111 - slow]if(tokens.size()<4){
+    //[CO20221111 - slow]  message << "Odd AURL format for entry " << auid << ": " << aurl;
+    //[CO20221111 - slow]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+    //[CO20221111 - slow]  return vspecies_aurl;
+    //[CO20221111 - slow]}
+    //[CO20221111 - slow]string species_string="";
+    //[CO20221111 - slow]if(path.find("_ICSD_")!=string::npos){  //if ICSD: AFLOWDATA/ICSD_WEB/HEX/Te2Zr1_ICSD_653213
+    //[CO20221111 - slow]  species_string=tokens[3];
+    //[CO20221111 - slow]  string::size_type loc;loc=species_string.find("_ICSD_");
+    //[CO20221111 - slow]  species_string=species_string.substr(0,loc);
+    //[CO20221111 - slow]}
+    //[CO20221111 - slow]else{ //otherwise: AFLOWDATA/LIB2_RAW/TeZr_sv/10
+    //[CO20221111 - slow]  species_string=tokens[2];
+    //[CO20221111 - slow]  //fix LIB1: Zr_sv:PAW_PBE:07Sep2000
+    //[CO20221111 - slow]  string::size_type loc;loc=species_string.find(":");
+    //[CO20221111 - slow]  species_string=species_string.substr(0,loc);
+    //[CO20221111 - slow]}
+
+    vector<double> vcomposition;  //save some overloads
+    bool clean=true;          //clean LIB1
+    bool sort_elements=false; //not necessary, already sorted
+    bool keep_pp=false;       //remove pp
+    vspecies_aurl=aurostd::getElements(species_string,vcomposition,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vspecies_aurl=" << aurostd::joinWDelimiter(vspecies_aurl,",") << endl;}
+    return vspecies_aurl;
   }
 }
 

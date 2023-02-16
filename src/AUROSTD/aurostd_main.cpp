@@ -35,6 +35,13 @@ using aurostd::ran0;
 #define COMMENT_NEGLECT_2 string("//")
 #define COMMENT_NEGLECT_3 string("!")
 
+#ifdef AFLOW_MULTITHREADS_ENABLE  //CO+HE20221116
+// Global mutex that prevents two xThread instances from executing a system call.
+// system calls are not generally thread-safe: https://stackoverflow.com/questions/12025640/how-can-i-know-whether-a-linux-syscall-is-thread-safe
+static std::mutex xthread_execute;
+#endif
+
+
 //CO20171215 - moved to xscalar
 // ***************************************************************************
 // ROUNDOFF for scalars
@@ -809,6 +816,8 @@ namespace aurostd {
     //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
     //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX); 
 
+    string pwd=aurostd::getenv2string("PWD");
+    if(!pwd.empty()){return pwd;}
     return aurostd::execute2string("pwd"); //XHOST.command("pwd") ?
   }
 
@@ -3380,7 +3389,9 @@ namespace aurostd {
   }
 
   bool execute(const string& _command) {
-
+#ifdef AFLOW_MULTITHREADS_ENABLE  //CO+HE20221116
+    std::lock_guard<std::mutex> lk(xthread_execute);  //prevents race conditions likely caused by system calls
+#endif
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
     string command=aurostd::CleanCommand4Execute(_command); //CO20200624
@@ -5225,9 +5236,14 @@ namespace aurostd {
   }
   template<typename utype> utype string2utype(const string& from, const uint base) {
     if(from.empty()){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
-    string FROM=aurostd::toupper(from); //CO20210315
-    if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
-    if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    if(from.find("T")!=string::npos||from.find("t")!=string::npos||from.find("F")!=string::npos||from.find("f")!=string::npos){ //CO20221112
+      //CO20221112 - gdb died here when running chull in parallel
+      //seems toupper might have some issues with threaded processes
+      //adding this guard to mitigate the issue
+      string FROM=aurostd::toupper(from); //CO20210315
+      if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+      if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    }
     if (base != 10) { //HE20220324 add non-decimal bases (will ignore positions behind a point)
       std::stringstream temp;
       temp << std::stoll(from, nullptr, base); // stoll -> string to long long
@@ -7213,6 +7229,54 @@ namespace aurostd {
     sort(vv.begin(),vv.end(),_sort_string_string_double_double_string_());
     for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;varg4[i]=vv[i].arg4;varg5[i]=vv[i].arg5;}
   }
+}
+
+// ----------------------------------------------------------------------------
+// reorder vector //CO20221111
+namespace aurostd {
+  template<class utype> // function quicksort
+    void reorder(vector<utype>& vec,vector<uint>& vorder,uint mode){	//CO20221111
+			//algorithms and discussion from here: https://stackoverflow.com/questions/838384/reorder-vector-using-a-vector-of-indices (very good!)
+			//solution by chmike
+      //reorder a vector given input indices
+      //there are two ways this can be done depending on what is inside vorder
+      //input: vec={7,5,9,6}; vorder={1,3,0,2}
+      //
+      //mode 1: ``draw the elements of vector from the position of the indices''
+      //result: {5,6,7,9}
+      //NOTE: this is the default mode
+      //
+      //mode 2: ``move elements of vector to the position of the indices''
+      //result: {9,7,6,5}
+      //NOTE: this can also be accomplished with aurostd::sort(vorder,vec) but it requires vec to be C++ type or string
+      //this function seems to run faster than aurostd::sort() as well
+			uint i=0,j=0;
+			if(mode==1){
+				for(i=0;i<vec.size()-1;i++){
+					if(vorder[i]==i){continue;}
+					for(j=i+1;j<vorder.size();j++){
+						if(vorder[j]==i){break;}
+					}
+					std::iter_swap(vec.begin()+i,vec.begin()+vorder[i]);
+					std::iter_swap(vorder.begin()+i,vorder.begin()+j);
+				}
+        return;
+      }
+      else if(mode==2) {
+				uint alt=0;
+				// for all elements to put in place
+				for(i=0;i<vec.size()-1;++i){
+					// while the element i is not yet in place 
+					while(i!=vorder[i]){
+						// swap it with the element at its final place
+						alt=vorder[i];
+            std::iter_swap(vec.begin()+i,vec.begin()+alt);
+            std::iter_swap(vorder.begin()+i,vorder.begin()+alt);
+					}
+				}
+			}
+			else{throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Unknown mode", _INPUT_ILLEGAL_);}
+    }
 }
 
 // ***************************************************************************
