@@ -13,6 +13,7 @@
 #include "aflow.h"
 #include "aflow_pocc.h" //CO20200624
 #include "aflow_symmetry_spacegroup.h" //DX20200929
+#include "aflowlib.h" //SD20221207
 #include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
 #include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
@@ -4233,6 +4234,16 @@ namespace aflowlib {
     else{server="aflowlib.duke.edu";}
 
     path_full=server+"/"+path;
+    return path_full;
+  }
+  /// @brief get the full directory path of the aflowlib entry
+  /// @param filesystem_collection filesystem collection (LIB, RAW, WEB)
+  /// @return directory path
+  /// @authors
+  /// @mod{SD,20221207,created}
+  string _aflowlib_entry::getPathDirectory(const string& filesystem_collection) {
+    string path_full = DEFAULT_ENTRY_LOADER_FS_PATH + (*this).aurl.substr(28) + "/";
+    path_full = std::regex_replace(path_full, aurostd::regex_aurl2file, "$1/" + filesystem_collection + "/");
     return path_full;
   }
   vector<string> _aflowlib_entry::getSpecies() const{ //CO20221110

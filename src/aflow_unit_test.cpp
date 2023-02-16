@@ -1470,10 +1470,9 @@ namespace unittest {
       xvector<long long> xvll_exp = {449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
       checkEqual( xvll_res, xvll_exp, check_function, check_description + "long long>", passed_checks, results);
 
-      // initialize_xscalar_xvector_xmatrix_xtensor in boot is not called for unsigned ints
-      // xvector<unsigned long long> xvull_res = jo["xvector_ull"];
-      // xvector<unsigned long long> xvull_exp = {449644208, 252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
-      // checkEqual( xvull_res, xvull_exp, check_function, check_description + "unsigned long long>", passed_checks, results);
+      xvector<unsigned long long> xvull_res = jo["xvector_ull"];
+      xvector<unsigned long long> xvull_exp = {449644208, 252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
+      checkEqual( xvull_res, xvull_exp, check_function, check_description + "unsigned long long>", passed_checks, results);
 
 
       xvll_res = jo["xvector_mixed"];
@@ -1522,7 +1521,6 @@ namespace unittest {
                                {    -29826,      539915, 1281986870,  26952942,    74,  1538912783,       255}};
       xmatrix<int> xmll_res = jo["xmatrix_double_mix"];
       checkEqual( xmll_res, xmll_exp, check_function, check_description + "int> mixed", passed_checks, results);
-      // <long long> would fail as operator << xmatrix<long long> does not exist yet
     }
 
     // read std::map

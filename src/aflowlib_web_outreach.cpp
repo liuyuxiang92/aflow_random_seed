@@ -164,7 +164,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   string authors=_authors;
   vector<string> vfix;
   aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano,Ojeda Mota,Simmons Jr.,Mattos Jr.",vfix,",");
-  for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
+  for(size_t i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix[i],string("{"+vfix[i]+"}")); // FIX
   aurostd::StringSubst(authors,".",".~"); 
   aurostd::StringSubst(authors,"~ "," "); 
   aurostd::StringSubst(authors,"~ "," "); 
@@ -190,8 +190,8 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   bibcontent << endl << "}" << endl;
   bibcontent << "% Automatically generated - AFLOW " << AFLOW_VERSION << endl;
 
+  // save
   aurostd::stringstream2file(bibcontent,bibfile);
-  //	oss << bibfile << endl; 
   return bibcontent.str().size();
 }
 
@@ -204,23 +204,26 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
   // ***************************************************************************
   // ARTICLE
   if(aurostd::substring2bool(outreach.type,"ARTICLE")) {
-    string authors="";
 
-    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
-      authors+="[";
-      for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-        authors+="\""+outreach.vauthor.at(iauth)+"\"";
-        if(iauth!=outreach.vauthor.size()-1) authors+=",";
-      }
-      authors+="]";	
-    } else { // TXT, HTML, LATEX
-      for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-        authors+=outreach.vauthor.at(iauth);
-        if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors+=" and ";
-        if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors+=", and ";
-        if(iauth!=outreach.vauthor.size()-2 && iauth!=outreach.vauthor.size()-1) authors+=", ";
-      }
+    // generate authors_json
+    string authors_json;
+    authors_json="[";
+    for(size_t iauth=0;iauth<outreach.vauthor.size();iauth++) {
+      authors_json+="\""+outreach.vauthor[iauth]+"\"";
+      if(iauth!=outreach.vauthor.size()-1) authors_json+=",";
     }
+    authors_json+="]";
+
+    // generate authors_txt
+    string authors_txt;
+    authors_txt="";
+    for(size_t iauth=0;iauth<outreach.vauthor.size();iauth++) {
+        authors_txt+=outreach.vauthor[iauth];
+        if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors_txt+=" and ";
+        if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors_txt+=", and ";
+        if(iauth!=outreach.vauthor.size()-2 && iauth!=outreach.vauthor.size()-1) authors_txt+=", ";
+      }
+
     string wnumber=aurostd::utype2string(outreach.wnumber);
     if(wnumber.length()<2) wnumber="0"+wnumber;
 
@@ -241,8 +244,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
     // TXT
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
       // 3rd line AUTHORS
-      aurostd::StringSubst(authors,"Csányi","Csanyi");
-      oss << aurostd::html2txt(authors) << ", ";
+      aurostd::StringSubst(authors_txt,"Csányi","Csanyi");
+      oss << aurostd::html2txt(authors_txt) << ", ";
       // 4th line TITLE
       oss << "\"" << aurostd::html2txt(outreach.title) << "\", ";
       // 5th line JOURNAL with year
@@ -289,8 +292,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         }
       }
       // 3rd line AUTHORS
-      aurostd::StringSubst(authors,"Csányi","Csanyi");
-      oss << "\"authors\":" <<  authors << ",";
+      aurostd::StringSubst(authors_json,"Csányi","Csanyi");
+      oss << "\"authors\":" <<  authors_json << ",";
       // 4th line TITLE
       oss << "\"title\":\"" << outreach.title << "\",";
       // 5th line JOURNAL with year
@@ -316,7 +319,7 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         oss << "\"link\":\"" << outreach.link << "\",";
       // 7th line BIBTEX
       if(XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") && outreach.bibtex.size() && outreach.bibtex_journal.size() && outreach.doi.size() && outreach.title.size() && outreach.vauthor.size() ) { // needs to have bibtex pdf doi title and authors
-        bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
+        bibtex2file(outreach.bibtex,authors_txt,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
         oss << "\"bibtex\":\"" << WEB_BIBTEX << outreach.bibtex << ".txt" << "\",";
       }
       // Xth line EXTRA
@@ -360,8 +363,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         }
       }
       // 3rd line AUTHORS
-      aurostd::StringSubst(authors,"Csányi","Csanyi");
-      oss << "<span class=\"pubAuthors\">" <<  authors << "</span>, " << (compact?" ":newline.str());
+      aurostd::StringSubst(authors_txt,"Csányi","Csanyi");
+      oss << "<span class=\"pubAuthors\">" <<  authors_txt << "</span>, " << (compact?" ":newline.str());
       // 4th line TITLE
       oss << "<span class=\"pubTitle\">" << outreach.title << "</span>, " << (compact?" ":newline.str());
       // 5th line JOURNAL with year
@@ -387,7 +390,7 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         oss << "[<a href="+outreach.link << "><b>link</b></a>] " << (compact?" ":newline.str());
       // 7th line BIBTEX
       if(XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") && outreach.bibtex.size() && outreach.bibtex_journal.size() && outreach.doi.size() && outreach.title.size() && outreach.vauthor.size() ) { // needs to have bibtex pdf doi title and authors
-        bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
+        bibtex2file(outreach.bibtex,authors_txt,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
         oss << "[<a href=" << WEB_BIBTEX << outreach.bibtex << ".txt" << "><b>bibtex</b></a>] " << (compact?" ":newline.str());
       }
       // Xth line EXTRA
@@ -410,8 +413,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
     // LATEX
     if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
       // 3rd line AUTHORS
-      authors=aurostd::html2latex(authors)+", ";
-      oss << " " << authors;
+      authors_txt=aurostd::html2latex(authors_txt)+", ";
+      oss << " " << authors_txt;
       // 4th line TITLE
       string title="\\textit{"+aurostd::html2latex(outreach.title)+"}, ";
       oss << " " << title;
