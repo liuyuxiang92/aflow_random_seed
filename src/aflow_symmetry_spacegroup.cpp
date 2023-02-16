@@ -3511,7 +3511,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   xstr.MinkowskiBasisReduction();
 
   // ===== Declare variables ===== //
-  ostringstream woss, woss_min;  //stringstream for wyccar //DX20221115 - need to store minimum wyccar stringstream
+  ostringstream woss, woss_min;  //stringstream for wyccar //DX+KC20221115 - need to store minimum wyccar stringstream for aflow --wyckoff --print=json
   int spacegroup = 0, spacegroup_global = 0; //DX20220920
   bool foundspacegroup = false, foundspacegroup_global = false; //DX20220827 - added foundspacegroup_global
   deque<_atom> atomicbasis;
@@ -3633,7 +3633,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols = wyckoffSymbols_min;
           wyckoffVariables = wyckoffVariables_min;
           tmpvvvstring = tmpvvvstring_min;
-          woss.str(""); woss << woss_min.str(); //DX20221103
+          woss.str(""); woss << woss_min.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift = OriginShift_Wyckoff_min;
           break;
@@ -4337,7 +4337,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols_min = wyckoffSymbols;
           wyckoffVariables_min = wyckoffVariables;
           tmpvvvstring_min = tmpvvvstring;
-          woss_min.str(""); woss_min << woss.str(); //DX20221103
+          woss_min.str(""); woss_min << woss.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift_Wyckoff_min = OriginShift;
         }
@@ -4353,7 +4353,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols = wyckoffSymbols_min;
           wyckoffVariables = wyckoffVariables_min;
           tmpvvvstring = tmpvvvstring_min;
-          woss.str(""); woss << woss_min.str(); //DX20221103
+          woss.str(""); woss << woss_min.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift = OriginShift_Wyckoff_min;
         }
