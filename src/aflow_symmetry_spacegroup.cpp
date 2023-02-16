@@ -4446,7 +4446,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   // === Add Wyckoff positions === //
   wss << endl
     << "Direct(WYCCAR)" << endl;
-  wss << woss_min;  //<< endl; //KC20221222 - added woss_min for aflow --wyckoff --print-json
+  wss << woss_min.str();  //<< endl; //KC20221222 - added woss_min for aflow --wyckoff --print-json
 
   vector<string> wyccar_string_vec;
   aurostd::stream2vectorstring(wss, wyccar_string_vec);
