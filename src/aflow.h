@@ -636,6 +636,12 @@ inline std::string aflowFile(const std::string &file_name, const size_t line_num
 #undef _AFLOW_AFLOWRC_CPP_
 #undef _AFLOW_AFLOWRC_H_
 
+// ----------------------------------------------------------------------------
+// aflow_bfiles.cpp  //CO20221111
+#define _AFLOW_BFILES_CPP_
+#include "aflow_bfiles.cpp"
+#undef _AFLOW_BFILES_CPP_
+
 // --------------------------------------------------------------------------
 
 // Structures for flags and properties to share FAST !

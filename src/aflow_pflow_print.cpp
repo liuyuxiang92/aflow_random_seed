@@ -3661,7 +3661,7 @@ namespace pflow {
         }
         xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
         str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_expanded); //DX20220921 - changed str_sg to str_expanded in last argument
-        str_expanded.lattice=str_sg.standard_lattice_ITC;
+        str_expanded.lattice=GetClat(data(1), data(2), data(3), data(4), data(5), data(6)); //DX20221128 - need to use GetClat to get standard representation of the ITC unit cell (rather than using std_lattice_ITC(), which could be rotated)
         str_expanded.ReScale(1.0);
         str_expanded.neg_scale=FALSE;
         str_expanded.iomode = IOVASP_POSCAR;
