@@ -3333,14 +3333,13 @@ namespace aurostd {
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
     vector<xvector<double> > v;
     if (binning_algorithm == 1){
-	    //ceiling to ensure that it is never rounded to zero 
-	    int bin_est = std::ceil(std::sqrt((double)data.rows));
-	    cerr << "estimated bin=" << bin_est << endl;
-	    if (min_bins > bin_est){
-            v = histogram(data, min_bins);
-	    return v;
-	    }
-            v = histogram(data, bin_est);
+    //ceiling to ensure that it is never rounded to zero 
+      int bin_est = std::ceil(std::sqrt((double)data.rows));
+      if (min_bins > bin_est){
+      v = histogram(data, min_bins);
+      return v;
+      }
+      v = histogram(data, bin_est);
     }
     return v;
 }
@@ -3348,7 +3347,6 @@ namespace aurostd {
 template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);
 template vector<xvector <double>> histogram(const xvector<double>& data, uint max_bins, uint binning_algorithm);
 }
-
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------- implementation for extra data type
