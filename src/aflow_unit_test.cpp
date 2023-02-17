@@ -907,12 +907,6 @@ namespace unittest {
     xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
     vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
     checkEqual(vec_xvecdbls[1], expected_edges, check_function, check_description, passed_checks, results);
-//    cerr << "counts" << endl;
-//    cerr << vec_xvecdbls[0] << endl;
-//    cerr << "bins" << endl;
-//    cerr << vec_xvecdbls[1] << endl;
-
-//    cerr << in_xvecdbl +0.5 << endl;
 
     // ---------------------------------------------------------------------------
     // Check | histogram edges //AZ20230213
@@ -932,14 +926,55 @@ namespace unittest {
     cerr << "counts of histogram bins incorrect" << expected_counts << endl;
     cerr << "expected_counts= " << expected_counts << endl;
     cerr << "vec_xvecdbls[0]= " << vec_xvecdbls[0] << endl;
+  //  checkEqual(vec_xvecdbls[0], expected_counts, check_function, check_description, passed_checks, results);
+  //
+
+    // ---------------------------------------------------------------------------
+    // Check | auto histogram edges (full set) //AZ20230213
+    // ---------------------------------------------------------------------------
+
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+    cerr << "autobins full set" << endl;
+    check_function = "aurostd::histogram()";
+    check_description = "automatic histogram bins";
+    expected_counts =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
+    cerr << "expected_counts= " << expected_counts << endl;
+    cerr << "vec_xvecdbls[0]= " << vec_xvecdbls[0] << endl;
     checkEqual(vec_xvecdbls[0], expected_counts, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | histogram edges //AZ20230213
+    // Check | auto histogram edges (full array) //AZ20230213
     // ---------------------------------------------------------------------------
-//    in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.};
-//    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
-//    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 10000, 1);
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+
+    cerr << "autobins full set" << endl;
+    check_function = "aurostd::histogram()";
+    check_description = "automatic histogram bins";
+    expected_counts =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
+    cerr << "expected_counts= " << expected_counts << endl;
+    cerr << "vec_xvecdbls[0]= " << vec_xvecdbls[0] << endl;
+    checkEqual(vec_xvecdbls[0], expected_counts, check_function, check_description, passed_checks, results);
+    // ---------------------------------------------------------------------------
+    // Check | auto histogram bins //AZ20230213
+    // ---------------------------------------------------------------------------
+    in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.};
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+
+    cerr << "autobins partial set 1" << endl;
+    check_function = "aurostd::histogram()";
+    check_description = "automatic histogram bins";
+    expected_counts =  {16.,18.,12.,15.,19.};
+    cerr << "expected_counts= " << expected_counts << endl;
+    cerr << "vec_xvecdbls[1]= " << vec_xvecdbls[1] << endl;
+    checkEqual(vec_xvecdbls[0], expected_counts, check_function, check_description, passed_checks, results);
+
+    cerr << "autobins partial set 2" << endl;
+    check_function = "aurostd::histogram()";
+    check_description = "automatic histogram edges";
+    expected_edges =  {0., 1.8, 3.6, 5.4, 7.2, 9., };
+    cerr << "expected_edges= " << expected_edges << endl;
+    cerr << "vec_xvecdbls[0]= " << vec_xvecdbls[1] << endl;
+    checkEqual(vec_xvecdbls[0], expected_edges, check_function, check_description, passed_checks, results);
 }
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
