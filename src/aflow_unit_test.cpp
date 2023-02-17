@@ -898,17 +898,31 @@ namespace unittest {
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | histogram //AZ20230213
+    // Check | histogram bins //AZ20230213
     // ---------------------------------------------------------------------------
-    vector<xvector<double> > out_xvecdbl;
-    
+    check_function = "aurostd::histogram()";
+    check_description = "edges of histogram bins";
+    xvector<double> expected_edges = {0., 1.8, 3.6, 5.4, 7.2, 9.};
+    vector<xvector<double> > vec_xvecdbls;
     xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
+    checkEqual(vec_xvecdbls[1], expected_edges, check_function, check_description, passed_checks, results);
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+    cerr << "counts" << endl;
+    cerr << vec_xvecdbls[0] << endl;
+    cerr << "bins" << endl;
+    cerr << vec_xvecdbls[1] << endl;
 
-    out_xvecdbl = aurostd::histogram(in_xvecdbl, 5);
-//    for (auto i: out_xvecdbl){
-//        cerr << i << endl;
-//    }
-    out_xvecdbl = aurostd::histogram(in_xvecdbl, 10000, 1);
+//    cerr << in_xvecdbl +0.5 << endl;
+
+    // ---------------------------------------------------------------------------
+    // Check | histogram edges //AZ20230213
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::histogram()";
+    check_description = "counts of histogram bins";
+    xvector<double> expected_counts = {16., 18., 12., 15., 19.};
+    checkEqual(vec_xvecdbls[0], expected_counts, check_function, check_description, passed_checks, results);
+    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 10000, 1);
   }
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {

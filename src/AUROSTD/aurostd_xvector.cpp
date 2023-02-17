@@ -1915,17 +1915,6 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
-  template<class utype> xvector<utype>                    // function lgamma xvector<>
-    lgamma(const xvector<utype>& a) {
-      xvector<utype> c(a.lrows,a.urows);
-      for(int i=c.lrows;i<=c.urows;i++) {
-        c[i]=(utype) std::lgamma(a[i]);
-      }
-      return c;
-    }
-template xvector<double> lgamma(const xvector<double>& a);
-}
-namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>                    // function cos xvector<>
     cos(const xvector<utype>& a) {
       xvector<utype> c(a.lrows,a.urows);
@@ -3328,74 +3317,30 @@ namespace aurostd {
     xvector<double> counts(bins); // counts in bin
     int bin_index; // min data point
     xvector<double> edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
-//    cerr << "bins: " << bins << endl;
-//    cerr << "edges: " << edges << endl;
-//    cerr << "min/max " << minimum_data << " " << maximum_data << endl;
     double width = edges[edges.lrows+1]-edges[edges.lrows];
     for(int j = data.lrows; j <= data.urows; j++){
         bin_index = std::min((int)bins,(int)std::floor((data[j]-minimum_data)/width)+1);
 	counts[bin_index]++; 
-
-//	cerr << "***********************" << endl;
-//	cerr << "left_edge: " << edges[bin_index] << endl; 
-//	cerr << "data: " << data[j] << endl;
-//	cerr << "right_edge: " << edges[bin_index+1] << endl; 
-//	cerr << "bin_index: " << bin_index << endl;
-//	cerr << "counts: " << counts << endl;
-//	cerr << "edges: " << edges << endl;
     }
-//    double param, result;
-//    param = 0.5;
-//    result = std::lgamma(param);
-//    cerr << result << endl;
-    
     vector<xvector<double> > v;
     v.push_back(counts);
     v.push_back(edges);
-//    cout << "counts pushed " << endl;
     return v;
   }
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
 }
-  template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint max_bins, uint binning_algorithm) {
+  template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
     vector<xvector<double> > v;
     if (binning_algorithm == 1){
-	    double part1;
-	    double part2;
-	    double N = (double)data.rows;
-	    double highest_prob = -1.0;
-	    double current_prob;
-	    int highest_prob_bins;
-	    xvector<double> posterior_probabilities(max_bins);
-	    for(int i = 1; i <= max_bins; i++){
-	      double M = (double)i;
-	      //cout << "loop: " << i << endl;
-	      v = histogram(data, i);
-	      part1 = N*log(M)+std::lgamma(0.5*M) - std::lgamma((N+M)*.5);
-	      part2 = -1.0*(M*std::lgamma(0.5) + sum(lgamma(v[0]+0.5)));
-	      current_prob = part1 + part2;
-	      if (current_prob > highest_prob){
-		      highest_prob = current_prob;
-		      highest_prob_bins = i;
-	      }
-		    
-	      posterior_probabilities(i) = part1 + part2;
-	      //cout << "loop done" <<i << endl;
-	      //cout << posterior_probabilities(i) << endl;
+	    //ceiling to ensure that it is never rounded to zero 
+	    int bin_est = std::ceil(std::sqrt((double)data.rows));
+	    if (min_bins > bin_est){
+            v = histogram(data, min_bins);
+	    return v;
 	    }
+            v = histogram(data, bin_est);
 
-	      //cout << "posterior_probabilities of all" << endl;
-	      //cout << posterior_probabilities << endl;
-	      //cout << "length of posterior vector" << endl;
-	      //cout << posterior_probabilities.rows << endl;
-
-	      cout << "posterior_probability of best" << endl;
-	      cout << posterior_probabilities(highest_prob_bins) << endl;
-	      cout << "best_bins: " << highest_prob_bins << endl;
-	      v = histogram(data, highest_prob_bins);
-	      cout << "best histogram: " << v[0] << endl;
-	      cout << "best histogram: " << v[1] << endl;
     }
     return v;
 }
