@@ -3322,10 +3322,7 @@ namespace aurostd {
         bin_index = std::min((int)bins,(int)std::floor((data[j]-minimum_data)/width)+1);
 	counts[bin_index]++; 
     }
-    vector<xvector<double> > v;
-    v.push_back(counts);
-    v.push_back(edges);
-    return v;
+    return {counts, edges};
   }
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
