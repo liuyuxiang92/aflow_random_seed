@@ -3303,7 +3303,7 @@ namespace aurostd {
   /// is the endpoints where the right edge is included. One can also pass a min and max
   /// value into the function and the function will use those values to calculate the bins
   /// 
-  /// @param number of bins 
+  /// @param bins number of bins 
   ///
   /// @return vector of the xvectors bin edges and counts 
   ///
