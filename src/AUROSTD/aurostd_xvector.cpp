@@ -3303,9 +3303,9 @@ namespace aurostd {
   /// is the endpoints where the right edge is included. One can also pass a min and max
   /// value into the function and the function will use those values to calculate the bins
   /// 
-  /// @param number of bins 
+  /// @param bins number of bins 
   ///
-  /// @return xvector of bin edges and counts 
+  /// @return vector of the xvectors bin edges and counts 
   ///
   /// @authors
   /// @mod{AZ,2023,created function}
@@ -3322,26 +3322,26 @@ namespace aurostd {
         bin_index = std::min((int)bins,(int)std::floor((data[j]-minimum_data)/width)+1);
 	counts[bin_index]++; 
     }
-    vector<xvector<double> > v;
-    v.push_back(counts);
-    v.push_back(edges);
-    return v;
+    return {counts, edges};
   }
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
 }
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
-    vector<xvector<double> > v;
-    if (binning_algorithm == 1){
-    //ceiling to ensure that it is never rounded to zero 
-      int bin_est = std::ceil(std::sqrt((double)data.rows));
-      if (min_bins > bin_est){
-      v = histogram(data, min_bins);
-      return v;
+       switch (binning_algorithm) {
+     
+      case (1) {
+        //ceiling to ensure that it is never rounded to zero
+        int bin_est = std::ceil(std::sqrt((double)data.rows));
+        if (min_bins > bin_est){
+          return histogram(data, min_bins);
+        } else return histogram(data, bin_est);
+        break;
       }
-      v = histogram(data, bin_est);
-    }
-    return v;
+     
+      default: {
+        return {};
+      }    
 }
 	
 template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);

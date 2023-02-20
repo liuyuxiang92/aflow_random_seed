@@ -444,8 +444,6 @@ namespace aurostd {
   template<class utype> xvector<utype>
     asin(const xvector<utype>&) __xprototype;
   
-  template<class utype> xvector<utype>
-    lgamma(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
     acos(const xvector<utype>&) __xprototype;
