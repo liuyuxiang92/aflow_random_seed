@@ -3328,17 +3328,20 @@ namespace aurostd {
     return histogram(data, bins, min(data), max(data));
 }
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
-    vector<xvector<double> > v;
-    if (binning_algorithm == 1){
-    //ceiling to ensure that it is never rounded to zero 
-      int bin_est = std::ceil(std::sqrt((double)data.rows));
-      if (min_bins > bin_est){
-      v = histogram(data, min_bins);
-      return v;
+       switch (binning_algorithm) {
+     
+      case (1) {
+        //ceiling to ensure that it is never rounded to zero
+        int bin_est = std::ceil(std::sqrt((double)data.rows));
+        if (min_bins > bin_est){
+          return histogram(data, min_bins);
+        } else return histogram(data, bin_est);
+        break;
       }
-      v = histogram(data, bin_est);
-    }
-    return v;
+     
+      default: {
+        return {};
+      }    
 }
 	
 template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);
