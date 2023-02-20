@@ -3305,7 +3305,7 @@ namespace aurostd {
   /// 
   /// @param number of bins 
   ///
-  /// @return xvector of bin edges and counts 
+  /// @return vector of the xvectors bin edges and counts 
   ///
   /// @authors
   /// @mod{AZ,2023,created function}
