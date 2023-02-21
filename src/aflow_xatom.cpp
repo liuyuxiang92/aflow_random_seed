@@ -7430,7 +7430,7 @@ void xstructure::MakeTypes(void) {
 // efficient for-loop for atoms (upper-triangular) and update species/basis
 // info once at the end
 
-void xstructure::AddAtom(const deque<_atom>& _atoms_in, bool check_present) { //DX20210129
+void xstructure::AddAtom(const deque<_atom>& _atoms_in, bool check_present) { //DX20210129  //CO20230220 - patching names vs. types bug
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   deque<_atom> atoms_in=_atoms_in;  //make a copy so we can fix types
 
@@ -7569,7 +7569,7 @@ void xstructure::AddAtom(const deque<_atom>& _atoms_in, bool check_present) { //
   }
 
   GetStoich();  //CO20170724
-  //BEWARE: this stable sort is NOT meant to sort species
+  //CO20230220 - BEWARE: this stable sort is NOT meant to sort species
   //it is meant to sort atoms added to the end of the list to the right species-set within already constructed species vector
   //do NOT use sortAtomNames
   //[CO20230220 - does not work, will rearrange differently than UpdateSpecies() above, so species order does not match atom order]//ME20220612 - Originally had sortAtomsTypes, but other parts of xstructure use sortAtomsNames,
@@ -7583,7 +7583,7 @@ void xstructure::AddAtom(const deque<_atom>& _atoms_in, bool check_present) { //
 // **************************************************************************
 // This adds an atom to the structure.
 
-void xstructure::AddAtom(const _atom& atom, bool check_present) {
+void xstructure::AddAtom(const _atom& atom, bool check_present) { //CO20230220 - patching names vs. types bug
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
   _atom btom=atom; //DX20210202
   
@@ -7663,7 +7663,7 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
   //[CO20230220 - moved up]  //DX20170921 - Need to keep spin info  btom.CleanSpin();
   //[CO20230220 - moved up]}
   GetStoich();  //CO20170724
-  //BEWARE: this stable sort is NOT meant to sort species
+  //CO20230220 - BEWARE: this stable sort is NOT meant to sort species
   //it is meant to sort atoms added to the end of the list to the right species-set within already constructed species vector
   //do NOT use sortAtomNames
   //[CO20230220 - does not work, will rearrange differently than UpdateSpecies() above, so species order does not match atom order]//ME20220612 - Originally had sortAtomsTypes, but other parts of xstructure use sortAtomsNames,
@@ -14010,7 +14010,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     // this checks volumes, number of atoms, etc. internally
     prim.TransformStructure(transformation_matrix, rotation_matrix);
   }
-  catch(aurostd::xerror& err){
+  catch(aurostd::xerror& err){  //CO20230220 - patching names vs. types bug
     if(aurostd::substring2bool(err.whereFileName(),"aflow_xatom.cpp") && 
         aurostd::substring2bool(err.whereFunction(),"xstructure::ReplaceAtoms():") && 
         aurostd::substring2bool(err.what(),"atoms and species were incorrectly (re)sorted")){
