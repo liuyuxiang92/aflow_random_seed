@@ -6,6 +6,7 @@
         -- fixing --npmax and --np=max options (CO)
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
+        -- patching AddAtom() types vs. names bug (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
