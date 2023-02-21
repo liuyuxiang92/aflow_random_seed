@@ -6553,6 +6553,7 @@ namespace pocc {
       cerr << __AFLOW_FUNC__ << " OLD VOLUME=" << xstr_nopocc.Volume() << endl;
       cerr << __AFLOW_FUNC__ << " xstr_nopocc.scale=" << xstr_nopocc.scale << endl;
       cerr << __AFLOW_FUNC__ << " xstr_nopocc.lattice=" << endl;cerr << xstr_nopocc.lattice << endl;
+      cerr << __AFLOW_FUNC__ << " xstr_nopocc.atoms.size()=" << xstr_nopocc.atoms.size() << endl;
     }
     xstr_nopocc.SetAutoVolume(use_automatic_volumes_in);  //always use automatic_volumes_in
     //xstr_nopocc.neg_scale=TRUE; //no need, scale is already taken care of (no need to DISPLAY volume)
@@ -6770,8 +6771,8 @@ namespace pocc {
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
 
       if(LDEBUG) {
-        cerr << __AFLOW_FUNC__ << " xstr_pocc_tmp" << endl;
-        cerr << xstr_pocc_tmp << endl;
+        cerr << __AFLOW_FUNC__ << " xstr_pocc_tmp" << endl << xstr_pocc_tmp << endl;
+        cerr << __AFLOW_FUNC__ << " xstr_pocc_tmp.species=" << aurostd::joinWDelimiter(xstr_pocc_tmp.species,",") << endl;
       }
 
       vector<POccUnit> pocc_sites_tmp=getPOccSites(xstr_pocc_tmp);
