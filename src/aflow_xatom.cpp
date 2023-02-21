@@ -7795,7 +7795,7 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
   //DX20210129 [OBSOLETE - remove all at once] }
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing all atoms" << endl;
   RemoveAtom(); //DX20210129 - remove all atoms and clear species variables
-  
+
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " adding new atoms" << endl;
   //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
   AddAtom(new_atoms, check_present);  //adding atoms
