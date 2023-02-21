@@ -7821,6 +7821,7 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
       if(!atoms[iatom].name.empty() && !species[itype].empty() && atoms[iatom].name!=species[itype]){
         throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atoms and species were incorrectly (re)sorted",_RUNTIME_ERROR_);
       }
+      iatom++;
     }
   }
   //
