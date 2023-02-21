@@ -3301,7 +3301,26 @@ namespace aurostd {
   /// meaning the bins can be expressed as the half open interval [left_edge, right_edge)
   /// or if (left_edge <= x < right_edge) == x_is_in_bin == true. The exception to this
   /// is the endpoints where the right edge is included. One can also pass a min and max
-  /// value into the function and the function will use those values to calculate the bins
+  /// value into the function and the function will use those values to calculate the bins.
+  /// Histogram calculation is a nontrivial problem as the chosen bins greatly influence
+  /// the appearance of distributions. The histogram can be thought of as a density estimator
+  /// and there are many ways to calculate the bins to calculate an accurate density estimate.
+  /// The following reference gives some background into the use of histograms as density estimators.
+  /// 
+  /// Freedman, D., Diaconis, P. On the histogram as a density estimator:L 2 theory. 
+  /// Z. Wahrscheinlichkeitstheorie verw Gebiete 57, 453–476 (1981). https://doi.org/10.1007/BF01025868
+  /// 
+  /// Currently there is only one algorithm for bin choices implemented (binning_algorithm = 1)
+  ///
+  /// List of rules for histogram binning.
+  /// - k = sqrt(n) (binning algorithm = 1)
+  /// - k = log2(n)+1 Sturges' formula 
+  /// - Rice rule
+  /// - Doane's formula
+  /// - Scott's normal reference rule
+  /// - Freedman-Diaconis' choice
+  /// - Scott's rule with cross validation
+  /// - Shimazaki and Shinomoto's choice
   /// 
   /// @param bins number of bins 
   ///
@@ -3309,6 +3328,8 @@ namespace aurostd {
   ///
   /// @authors
   /// @mod{AZ,2023,created function}
+
+  //choose number of bins and the min and max bin 
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins, double minimum_data, double maximum_data) {
     if (bins <= 0) {
       string message = "Number of bins must be greater than zero";
@@ -3316,24 +3337,30 @@ namespace aurostd {
     }
     xvector<double> counts(bins); // counts in bin
     int bin_index; // min data point
-    xvector<double> edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
+    xvector<utype> edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
     double width = edges[edges.lrows+1]-edges[edges.lrows];
     for(int j = data.lrows; j <= data.urows; j++){
+	// min is required because we need to force the last last edge into the last bin (remember bins < edges)
         bin_index = std::min((int)bins,(int)std::floor((data[j]-minimum_data)/width)+1);
 	counts[bin_index]++; 
     }
     return {counts, edges};
   }
+  //manually choose number of bins
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
 }
+  //automatic binning with option to set minumum number of bins
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
-       switch (binning_algorithm) {
+      switch (binning_algorithm) {
      
-      case (1) {
+      // binning algorithms
+
+      // square root bin choice (binning_algorithm = 1)
+      case (1) : {
         //ceiling to ensure that it is never rounded to zero
         int bin_est = std::ceil(std::sqrt((double)data.rows));
-        if (min_bins > bin_est){
+        if ((int)min_bins > bin_est){
           return histogram(data, min_bins);
         } else return histogram(data, bin_est);
         break;
@@ -3342,12 +3369,12 @@ namespace aurostd {
       default: {
         return {};
       }    
-}
-	
+   }
+}	
 template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);
 template vector<xvector <double>> histogram(const xvector<double>& data, uint max_bins, uint binning_algorithm);
+template vector<xvector <double>> histogram(const xvector<double>& data, uint bins, double minimum_data, double maximum_data);
 }
-
 // ----------------------------------------------------------------------------
 // ----------------------------------------- implementation for extra data type
 #define DEBUG_CONVOLUTION 0
