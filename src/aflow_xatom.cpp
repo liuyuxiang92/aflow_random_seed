@@ -7806,13 +7806,24 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
     cerr << __AFLOW_FUNC__ << " xstr.species=" << aurostd::joinWDelimiter(species,",") << endl;
   }
 
-  (*this).SpeciesPutAlphabetic(); //DX20210129
+  SpeciesPutAlphabetic(); //DX20210129
   
   if(LDEBUG){
     cerr << __AFLOW_FUNC__ << " POST-SPECIES-SORT" << endl;
     cerr << __AFLOW_FUNC__ << " xstr=" << endl << (*this) << endl;
     cerr << __AFLOW_FUNC__ << " xstr.species=" << aurostd::joinWDelimiter(species,",") << endl;
   }
+
+  //CO20230220 - test that species matches names
+  uint itype=0,i=0,iatom=0;
+  for(itype=0;itype<num_each_type.size();itype++){
+    for(i=0;i<(uint)num_each_type[itype];i++){
+      if(!atoms[iatom].name.empty() && !species[itype].empty() && atoms[iatom].name!=species[itype]){
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atoms and species were incorrectly (re)sorted",_RUNTIME_ERROR_);
+      }
+    }
+  }
+  //
 }
 
 // **************************************************************************
@@ -13998,7 +14009,12 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     // this checks volumes, number of atoms, etc. internally
     prim.TransformStructure(transformation_matrix, rotation_matrix);
   }
-  catch(aurostd::xerror& re){
+  catch(aurostd::xerror& err){
+    if(aurostd::substring2bool(err.whereFileName(),"aflow_xatom.cpp") && 
+        aurostd::substring2bool(err.whereFunction(),"xstructure::ReplaceAtoms():") && 
+        aurostd::substring2bool(err.what(),"atoms and species were incorrectly (re)sorted")){
+      throw err;
+    }
     return;
   }
 
