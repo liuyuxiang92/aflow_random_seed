@@ -3371,8 +3371,9 @@ namespace aurostd {
   }    
 }
 }	
-template vector<xvector <double>> histogram(const xvector<double>& data, uint bins);
 template vector<xvector <double>> histogram(const xvector<double>& data, uint max_bins, uint binning_algorithm);
+template vector<xvector <double>> histogram(const xvector<float>& data, uint max_bins, uint binning_algorithm);
+template vector<xvector <double>> histogram(const xvector<int>& data, uint max_bins, uint binning_algorithm);
 template vector<xvector <double>> histogram(const xvector<double>& data, uint bins, double minimum_data, double maximum_data);
 }
 // ----------------------------------------------------------------------------
