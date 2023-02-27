@@ -3337,7 +3337,7 @@ namespace aurostd {
     }
     xvector<double> counts(bins); // counts in bin
     int bin_index; // min data point
-    xvector<utype> edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
+    xvector<double> edges = linspace(minimum_data, maximum_data, (int)(bins+1)); // edges of histogram bins
     double width = edges[edges.lrows+1]-edges[edges.lrows];
     for(int j = data.lrows; j <= data.urows; j++){
       // min is required because we need to force the last last edge into the last bin (remember bins < edges)
