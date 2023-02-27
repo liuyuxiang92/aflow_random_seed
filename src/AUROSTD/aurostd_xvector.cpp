@@ -3351,7 +3351,8 @@ namespace aurostd {
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
 }
-  //automatic binning with option to set minumum number of bins
+  ///@overload
+  ///@note automatic binning with option to set minumum number of bins
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint min_bins, uint binning_algorithm) {
     switch (binning_algorithm) {
      
