@@ -3346,7 +3346,8 @@ namespace aurostd {
     }
     return {counts, edges};
   }
-  //manually choose number of bins
+  ///@overload
+  ///@note manually choose number of bins
   template<class utype> vector<xvector<double> > histogram(const xvector<utype>& data, uint bins) {
     return histogram(data, bins, min(data), max(data));
 }
