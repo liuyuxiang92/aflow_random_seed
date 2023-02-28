@@ -2456,10 +2456,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
       species.push_back(names[all_indices[i][j]]);
     }
     xstr_tmp.SetSpecies(species);
-    //DX TEST xstr_tmp.species_pp = species; //for vasp5 20190731
-    xstr_tmp.species = species; //DX20190813
-    xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
-    xstr_tmp.SpeciesPutAlphabetic(); // updates num each type
+    std::stable_sort(xstr_tmp.atoms.begin(),xstr_tmp.atoms.end(),sortAtomsNames); //DX20230227 - with updated SetSpecies using ReplaceAtoms, need to resort atoms based on names
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 

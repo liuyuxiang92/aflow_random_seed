@@ -13,6 +13,7 @@
         -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
         -- fixed printing of Wyccar to check if the space group has been calculated (DX)
         -- added tie-breaker scheme to choose AFLOW prototype that is most alphabetical from left-to-right (DX)
+        -- fixed atom decoration comparisons with new SetSpecies() function (DX)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)
