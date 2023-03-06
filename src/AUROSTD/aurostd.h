@@ -947,10 +947,14 @@ namespace aurostd { // aurostd_crc64.cpp
     UINT64_C(0xa6df411fbfb21ca3),UINT64_C(0xdc0731d78f8795da),UINT64_C(0x536fa08fdfd90e51),UINT64_C(0x29b7d047efec8728),
   };
 
+  static const string human_alphanum_choices="0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; ///< basis for the human readable hash, drops O and I to avoid mix-ups
+
   uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);
   uint64_t crc64(uint64_t crc, const string s);
   uint64_t crc64(const string s);  //HE20220404 partner function to aurostd::ctcrc64 starting at crc 0
   string crc2string(uint64_t crc);
+  string crc2human(const uint64_t crc, const uint width=0); //HE20230221
+  string crc2human(const string & input, const uint width=0); //HE20230221
 
   // HE20220404 START
   // constexpr variant of aurostd::crc64 that the compiler can precalculate
