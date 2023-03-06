@@ -1303,6 +1303,30 @@ namespace unittest {
     static constexpr uint64_t
       calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
     checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+
+
+    // ---------------------------------------------------------------------------
+    // Check | crc2human //HE20230221
+    // ---------------------------------------------------------------------------
+
+    {
+      check_function = "aurostd::crc2human()";
+      check_description = "create human readable hash";
+      std::string expected = "NEPPW041L8FJ2";
+      std::string result = aurostd::crc2human("Hello World!");
+      checkEqual(result, expected, check_function, check_description, passed_checks, results);
+
+      check_description = "create truncated human readable hash";
+      expected = "NEPPW0";
+      result = aurostd::crc2human("Hello World!", 6);
+      checkEqual(result, expected, check_function, check_description, passed_checks, results);
+
+      check_description = "check padding";
+      expected = "2ZP300";
+      result = aurostd::crc2human(145624, 6);
+      checkEqual(result, expected, check_function, check_description, passed_checks, results);
+    }
+
   }
 
 
