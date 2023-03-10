@@ -955,49 +955,49 @@ namespace unittest {
                     // setup test environment
     string check_function = "", check_description = "";
 
-    bool calculated_bool = false, expected_bool = false;
     xmatrix<int> calculated_xmatint, expected_xmatint;
-
-    // ---------------------------------------------------------------------------
-    // Check convert to xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::getxvec()";
-    xmatrix<int> full_xmatint, xmatint;
-    // need this matrix to test slicing
-    full_xmatint = xmatrix<int>(3,4);
-    full_xmatint = {{1,2,3,4},
-      {5,6,7,8},
-      {9,10,11,12}};
-    check_description = "getxvec() test for type conversion";
-    xvector<int> expected_xvecint(3);
-    xvector<int> calculated_xvecint(3);
-    expected_xvecint = {1,5,9};
-    calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | column xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get column xvector from xmatrix";
-    calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | row xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get row xvector from xmatrix";
-    expected_xvecint = {1,2,3};
-    calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | 1x1 xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get a 1x1 vector from xmatrix";
-    expected_xvecint = {12};
-    calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
+    bool calculated_bool = false, expected_bool = false;
+    {
+        // ---------------------------------------------------------------------------
+        // Check convert to xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_function = "aurostd::getxvec()";
+        xmatrix<int> full_xmatint, xmatint;
+        // need this matrix to test slicing
+        full_xmatint = xmatrix<int>(3,4);
+        full_xmatint = {{1,2,3,4},
+          {5,6,7,8},
+          {9,10,11,12}};
+        check_description = "getxvec() test for type conversion";
+        xvector<int> expected_xvecint(3);
+        xvector<int> calculated_xvecint(3);
+        expected_xvecint = {1,5,9};
+        calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | column xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get column xvector from xmatrix";
+        calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | row xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get row xvector from xmatrix";
+        expected_xvecint = {1,2,3};
+        calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | 1x1 xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get a 1x1 vector from xmatrix";
+        expected_xvecint = {12};
+        calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    }
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
