@@ -3308,7 +3308,7 @@ namespace aurostd {
   /// The following reference gives some background into the use of histograms as density estimators.
   /// 
   /// Freedman, D., Diaconis, P. On the histogram as a density estimator:L 2 theory. 
-  /// Z. Wahrscheinlichkeitstheorie verw Gebiete 57, 453–476 (1981). https://doi.org/10.1007/BF01025868
+  /// Z. Wahrscheinlichkeitstheorie verw Gebiete 57, 453–476 (1981). @doi{10.1007/BF01025868}
   /// 
   /// Currently there is only one algorithm for bin choices implemented (binning_algorithm = 1)
   ///

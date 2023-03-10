@@ -896,56 +896,58 @@ namespace unittest {
     expected_xvecdbl = {1.0, 1.375, 1.75, 2.125, 2.5};
     calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
+    {
+        // ---------------------------------------------------------------------------
+        // Check | histogram edges (manual bins) //AZ20230213
+        // ---------------------------------------------------------------------------
+        check_function = "aurostd::histogram()";
+        check_description = "edges of histogram bins (manual bins)";
+        expected_xvecdbl = {0., 1.8, 3.6, 5.4, 7.2, 9.};
+        vector<xvector<double> > vec_xvecdbls;
+        xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | histogram bins //AZ20230213
+        // ---------------------------------------------------------------------------
+        check_description = "counts of histogram bins (manual bins)";
+        expected_xvecdbl= {16., 18., 12., 15., 19.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram edges (full vector) //AZ20230213
+        // ---------------------------------------------------------------------------
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_description = "automatic histogram bins (large vector)";
+        expected_xvecdbl =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram edges (full vector) //AZ20230213
+        // ---------------------------------------------------------------------------
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram edges (large vector)";
+        expected_xvecdbl =  {0.,1.,2.,3.,4.,5.,6.,7.,8.,9.};
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram bins //AZ20230213
+        // ---------------------------------------------------------------------------
+        in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.};
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram bins (small vector)";
+        expected_xvecdbl =  {5.,4.,2.,2.,4.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram edges (small vector)";
+        expected_xvecdbl =  {0., 1.8, 3.6, 5.4, 7.2, 9.};
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    }
 
-    // ---------------------------------------------------------------------------
-    // Check | histogram edges (manual bins) //AZ20230213
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::histogram()";
-    check_description = "edges of histogram bins (manual bins)";
-    expected_xvecdbl = {0., 1.8, 3.6, 5.4, 7.2, 9.};
-    vector<xvector<double> > vec_xvecdbls;
-    xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
-    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
-    checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | histogram bins //AZ20230213
-    // ---------------------------------------------------------------------------
-    check_description = "counts of histogram bins (manual bins)";
-    expected_xvecdbl= {16., 18., 12., 15., 19.};
-    checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | auto histogram edges (full vector) //AZ20230213
-    // ---------------------------------------------------------------------------
-    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
-    check_description = "automatic histogram bins (large vector)";
-    expected_xvecdbl =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
-    checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | auto histogram edges (full vector) //AZ20230213
-    // ---------------------------------------------------------------------------
-    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
-    check_function = "aurostd::histogram()";
-    check_description = "automatic histogram edges (large vector)";
-    expected_xvecdbl =  {0.,1.,2.,3.,4.,5.,6.,7.,8.,9.};
-    checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | auto histogram bins //AZ20230213
-    // ---------------------------------------------------------------------------
-    in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.};
-    vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
-    check_function = "aurostd::histogram()";
-    check_description = "automatic histogram bins (small vector)";
-    expected_xvecdbl =  {5.,4.,2.,2.,4.};
-    checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-
-    check_function = "aurostd::histogram()";
-    check_description = "automatic histogram edges (small vector)";
-    expected_xvecdbl =  {0., 1.8, 3.6, 5.4, 7.2, 9.};
-    checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
 }
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
