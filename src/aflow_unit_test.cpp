@@ -896,56 +896,108 @@ namespace unittest {
     expected_xvecdbl = {1.0, 1.375, 1.75, 2.125, 2.5};
     calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
-  }
+    {
+        // ---------------------------------------------------------------------------
+        // Check | histogram edges (manual bins) //AZ20230213
+        // ---------------------------------------------------------------------------
+        check_function = "aurostd::histogram()";
+        check_description = "edges of histogram bins (manual bins)";
+        expected_xvecdbl = {0., 1.8, 3.6, 5.4, 7.2, 9.};
+        vector<xvector<double> > vec_xvecdbls;
+        xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | histogram bins //AZ20230213
+        // ---------------------------------------------------------------------------
+        check_description = "counts of histogram bins (manual bins)";
+        expected_xvecdbl= {16., 18., 12., 15., 19.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram edges (full vector) //AZ20230213
+        // ---------------------------------------------------------------------------
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_description = "automatic histogram bins (large vector)";
+        expected_xvecdbl =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram edges (full vector) //AZ20230213
+        // ---------------------------------------------------------------------------
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram edges (large vector)";
+        expected_xvecdbl =  {0.,1.,2.,3.,4.,5.,6.,7.,8.,9.};
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | auto histogram bins //AZ20230213
+        // ---------------------------------------------------------------------------
+        in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.};
+        vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5, 1);
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram bins (small vector)";
+        expected_xvecdbl =  {5.,4.,2.,2.,4.};
+        checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    
+        check_function = "aurostd::histogram()";
+        check_description = "automatic histogram edges (small vector)";
+        expected_xvecdbl =  {0., 1.8, 3.6, 5.4, 7.2, 9.};
+        checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
+    }
+
+}
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
                     // setup test environment
     string check_function = "", check_description = "";
 
-    bool calculated_bool = false, expected_bool = false;
     xmatrix<int> calculated_xmatint, expected_xmatint;
-
-    // ---------------------------------------------------------------------------
-    // Check convert to xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::getxvec()";
-    xmatrix<int> full_xmatint, xmatint;
-    // need this matrix to test slicing
-    full_xmatint = xmatrix<int>(3,4);
-    full_xmatint = {{1,2,3,4},
-      {5,6,7,8},
-      {9,10,11,12}};
-    check_description = "getxvec() test for type conversion";
-    xvector<int> expected_xvecint(3);
-    xvector<int> calculated_xvecint(3);
-    expected_xvecint = {1,5,9};
-    calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | column xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get column xvector from xmatrix";
-    calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | row xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get row xvector from xmatrix";
-    expected_xvecint = {1,2,3};
-    calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | 1x1 xvector //AZ20220627
-    // ---------------------------------------------------------------------------
-    check_description = "get a 1x1 vector from xmatrix";
-    expected_xvecint = {12};
-    calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-
+    bool calculated_bool = false, expected_bool = false;
+    {
+        // ---------------------------------------------------------------------------
+        // Check convert to xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_function = "aurostd::getxvec()";
+        xmatrix<int> full_xmatint, xmatint;
+        // need this matrix to test slicing
+        full_xmatint = xmatrix<int>(3,4);
+        full_xmatint = {{1,2,3,4},
+          {5,6,7,8},
+          {9,10,11,12}};
+        check_description = "getxvec() test for type conversion";
+        xvector<int> expected_xvecint(3);
+        xvector<int> calculated_xvecint(3);
+        expected_xvecint = {1,5,9};
+        calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | column xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get column xvector from xmatrix";
+        calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | row xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get row xvector from xmatrix";
+        expected_xvecint = {1,2,3};
+        calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+        // ---------------------------------------------------------------------------
+        // Check | 1x1 xvector //AZ20220627
+        // ---------------------------------------------------------------------------
+        check_description = "get a 1x1 vector from xmatrix";
+        expected_xvecint = {12};
+        calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
+        checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    }
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
@@ -1103,6 +1155,7 @@ namespace unittest {
       smat = aurostd::hstack(vector<xvector<int>>({xv, xv, xv}));
       checkEqual(smat, hsmat, check_function, check_description, passed_checks, results);
     }
+
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {

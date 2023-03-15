@@ -443,6 +443,7 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     asin(const xvector<utype>&) __xprototype;
+  
 
   template<class utype> xvector<utype>
     acos(const xvector<utype>&) __xprototype;
@@ -645,6 +646,11 @@ namespace aurostd { //CO20190620
   //signal processing
   template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
   template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
+
+  template<class utype> vector<xvector<double>> histogram(const xvector<utype>& data, uint bins, double minimum_data, double maximum_data);
+  template<class utype> vector<xvector<double>> histogram(const xvector<utype>& data, uint bins); //AZ20230204
+  template<class utype> vector<xvector<double>> histogram(const xvector<utype>& data, uint max_bins, uint bin_mode); //AZ20230204
+														     
 }
 
 namespace aurostd {
