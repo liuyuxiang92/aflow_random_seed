@@ -381,9 +381,9 @@ namespace aurostd {
     inverseByQR(const xmatrix<utype>&) __xprototype;  //SD20220426
 
   template<class utype> void
-    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426
+    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426  //CO20230313 - utype clang warnings
   template<class utype> void
-    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426
+    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426 //CO20230313 - utype clang warnings
 
   template<class utype> xmatrix<utype>
     inverseByLUP(const xmatrix<utype>&) __xprototype;  //SD20220426
@@ -628,7 +628,7 @@ namespace aurostd {
         xmatrix<utype>& deformation,
         bool check_orthogonal_rotation=true); __xprototype;
 
-  template<class utype> void equilibrateMatrix(const xmatrix<utype>& A_orig, xmatrix<utype>& A, xmatrix<utype>& R, xmatrix<utype>& C, uint niter=100, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); __xprototype; //SD20220425
+  template<class utype> void equilibrateMatrix(const xmatrix<utype>& A_orig, xmatrix<utype>& A, xmatrix<utype>& R, xmatrix<utype>& C, uint niter=100, utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); __xprototype; //SD20220425  //CO20230313 - utype clang warnings
 
 }
 
@@ -669,17 +669,17 @@ namespace aurostd {
   // but since you have just done an N3 procedure to get the eigenvalues, you can afford yourself
   // this little indulgence.
   template<class utype> 
-    void QRDecomposition_HouseHolder(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110
+    void QRDecomposition_HouseHolder(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110 //CO20230313 - utype clang warnings
   template<class utype> 
-    void QRDecomposition_HouseHolder_MW(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110
+    void QRDecomposition_HouseHolder_MW(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110  //CO20230313 - utype clang warnings
   template<class utype> 
-    void QRDecomposition_HouseHolder_TB(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110
+    void QRDecomposition_HouseHolder_TB(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=(utype)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO20191110  //CO20230313 - utype clang warnings
   // general Householder, mat is mxn, m>=n
   // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
   template<class utype> 
     void getEHermite(utype a,utype b,xmatrix<utype>& ehermite); //CO+YL20191201
   template<class utype> 
-    void getSmithNormalForm(const xmatrix<utype>& A,xmatrix<utype>& U,xmatrix<utype>& V,xmatrix<utype>& S,double tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO+YL20191201
+    void getSmithNormalForm(const xmatrix<utype>& A,xmatrix<utype>& U,xmatrix<utype>& V,xmatrix<utype>& S,double tol=(double)_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO+YL20191201 //CO20230313 - utype clang warnings
   template<class utype>
     void tred2(const xmatrix<utype> &a,xvector<utype> &d,xvector<utype> &e) __xprototype;
   // Householder reduction of a real, symmetric matrix a[1..n][1..n].
