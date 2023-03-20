@@ -6153,7 +6153,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // CIF INPUT
   if(a.iomode==IOCIF) { // CIF
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [0]" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
     a.lattice=aurostd::eye<double>(3,3); //CO20190520
@@ -6195,6 +6195,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       //DX20190708 - added another space group variant - END
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [1]" << endl;
     // get space group setting
     string spacegroup_Hall="";
     for(uint i=0;i<vinput.size();i++) {
@@ -6211,6 +6212,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //DX20190708 - fix Hall reader - END
       }
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [2]" << endl;
     //DX20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
@@ -6250,6 +6252,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
       }
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [3]" << endl;
     for(uint setting_number=1;setting_number<=2;setting_number++){
       string setting_string = aurostd::utype2string<uint>(setting_number);
       int general_wyckoff_multiplicity=0; // general Wyckoff position multiplicity
@@ -6357,6 +6360,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [4]" << endl;
     if(!found_setting){
       // ME20220124 - Changed to warning
       message << "Symmetry operations do not match between input operations and space group number/option.";  //CO20190629
@@ -6368,6 +6372,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [5]" << endl;
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
       vector<string> tokens;
@@ -6395,6 +6400,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.FixLattices();
     a.partial_occupation_flag = FALSE;
 
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [6]" << endl;
     // ME20220124 - Convert xyz to symbolic representation
     vector<symbolic::Symbolic> spacegroup_symop_symbolic;
     if (!found_setting) {
@@ -6407,6 +6413,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     // get atoms
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [7]" << endl;
     vector<string> atom_site_fields;
     bool found_atom_site_labels=FALSE;
     bool already_storing_atoms=FALSE;
@@ -6481,7 +6488,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
           a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
           atom_tmp.cpos=a.f2c*atom_tmp.fpos;
+          if(LDEBUG) cerr << __AFLOW_FUNC__ << " pre AddAtom() [i=" << i << "]" << endl;
           a.AddAtom(atom_tmp,true); //CO20230319 - add by species
+          if(LDEBUG) cerr << __AFLOW_FUNC__ << " post AddAtom() [i=" << i << "]" << endl;
           //ME20220124 - Use symmetry operations when setting unknown
           if (!found_setting) {
             uint natoms = a.atoms.size();  // For Wyckoff positions
@@ -6512,6 +6521,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [8]" << endl;
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
     //DX20191010 - moved loop that used to be here after re-alphabetizing
@@ -6521,6 +6531,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.MakeBasis(); //DX20200803 - must be after alphabetic sort
     a.MakeTypes(); //DX20190508 - otherwise types are not created //DX20200803 - must be after alphabetic sort
     //DX20191010 - moved this loop - START
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [9]" << endl;
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
         poccaus.push_back(a.atoms[i].partial_occupation_value);
@@ -6538,6 +6549,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // add title, CIFs do not generally have a canonical "title" line, so make one
     a.BringInCell();  //ME20220124
     a.buildGenericTitle(); //DX20210211
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF [DONE]" << endl;
   } // CIF INPUT
 
   // ----------------------------------------------------------------------
@@ -7614,7 +7626,7 @@ void xstructure::AddAtom(const _atom& atom, bool add_species, bool check_present
   //only modify the type of the incoming atoms vector
   //NOTE: MapAtom() below DEPENDS on having correct type implicitly, so this part of the routine MUST come first
   if(add_species){  //CO20230319 - fix atom's type
-    if(!btom.name.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atom.name.empty()",_INPUT_MISSING_);}
+    if(btom.name.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atom.name.empty()",_INPUT_MISSING_);}
     deque<string> species_new=species;
     //
     if(LDEBUG){

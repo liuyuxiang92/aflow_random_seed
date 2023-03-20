@@ -155,7 +155,6 @@ namespace unittest {
     xchk.task_description = "entryLoader functions";
     test_functions["entry_loader"] = xchk;
 
-
     // ovasp
     //Not working yet because we cannot load OUTCARs via the RestAPI
     //xchk = initializeXCheck();
@@ -2152,7 +2151,7 @@ namespace unittest {
     // Check | number of created AEs
     check_description = "number of created AEs";
     checkEqual(uint(AE.size()), uint(6), check_function, check_description, passed_checks, results);
-
+    
     // ---------------------------------------------------------------------------
     // Check | point index mapping
     check_description = "point index mapping";
@@ -2245,6 +2244,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Test 1: parse structure with known settings
     // ---------------------------------------------------------------------------
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 1: parse structure with known settings" << std::endl;
 
     // CrO3 was a problematic structure in the past
     str_cif =
@@ -2318,23 +2318,29 @@ namespace unittest {
 
     check_function = "xstructure::operator<<";
     check_description = "Parsing CIF file with recognized setting (CrO3)";
-
+    
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [1] Parsing CIF file with recognized setting (CrO3)" << std::endl;
     aurostd::StringstreamClean(xstrss);
     xstrss << str_cif;
-    xstr_cif = xstructure(xstrss);
+    try {xstr_cif = xstructure(xstrss);} 
+    catch(aurostd::xerror& excpt) {errors.push_back("Could not generate CrO3");}
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [2] Parsing CIF file with recognized setting (CrO3)" << std::endl;
 
     aurostd::StringstreamClean(xstrss);
     xstrss << str_poscar;
     xstr_poscar = xstructure(xstrss);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [3] Parsing CIF file with recognized setting (CrO3)" << std::endl;
 
     // ---------------------------------------------------------------------------
     // test: parse structure
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " test: parse structure" << std::endl;
     expected_bool = true;
     calculated_bool = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
     checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // test: compare Wyckoff positions
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " test: compare Wyckoff positions" << std::endl;
     check_description = "Compare parsed Wyckoff positions of CrO3";
     vector<wyckoffsite_ITC> vwyckoff(4);
     xvector<double> coords;
@@ -2400,6 +2406,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Test 2: parse structure with unrecognized (old) settings
     // ---------------------------------------------------------------------------
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 2: parse structure with unrecognized (old) settings" << std::endl;
     check_description = "Parsing CIF file with unrecognized setting (GePt3)";
     aurostd::StringstreamClean(xstrss);
     str_cif =
