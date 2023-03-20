@@ -2144,7 +2144,7 @@ namespace unittest {
     // Check | number of created AEs
     check_description = "number of created AEs";
     checkEqual(uint(AE.size()), uint(6), check_function, check_description, passed_checks, results);
-
+    
     // ---------------------------------------------------------------------------
     // Check | point index mapping
     check_description = "point index mapping";
