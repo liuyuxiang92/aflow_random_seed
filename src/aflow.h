@@ -1624,14 +1624,17 @@ class xstructure {
     void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
-    void AddAtom(const _atom& atom,bool check_present=true);      // adding an atom
-    void AddAtom(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //CO20210129 //DX20210201
+    void AddAtom(const _atom& atom,bool add_species,              // adding an atom //CO20230319 - adding add_species which assumes the species information of the incoming atoms is correct, otherwise add by type
+        bool check_present=true);
+    void AddAtom(const deque<_atom>& atom,bool add_species,       // adding a deque<_atom> //CO20210129 //DX20210201  //CO20230319 - adding add_species which assumes the species information of the incoming atoms is correct, otherwise add by type
+        bool check_present=true);
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
     void RemoveAtom(void);                                        // removes all atoms //DX20210129
     void ReplaceAtoms(const deque<_atom>& new_atoms,
-        bool check_atom_overlap=true);                            // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
+        bool check_atom_overlap=true,                             // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
+        bool sort_species=true);                                  // CO20230319 - sort species
     void RemoveCopies(double=1.0e-3);                             // deleting atoms too close F/C
     void RemoveFractionalCopies(double=1.0e-3);                   // deleting atoms too close F
     void RemoveCartesianCopies(double=1.0e-3);                    // deleting atoms too close C
@@ -1648,8 +1651,13 @@ class xstructure {
     bool SpeciesGetAlphabetic(void);                              // Check is species are in alphabetic order
     bool SpeciesPutAlphabetic(void);                              // Put Species in alphabetic
     string SpeciesString(void);                                   // Gives a string with the list of all the species
-    uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
-    void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
+    uint SetSpecies(const std::deque<string>& vspecies,           // Set the species
+        bool sort_species=true);                                  // CO20230319 - sort species
+    void UpdateSpecies(const _atom& atom,bool add_species);       // Update species from atom (consolidated from AddAtom) //DX20210202  //CO20230319 - adding add_species which assumes the species information of the incoming atoms is correct, otherwise add by type
+    void UpdateSpecies_20230319(const _atom& atom,                // Update species from atom (consolidated from AddAtom) //DX20210202  //CO20230319 - adding add_species which assumes the species information of the incoming atoms is correct, otherwise add by type
+        bool add_species);
+    void UpdateSpecies_20230101(const _atom& atom,                // Update species from atom (consolidated from AddAtom) //DX20210202  //CO20230319 - adding add_species which assumes the species information of the incoming atoms is correct, otherwise add by type
+        bool add_species);
     //DX20210302 [OBSOLETE] void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     //DX20210302 [OBSOLETE] void GetLatticeType(void);                                    // Get all lattices
     void GetLatticeType(

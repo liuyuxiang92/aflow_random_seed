@@ -4973,7 +4973,7 @@ namespace SYM {
     //DX+CO END
     aa.title="KLATTICE";
     _atom atom;
-    aa.AddAtom(atom); // just something in the origin;
+    aa.AddAtom(atom,false); // just something in the origin;  //CO20230319 - add by type
     //  cerr << aa << endl;
     //DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
     Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); //DX20170808 - New klattice routine
@@ -5010,7 +5010,7 @@ namespace SYM {
     //DX+CO END
     aa.title="KCRYSTAL";
     _atom atom;
-    aa.AddAtom(atom); // just something in the origin;
+    aa.AddAtom(atom,false); // just something in the origin;  //CO20230319 - add by species
     //  cerr << aa << endl;
     //DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL //HE20220912

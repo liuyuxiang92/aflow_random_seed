@@ -3657,7 +3657,7 @@ namespace pflow {
           atom_tmp.name = str_sg.wyckoff_sites_ITC[i].type;
           atom_tmp.partial_occupation_flag = aurostd::isdifferent(str_sg.wyckoff_sites_ITC[i].site_occupation,1.0);
           atom_tmp.partial_occupation_value = str_sg.wyckoff_sites_ITC[i].site_occupation;
-          str_expanded.AddAtom(atom_tmp);
+          str_expanded.AddAtom(atom_tmp,true);  //CO20230319 - add by species
         }
         xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
         str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_expanded); //DX20220921 - changed str_sg to str_expanded in last argument

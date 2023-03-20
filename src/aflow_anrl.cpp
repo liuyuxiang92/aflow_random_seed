@@ -565,7 +565,7 @@ namespace anrl {
     // reorder Wyckoff positions alphabetically by Wyckoff letter, then by species
     std::sort(ordered_Wyckoff_sites_ITC.begin(), ordered_Wyckoff_sites_ITC.end()); 
 
-    if(LDEBUG) { for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){cerr << __AFLOW_FUNC__ << "::Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;} }
+    if(LDEBUG) { for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){cerr << __AFLOW_FUNC__ << ":Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;} }
 
     // determine degrees of freedom in Wyckoff positions 
     for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
@@ -2331,7 +2331,7 @@ namespace anrl {
 
     if(LDEBUG){ 
       for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
-        cerr << __AFLOW_FUNC__ << "::Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;
+        cerr << __AFLOW_FUNC__ << ":Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;
       }
     }
 
@@ -2586,7 +2586,7 @@ namespace anrl {
           if(vpermutation.size()>0)  { atoms.at(i).type=vpermutation.at(type); }  // PERMUTATIONS 
           if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
           //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
-          str.AddAtom(atoms.at(i));
+          str.AddAtom(atoms.at(i),false);  //CO20230319 - add by type
           // DX20181205 - Volume scaling by atomic species - START
           // ---------------------------------------------------------------------------
           // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
@@ -2599,7 +2599,7 @@ namespace anrl {
               }
             }
             //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-            str.SetVolume(volume); //CO20190205 - more robust
+            str.SetVolume(volume);  //CO20190205 - more robust
             str.neg_scale=TRUE;
           }
           //DX20181205 - Volume scaling by atomic species - END
@@ -7183,15 +7183,16 @@ namespace anrl {
           if(vpermutation.size()>0)  { atoms.at(i).type=vpermutation.at(type); }  // PERMUTATIONS 
           if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
           //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
-          str.AddAtom(atoms.at(i));
-          //DX20181205 - Volume scaling by atomic species - START
+          str.AddAtom(atoms.at(i),false);  //CO20230319 - add by type
+          // DX20181205 - Volume scaling by atomic species - START
+          // ---------------------------------------------------------------------------
           // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
           if(scale_volume_by_species==true){
             double volume=0.0;
             for(uint i=0;i<str.num_each_type.size();i++) {
               for(uint j=0;j<(uint)str.num_each_type[i];j++){
                 volume+=vvolumeX[i];
-                if(LDEBUG) { oss << "DEBUG: (anrl::PrototypeANRL) volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
+                if(LDEBUG) { cerr << __AFLOW_FUNC__ << " volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
               }
             }
             //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);

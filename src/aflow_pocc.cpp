@@ -5398,7 +5398,7 @@ namespace pocc {
     supercell_clean.scale=supercell.scale;
     supercell_clean.FixLattices();
 
-    for(uint atom=0;atom<atoms.size();atom++){supercell_clean.AddAtom(atoms[atom]);}
+    for(uint atom=0;atom<atoms.size();atom++){supercell_clean.AddAtom(atoms[atom],false);}  //CO20230319 - add by type
 
     //we need to copy the follow species info over, which is not copied with AddAtom(), space is created for them though
     //species_pp_type
@@ -6742,7 +6742,7 @@ namespace pocc {
 
       //redecorate xstr_pocc (tmp) to create xstr_nopocc
       xstructure xstr_pocc_tmp(xstr_pocc);
-      xstr_pocc_tmp.SetSpecies(aurostd::vector2deque(species)); //do NOT change order of species assignment
+      xstr_pocc_tmp.SetSpecies(aurostd::vector2deque(species),false); //do NOT change order of species assignment
 
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]deque<_atom> atoms;
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint iatom=0;
@@ -6767,7 +6767,7 @@ namespace pocc {
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing atom[" << i << "]" << endl;
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  xstr_pocc_tmp.RemoveAtom(i);
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i]);}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i],true);}  //CO20230319 - add by species
       //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
 
       if(LDEBUG) {

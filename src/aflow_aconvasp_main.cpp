@@ -5524,8 +5524,8 @@ namespace pflow {
               _atom atom=b.atoms.at(iat);
               atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
               atom.cpos=F2C(a.lattice,atom.fpos);
-              if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) a.AddAtom(atom);
-              //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   a.AddAtom(atom);	    //a.AddAtom(atom);
+              if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) a.AddAtom(atom,false);  //CO20230319 - add by type
+              //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   a.AddAtom(atom,false);	    //a.AddAtom(atom,false);  //CO20230319 - add by type
             }
           }
         }
@@ -8183,7 +8183,7 @@ namespace pflow {
                 atom=a.atoms.at(iat);
                 atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
                 if(aurostd::isequal(atom.fpos[1],1.0,0.02) || aurostd::isequal(atom.fpos[2],1.0,0.02)|| aurostd::isequal(atom.fpos[3],1.0,0.02))
-                  b.AddAtom(F2C(b,atom));
+                  b.AddAtom(F2C(b,atom),false); //CO20230319 - add by type
               }
         }
         a=b;
@@ -10133,7 +10133,7 @@ namespace pflow {
         atom.name = species[type_idx];
         atom.cleanname = species[type_idx];
         atom.name_is_given = true;
-        new_structure.AddAtom(atom);
+        new_structure.AddAtom(atom,false);  //CO20230319 - add by type
         num_atoms++;
       }
     }
@@ -10972,7 +10972,7 @@ namespace pflow {
             _atom atom=a.atoms.at(iat);
             atom.cpos=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3)+a.atoms.at(iat).cpos;
             atom.fpos=C2F(b.lattice,atom.cpos);               // put in fractional of new basis
-            if(modulus(atom.cpos)<=radius)  b.AddAtom(atom);
+            if(modulus(atom.cpos)<=radius)  b.AddAtom(atom,false);  //CO20230319 - add by species
           }
         }
       }
@@ -11753,6 +11753,12 @@ namespace pflow {
   };
   vector<POCCSiteSpecification> poccString2POCCSiteSpecification(const xstructure& xstr,const vector<string> pocc_sites){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG){ //CO20230319
+      cerr << __AFLOW_FUNC__ << " xstr=" << endl << xstr << endl;
+      cerr << __AFLOW_FUNC__ << " pocc_sites=";
+      for(uint i=0;i<pocc_sites.size();i++){cerr << pocc_sites[i] << (i<pocc_sites.size()-1?",":"");}
+      cerr << endl;
+    }
     stringstream message;
     vector<POCCSiteSpecification> vpss;
     if(pocc_sites.empty()){return vpss;}
@@ -12097,7 +12103,7 @@ namespace pflow {
     }
     xstr.RemoveAtom(atoms2remove);
     std::stable_sort(atoms2add.begin(),atoms2add.end(),sortAtomsTypes); //safe because we do AddAtom() below
-    for(uint i=0;i<atoms2add.size();i++){xstr.AddAtom(atoms2add[i]);}
+    for(uint i=0;i<atoms2add.size();i++){xstr.AddAtom(atoms2add[i],false);} //CO20230319 - add by type
     //volumes
     //AddAtom() takes care of setting default volumes/masses
     if(vvolumes.size()==xstr.species_volume.size()){

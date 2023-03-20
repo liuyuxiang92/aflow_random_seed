@@ -6783,7 +6783,7 @@ namespace compare {
     }
     std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
     for(uint i=0;i<new_basis.size();i++){
-      proto_new.AddAtom(new_basis[i]);
+      proto_new.AddAtom(new_basis[i],true); //CO20230319 - add by species
     }
     proto = proto_new;
 

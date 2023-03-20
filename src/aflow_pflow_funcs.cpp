@@ -3439,7 +3439,7 @@ namespace pflow {
           a.fpos=C2F(xlat1,a.cpos);
           //	a=pflow::SetFpos(a,C2F(lat1,cpos2[cnt]));
           a=pflow::SetType(a,num_types_1+it);
-          str1.AddAtom(a);
+          str1.AddAtom(a,false);  //CO20230319 - add by type
           cnt++;
         }
       }

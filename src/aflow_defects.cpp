@@ -942,7 +942,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     atom.type=str.species.size();       // to force an extra species
     atom.name="H";atom.cleanname="H";   // atom.name=string_species;atom.cleanname=string_species;
     // ADD atom, put alphabetic
-    straus.AddAtom(atom);
+    straus.AddAtom(atom,false); //CO20230319 - add by type
     straus.SpeciesPutAlphabetic();
     // make structure
     vstr.push_back(straus);
