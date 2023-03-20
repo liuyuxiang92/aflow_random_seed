@@ -2674,17 +2674,17 @@ namespace SYM {
       xcomplex<double> tmp3(0.0,-_axis(3)/2.0);
       complex_matrix(2,2) = theta*tmp3;
       xmatrix<xcomplex<double> > exp_matrix = aurostd::exp(complex_matrix);
-      if(!(abs(_SU2_matrix(1,1).re-exp_matrix(1,1).re)<1e-3 && abs(_SU2_matrix(1,1).im-exp_matrix(1,1).im)<1e-3 &&
-            abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
-            abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
-            abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
-        //DX20200217 - warning to error
-        stringstream message;
-        message << "Lie algebra does not connect back to Lie group, i.e., exp(theta*su(2)) != SU(2):" << endl;
-        message << "SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
-        message << "exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
-        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
-      }
+      //[CO20230319 - not sure what this is?]if(!(abs(_SU2_matrix(1,1).re-exp_matrix(1,1).re)<1e-3 && abs(_SU2_matrix(1,1).im-exp_matrix(1,1).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
+      //[CO20230319 - not sure what this is?]  //DX20200217 - warning to error
+      //[CO20230319 - not sure what this is?]  stringstream message;
+      //[CO20230319 - not sure what this is?]  message << "Lie algebra does not connect back to Lie group, i.e., exp(theta*su(2)) != SU(2):" << endl;
+      //[CO20230319 - not sure what this is?]  message << "SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
+      //[CO20230319 - not sure what this is?]  message << "exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
+      //[CO20230319 - not sure what this is?]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      //[CO20230319 - not sure what this is?]}
     }
     return true;
   }

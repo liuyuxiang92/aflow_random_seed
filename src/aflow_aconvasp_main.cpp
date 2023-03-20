@@ -10405,7 +10405,6 @@ namespace pflow {
     }
     if(message_parts.size()==0){return;}
 
-
     string tag_code="00000";
     string tag_message="MESSAGE";
     if (type == _LOGGER_ERROR_) {
@@ -10447,7 +10446,7 @@ namespace pflow {
         stream << "  ";
         stream << tag_message;
         stream << " ";
-        stream << __AFLOW_FUNC__;
+        stream << function_name;  //CO20230319
         stream << " ";
         stream << message_parts[i]; //CO20181226 //message;
         stream << Message(filename,aflags,message_metadata);
