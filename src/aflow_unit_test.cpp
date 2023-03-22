@@ -1223,88 +1223,116 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | substring2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::substring2string()";
-    check_description = "return the third match of the substring";
-    string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
-    calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
-    expected_string = "==49";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::substring2string()";
+      check_description = "return the third match of the substring";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
+      string expected_string = "==49";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::kvpair2string()";
-    check_description = "return the second match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
-    expected_string = "MEDIUM";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::kvpair2string()";
+      check_description = "return the second match of the kvpair";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
+      string expected_string = "MEDIUM";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | substring2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::substring2string()";
-    check_description = "return the last match of the substring";
-    calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
-    expected_string = "==SLOW";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::substring2string()";
+      check_description = "return the last match of the substring";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
+      string expected_string = "==SLOW";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | substring2strings //SD20230322
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::substring2strings()";
+      check_description = "return all the matches as vector of strings";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      vector<string> calculated_vstring;
+      aurostd::substring2strings(test_string, calculated_vstring, "IALGO");
+      vector<string> expected_vstring = {"==48", "==49", "==50"};
+      checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::kvpair2string()";
-    check_description = "return the last match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
-    expected_string = "SLOW";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::kvpair2string()";
+      check_description = "return the last match of the kvpair";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
+      string expected_string = "SLOW";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | string2utype //HE20220324
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::string2utype()";
-    check_description = "int - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
-    check_description = "float - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-110100100", 2)) == -420.0f);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::string2utype()";
+      check_description = "int - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+      check_description = "float - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-110100100", 2)) == -420.0f);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
 
-    check_description = "double - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+      check_description = "double - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | crc64 //HE20220404
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::crc64()";
-    check_description = "runtime hashing";
-    expected_uint64 = 15013402708409085989UL;
-    calculated_uint64 = aurostd::crc64("aflowlib_date");
-    checkEqual(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::crc64()";
+      check_description = "runtime hashing";
+      expected_uint64 = 15013402708409085989UL;
+      calculated_uint64 = aurostd::crc64("aflowlib_date");
+      checkEqual(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
 
-    check_function = "aurostd::ctcrc64()";
-    check_description = "compiler hashing (constexpr)";
-    static constexpr uint64_t
-      calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
-    checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+      check_function = "aurostd::ctcrc64()";
+      check_description = "compiler hashing (constexpr)";
+      static constexpr uint64_t
+        calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
+      checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+    }
 
 
     // ---------------------------------------------------------------------------
