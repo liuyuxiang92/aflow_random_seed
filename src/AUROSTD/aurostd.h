@@ -62,6 +62,9 @@
 #include <netdb.h>       //CO20180321 - frisco needs for AFLUX + for EntryLoader
 #include <fts.h>         //HE20220222 - for EntryLoader (effective filesystem tree walk)
 #include <regex>         //HE20220222 - for EntryLoader (faster match of complex patterns like alloy matching)
+#include <limits.h>      //HE20230324 - for embedded files
+#include "../BXZSTR/bxzstr.h"
+
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
 
@@ -1617,6 +1620,11 @@ namespace aurostd {
   struct b64_decoder_creator { };
   extern b64_decoder_creator b64_decoder;
   b64_decoder_proxy operator<<(std::ostream & os, b64_decoder_creator);
+}
+
+namespace aurostd{
+  string get_testdata();
+  string get_vLIBS();
 }
 
 //binary to base64 conversion

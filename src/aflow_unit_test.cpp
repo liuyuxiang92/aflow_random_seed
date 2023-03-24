@@ -1329,6 +1329,21 @@ namespace unittest {
       checkEqual(result, expected, check_function, check_description, passed_checks, results);
     }
 
+
+    // ---------------------------------------------------------------------------
+    // Check | embedded files ///HE20230324
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::embedded()";
+      check_description = "load txt from data";
+//      aurostd::INCBIN_EXTERN(afdataPrototestData);
+//      INCTXT_EXTERN(Readme);
+//      char* bla = aurostd::afdataPrototestData;
+//      cout << bla << endl;
+      cout << aurostd::get_testdata() << endl;
+      cout << aurostd::get_vLIBS() << endl;
+    }
+
   }
 
 
