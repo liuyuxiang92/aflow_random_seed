@@ -5088,6 +5088,7 @@ namespace aurostd {
   }
   //CO END
 
+//#define DEBUG_STRING2TOKENS
   // ***************************************************************************
   // Function string2tokens string2tokens<utype>
   // ***************************************************************************
@@ -5103,11 +5104,24 @@ namespace aurostd {
     tokens.clear(); // clear in the case there was something already in!
     string::size_type lastPos=(consecutive ? 0 : str.find_first_not_of(delimiters,0));   // Skip delimiters at beginning.
     string::size_type pos=str.find_first_of(delimiters,lastPos);     // Find first "non-delimiter".
+#ifdef DEBUG_STRING2TOKENS
+    cerr << __AFLOW_FUNC__ << " delimiters=" << delimiters << endl;
+    cerr << __AFLOW_FUNC__ << " consecutive=" << consecutive << endl;
+    cerr << __AFLOW_FUNC__ << " lastPos=" << lastPos << endl;
+    cerr << __AFLOW_FUNC__ << " pos=" << pos << endl;
+#endif
     while (pos!=string::npos || lastPos!=string::npos) {
       tokens.push_back(str.substr(lastPos,pos-lastPos));             // Found a token, add it to the vector.
+#ifdef DEBUG_STRING2TOKENS
+      cerr << __AFLOW_FUNC__ << " tokens.back()=\"" << tokens.back() << "\"" << endl;
+#endif
       if(consecutive){lastPos=(pos!=string::npos ? pos+1 : string::npos);}
-      else{lastPos=str.find_first_not_of(delimiters,pos);}  // Skip delimiters.  Note the "not_of"
+      else{lastPos=str.find_first_not_of(delimiters,pos);}           // Skip delimiters.  Note the "not_of"
       pos=str.find_first_of(delimiters,lastPos);                     // Find next "non-delimiter"
+#ifdef DEBUG_STRING2TOKENS
+      cerr << __AFLOW_FUNC__ << " lastPos=" << lastPos << endl;
+      cerr << __AFLOW_FUNC__ << " pos=" << pos << endl;
+#endif
     }
     return tokens.size();
   }
@@ -6008,14 +6022,15 @@ namespace aurostd {
 
   string substring2string(const string& _input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
     bool LDEBUG=FALSE;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " BEGIN [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " [input=\"" << input << "\"] [substring=\"" << strsub1 << "\"]" << endl;}
     if(input.find(strsub1)==string::npos) {return "";}
     stringstream strstream;
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " [tokens.size()=" << tokens.size() << "]" << endl;}
     int iter=0;
     if(instance>0) {
       for(uint i=0;i<tokens.size();i++) {
@@ -6025,7 +6040,7 @@ namespace aurostd {
           if(instance==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
         }
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
       return strstream.str();
     }
     else if(instance<0) {
@@ -6036,7 +6051,7 @@ namespace aurostd {
           if(instance==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
         }
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
       return strstream.str();
     }
     else { //instance==0
@@ -6046,7 +6061,7 @@ namespace aurostd {
           strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;
         }
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
       return strstream.str();
     }
     return "";
