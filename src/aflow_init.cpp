@@ -1809,6 +1809,8 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
+  if(XHOST.hostname=="bellatrix") return TRUE;  //CO20230411 - JHU
+  if(XHOST.hostname=="mintaka") return TRUE;  //CO20230411 - JHU
   stringstream messagestream;
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
   if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
