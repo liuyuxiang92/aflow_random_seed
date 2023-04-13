@@ -747,105 +747,7 @@ aflow_gnuplot_funcs.cpp: Makefile
 ###################################################################################################
 
 ###################################################################################################
-#CO20170622 - START
-aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-	echo "#define _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_WEBAPP_ENTRY_JS=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-#CO20170622 - END
-#CO20180305 - START
-aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-	echo "#define _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-#CO20180305 - END
-#MB20190301 - START
-aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_JSON=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-#MB20190301 - END
-#MB20190301 - START
-aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_PLOTTER_PY=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-#MB20190301 - END
-#MB20190301 - START
-aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-#MB20190301 - END
-#MB20190301 - START
-aflow_chull_python.cpp: aflow_chull_python.py Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_PYTHON_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_PYTHON_PY=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_CHULL_PYTHON_CPP_" >> $@
-#MB20190301 - END
-#CO20201105 - START
-aflow_cce_python.cpp: aflow_cce_python.py Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_CCE_PYTHON_CPP_" >> $@
-	echo "#define _AFLOW_CCE_PYTHON_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CCE_PYTHON_PY=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_CCE_PYTHON_CPP_" >> $@
-#CO20201105 - END
-#DX20201228 - START
-aflow_sym_python.cpp: aflow_sym_python.py Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_SYM_PYTHON_CPP_" >> $@
-	echo "#define _AFLOW_SYM_PYTHON_CPP_" >> $@
-	echo "// $@ automatically generated" >> $@
-	echo "std::string AFLOW_SYM_PYTHON_PY=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_SYM_PYTHON_CPP_" >> $@
-#DX20201228 - END
-#DX20201228 - START
-aflow_xtalfinder_python.cpp: aflow_xtalfinder_python.py Makefile
-	rm -rf $@
-	echo "#ifndef _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
-	echo "#define _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
-	echo "// $@ automatically generated" >> $@
-	echo "std::string AFLOW_XTALFINDER_PYTHON_PY=\"\\" >> $@
-	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif // _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
-#DX20201228 - END
+
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -1024,7 +926,7 @@ datainstall:
 redata: datainstall
 .PHONY: clean_autogen
 clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_cce_python.cpp aflow_sym_python.cpp aflow_xtalfinder_python.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+	rm -rf aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 ###################################################################################################
 
 ###################################################################################################
