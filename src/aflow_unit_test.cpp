@@ -19,7 +19,7 @@
 using namespace std::placeholders;
 
 namespace unittest {
-  aurostd::JSON::object utd = aurostd::get_aflow_data_unit_test();
+  aurostd::JSON::object utd = aurostd::EmbData::get_unit_test();
 
   UnitTest::UnitTest(ostream& oss) : xStream(oss) {
     initialize();

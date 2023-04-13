@@ -14,8 +14,6 @@
 #include "aflow_pocc.h" //CO20200624
 #include "aflow_symmetry_spacegroup.h" //DX20200929
 #include "aflowlib.h" //SD20221207
-#include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
-#include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
 const string _DEVIL_PROTOTYPES_STRING_ = "64,65,549,550,f8269,f9083,f8819";
 

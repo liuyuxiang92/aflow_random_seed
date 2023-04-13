@@ -1622,8 +1622,12 @@ namespace aurostd {
 }
 
 // Helper functions to retrieve embedded data //HE20230413 
-namespace aurostd{
-  JSON::object get_aflow_data_unit_test();
+namespace aurostd {
+  namespace EmbData {
+    JSON::object get_unit_test();
+    std::string get_content(const std::string &filename);
+    void save_to_file(const std::string &filename, const std::string &target_path);
+  }
 }
 
 //binary to base64 conversion
