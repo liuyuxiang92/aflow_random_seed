@@ -160,7 +160,7 @@ aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS)
 #	$(CPP) $(LIBS_AFLOW) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW)
 #	$(CPP) $(LIBS_AFLOW) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW)
 	@echo "linking aflow*.o"
-	@$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) -lz -lbz2 $(LIB_MKL) $(LIBS_AFLOW)
+	@$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) $(LIB_MKL) $(LIBS_AFLOW)
 	ln -sf aflow aflowd
 	ln -sf aflow apennsy
 .PHONY: static_no_pdf

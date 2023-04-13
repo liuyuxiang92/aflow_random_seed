@@ -1621,9 +1621,9 @@ namespace aurostd {
   b64_decoder_proxy operator<<(std::ostream & os, b64_decoder_creator);
 }
 
-// Stored data
+// Helper functions to retrieve embedded data //HE20230413 
 namespace aurostd{
-  JSON::object get_unit_test_data();
+  JSON::object get_aflow_data_unit_test();
 }
 
 //binary to base64 conversion
