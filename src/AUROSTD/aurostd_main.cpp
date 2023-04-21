@@ -1854,6 +1854,14 @@ namespace aurostd {
       cerr << __AFLOW_FUNC__ << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
       cerr << __AFLOW_FUNC__ << " vpids.empty()=" << vpids.empty() << endl;
     }
+    if(LDEBUG){
+      if(aurostd::substring2bool(process,"vasp_std")){
+        string command_full="ps axo uid,pgid,pid,user,etime,pcpu,pmem,args | grep vasp_std";
+        cerr << __AFLOW_FUNC__ << " running command_full=\"" << command_full << "\"" << endl;
+        string output_full=aurostd::execute2string(command_full);
+        cerr << __AFLOW_FUNC__ << " ps/grep output_full:" << endl << output_full << endl;
+      }
+    }
     return vpids;
   }
 

@@ -14,7 +14,7 @@
 //#define MaxAflowInSize 65535
 //string AflowIn; //[MaxAflowInSize];
 
-#define VRUNS_MAX_CUTOFF 32768
+#define VRUNS_MAX_CUTOFF 5000 //[CO20230307 - wastes too much time in the beginning]32768
 #define DUKE_BETANEW_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QRATS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QFLOW_DEFAULT_KILL_MEM_CUTOFF 1.50

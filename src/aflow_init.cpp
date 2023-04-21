@@ -2362,7 +2362,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
     //we were patient, now we have a problem
     string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
-    if(VERBOSE){message << "ls:" << endl << aurostd::execute2string("ls -l "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    if(VERBOSE){message << "ls:" << endl << aurostd::execute2string("ls -lasthr "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);}
     message << "initial launch of vasp did not produce an OUTCAR file; killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
     aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
@@ -2419,7 +2419,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
         //we were patient, now we have a problem
         string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
-        if(VERBOSE){message << "ls:" << endl << aurostd::execute2string("ls -l "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+        if(VERBOSE){message << "ls:" << endl << aurostd::execute2string("ls -lasthr "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);}
         message << "new vasp instance did not produce an OUTCAR file, killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
         aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
@@ -2468,14 +2468,14 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       //read LOCK to see what has been issued already
       processFlagsFromLOCK(xvasp,vflags,xfixed);
       xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
-      if(VERBOSE){message << "ls (pre):" << endl << aurostd::execute2string("ls -l "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      if(VERBOSE){message << "ls (pre):" << endl << aurostd::execute2string("ls -lasthr "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);}
       if(!KBIN::VASP_FixErrors(xvasp,xmessage,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
         if(xwarning.flag("CALC_FROZEN")==false && xwarning.flag("OUTPUT_LARGE")==false){  //kill vasp if the calc is frozen (no solution)
           kill_vasp=false;
           message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
       }
-      if(VERBOSE){message << "ls (post):" << endl << aurostd::execute2string("ls -l "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      if(VERBOSE){message << "ls (post):" << endl << aurostd::execute2string("ls -lasthr "+xvasp.Directory) << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);}
     }
 
     //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
