@@ -13465,20 +13465,15 @@ namespace pflow {
         if (!aurostd::FileExist(moddir)) aurostd::DirectoryMake(moddir);
         // Only include cpps here to avoid multiple definition errors
         if (mod == "aflow_cce") {
-#include "aflow_cce_python.cpp"
-          aurostd::string2file(AFLOW_CCE_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_cce_python.py", moddir + "/__init__.py");
         } else if (mod == "aflow_chull") {
-#include "aflow_chull_python.cpp"
-          aurostd::string2file(AFLOW_CHULL_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_chull_python.py", moddir + "/__init__.py");
         } else if (mod == "aflow_chull_plotter") {
-#include "aflow_chull_jupyter_plotter.cpp"
-          aurostd::string2file(AFLOW_CHULL_JUPYTER_PLOTTER_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_chull_jupyter_plotter.py", moddir + "/__init__.py");
         } else if (mod == "aflow_sym") {
-#include "aflow_sym_python.cpp"
-          aurostd::string2file(AFLOW_SYM_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_sym_python.py", moddir + "/__init__.py");
         } else if ((mod == "aflow_xtal_finder") || (mod == "aflow_xtalfinder")) {
-#include "aflow_xtalfinder_python.cpp"
-          aurostd::string2file(AFLOW_XTALFINDER_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_xtalfinder_python.py", moddir + "/__init__.py");
         }
       }
       message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";

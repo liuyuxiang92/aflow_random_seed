@@ -14,7 +14,6 @@
 #include "aflowlib.h"
 #include "aflow_pflow.h"
 #include "aflow_cce.h"
-#include "aflow_cce_python.cpp"  //CO20201105
 
 using std::cout;
 using std::cerr;
@@ -42,11 +41,9 @@ namespace cce {
       string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
-      string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
       stringstream output;
-      output << aflow_cce_python;
-      aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
+      aurostd::EmbData::save_to_file("aflow_cce_python.py", python_directory+'/'+"aflow_cce_python.py");
       // print CCE citation
       oss << print_citation();
     } else {
@@ -59,11 +56,8 @@ namespace cce {
       string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
-      string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
-      stringstream output;
-      output << aflow_cce_python;
-      aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
+      aurostd::EmbData::save_to_file("aflow_cce_python.py", python_directory+'/'+"aflow_cce_python.py");
       // print CCE citation
       oss << print_citation();
     } else {

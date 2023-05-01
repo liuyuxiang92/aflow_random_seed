@@ -12,7 +12,6 @@
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
-#include "aflow_xtalfinder_python.cpp" //DX20201228
 
 //[OBSOLETE - ME20220128] #undef AFLOW_MULTITHREADS_ENABLE
 
@@ -7800,10 +7799,8 @@ namespace compare {
     aurostd::DirectoryMake(python_dir);
 
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
-    stringstream output;
 
-    output << AFLOW_XTALFINDER_PYTHON_PY;
-    aurostd::stringstream2file(output, python_dir+"/"+"aflow_xtalfinder_python.py");
+    aurostd::EmbData::save_to_file("aflow_xtalfinder_python.py", python_dir+"/"+"aflow_xtalfinder_python.py");
   }
 }
 

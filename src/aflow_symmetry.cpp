@@ -29,7 +29,6 @@ using aurostd::isequal;
 //DX+CO START
 #include "aflow_symmetry_spacegroup.h"
 //DX+CO END
-#include "aflow_sym_python.cpp" //DX20201228
 
 #define  _NO_SCALE_LATTICE_PGROUP_
 
@@ -9021,10 +9020,8 @@ namespace SYM {
     aurostd::DirectoryMake(python_dir);
 
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
-    stringstream output;
 
-    output << AFLOW_SYM_PYTHON_PY;
-    aurostd::stringstream2file(output, python_dir+"/"+"aflow_sym_python.py");
+    aurostd::EmbData::save_to_file("aflow_sym_python.py", python_dir+"/"+"aflow_sym_python.py");
   }
 }
 

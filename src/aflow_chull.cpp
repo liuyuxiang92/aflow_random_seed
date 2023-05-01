@@ -14,10 +14,6 @@
 #include "aflow.h"
 #include "aflow_chull.h"
 #include "aflow_compare_structure.h"
-#include "aflow_chull_jupyter.cpp"  //MB20190301 - jupyter notebook stuff
-#include "aflow_chull_jupyter_plotter.cpp"  //MB20190305
-#include "aflow_chull_jupyter_requirements.cpp"  //MB20190305
-#include "aflow_chull_python.cpp"  //MB20190305
 
 //[CO20220630 - OBSOLETE]// Some parts are written within the C++0x support in GCC, especially std::thread,
 //[CO20220630 - OBSOLETE]// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
@@ -515,7 +511,7 @@ namespace chull {
     //MB20190301: For generating Jupyter notebook
     if(vpflow.flag("CHULL::WRITE_JUPYTER2") || vpflow.flag("CHULL::WRITE_JUPYTER3")){
 
-      string aflow_chull_jupyter_json=AFLOW_CHULL_JUPYTER_JSON;
+      string aflow_chull_jupyter_json=aurostd::EmbData::get_content("aflow_chull_jupyter.json");
       string aflow_chull_jupyter_subdir = "AFLOW_CHULL_JUPYTER";
       string jupyter_directory=directory + aflow_chull_jupyter_subdir;
       aurostd::DirectoryMake(jupyter_directory);
@@ -523,26 +519,15 @@ namespace chull {
       string ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
       string full_ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
       aurostd::StringSubst(aflow_chull_jupyter_json,"<ver>",ver);
-      aurostd::StringSubst(aflow_chull_jupyter_json,"<full ver>",full_ver);	
+      aurostd::StringSubst(aflow_chull_jupyter_json,"<full ver>",full_ver);
 
+      // write needed files
       stringstream output;
       output << aflow_chull_jupyter_json;
       aurostd::stringstream2file(output,jupyter_directory+'/'+"notebook.ipynb");
-
-      stringstream output2; 
-      string aflow_chull_jupyter_plotter_py=AFLOW_CHULL_JUPYTER_PLOTTER_PY;
-      output2 << aflow_chull_jupyter_plotter_py;
-      aurostd::stringstream2file(output2,jupyter_directory+'/'+"aflow_chull_plotter.py");
-
-      stringstream output3;
-      string aflow_chull_python_py=AFLOW_CHULL_PYTHON_PY;
-      output3 << aflow_chull_python_py;
-      aurostd::stringstream2file(output3,jupyter_directory+'/'+"aflow_chull.py");	
-
-      stringstream output4;
-      string aflow_chull_requirements_txt=AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT;
-      output4 << aflow_chull_requirements_txt;
-      aurostd::stringstream2file(output4,jupyter_directory+'/'+"requirements.txt");	
+      aurostd::EmbData::save_to_file("aflow_chull_jupyter_plotter.py", jupyter_directory+'/'+"aflow_chull_plotter.py");
+      aurostd::EmbData::save_to_file("aflow_chull_python.py", jupyter_directory+'/'+"aflow_chull.py");
+      aurostd::EmbData::save_to_file("aflow_chull_jupyter_requirements.txt", jupyter_directory+'/'+"requirements.txt");
 
       message << "Created " << aflow_chull_jupyter_subdir << " directory for " << input << " hull";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
@@ -11200,7 +11185,7 @@ namespace chull {
     }
     //watermark
     if(!doc_only){
-      aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, LATEX_dir+"/"+aflow_logo_skinny_file);
+      aurostd::EmbData::save_to_file("AFLOW_LOGO_SKINNY.pdf", LATEX_dir+"/"+aflow_logo_skinny_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_skinny_file)) {
         //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -11210,7 +11195,7 @@ namespace chull {
       }
     }
     if(print_aflow_logo_full) {
-      aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, LATEX_dir+"/"+aflow_logo_full_file);
+      aurostd::EmbData::save_to_file("AFLOW_LOGO_FULL.pdf", LATEX_dir+"/"+aflow_logo_full_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_full_file)) {
         //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -11220,7 +11205,7 @@ namespace chull {
       }
     }
     if(print_logo_2) {
-      aurostd::base642bin(_NOMAD_LOGO_BASE64_, LATEX_dir+"/"+logo_file_2);
+      aurostd::EmbData::save_to_file("NOMAD_LOGO.png", LATEX_dir+"/"+logo_file_2);
       if(!aurostd::FileExist(LATEX_dir+"/"+logo_file_2)) {
         //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_

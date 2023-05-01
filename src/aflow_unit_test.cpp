@@ -19,6 +19,7 @@
 using namespace std::placeholders;
 
 namespace unittest {
+  aurostd::JSON::object utd = aurostd::EmbData::get_unit_test();
 
   UnitTest::UnitTest(ostream& oss) : xStream(oss) {
     initialize();
@@ -1222,88 +1223,116 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | substring2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::substring2string()";
-    check_description = "return the third match of the substring";
-    string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
-    calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
-    expected_string = "==49";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::substring2string()";
+      check_description = "return the third match of the substring";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
+      string expected_string = "==49";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::kvpair2string()";
-    check_description = "return the second match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
-    expected_string = "MEDIUM";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::kvpair2string()";
+      check_description = "return the second match of the kvpair";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
+      string expected_string = "MEDIUM";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | substring2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::substring2string()";
-    check_description = "return the last match of the substring";
-    calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
-    expected_string = "==SLOW";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::substring2string()";
+      check_description = "return the last match of the substring";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
+      string expected_string = "==SLOW";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | substring2strings //SD20230322
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::substring2strings()";
+      check_description = "return all the matches as vector of strings";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      vector<string> calculated_vstring;
+      aurostd::substring2strings(test_string, calculated_vstring, "IALGO");
+      vector<string> expected_vstring = {"==48", "==49", "==50"};
+      checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::kvpair2string()";
-    check_description = "return the last match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
-    expected_string = "SLOW";
-    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::kvpair2string()";
+      check_description = "return the last match of the kvpair";
+      string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+      string calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
+      string expected_string = "SLOW";
+      checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | string2utype //HE20220324
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::string2utype()";
-    check_description = "int - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
-    multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
-    check_description = "float - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
-    multi_check = (multi_check && (aurostd::string2utype<float>("-110100100", 2)) == -420.0f);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::string2utype()";
+      check_description = "int - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
+      multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+      check_description = "float - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
+      multi_check = (multi_check && (aurostd::string2utype<float>("-110100100", 2)) == -420.0f);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
 
-    check_description = "double - bases 16, 10, 8, 5, 2";
-    multi_check = true;
-    multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
-    multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
-    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+      check_description = "double - bases 16, 10, 8, 5, 2";
+      multi_check = true;
+      multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
+      multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
+      checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | crc64 //HE20220404
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::crc64()";
-    check_description = "runtime hashing";
-    expected_uint64 = 15013402708409085989UL;
-    calculated_uint64 = aurostd::crc64("aflowlib_date");
-    checkEqual(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+    {
+      check_function = "aurostd::crc64()";
+      check_description = "runtime hashing";
+      expected_uint64 = 15013402708409085989UL;
+      calculated_uint64 = aurostd::crc64("aflowlib_date");
+      checkEqual(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
 
-    check_function = "aurostd::ctcrc64()";
-    check_description = "compiler hashing (constexpr)";
-    static constexpr uint64_t
-      calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
-    checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+      check_function = "aurostd::ctcrc64()";
+      check_description = "compiler hashing (constexpr)";
+      static constexpr uint64_t
+        calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
+      checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+    }
 
 
     // ---------------------------------------------------------------------------
@@ -1350,47 +1379,7 @@ namespace unittest {
     {
       check_function = "JSON";
       check_description = "test string parsing";
-      std::string string_json= "{\"1_2_3_bytes_UTF-8_sequences\": \"\\u0060\\u012a\\u12AB\", \n"
-                               "\"allowed_escapes\": \"\\\"\\\\\\/\\b\\f\\n\\r\\t\", \n"
-                               "\"pi\": \"π\", \n"
-                               "\"escaped_noncharacter\": \"\\uFFFF\", \n"
-                               "\"last_surrogates_1_and_2\": \"\\uDBFF\\uDFFF\", \n"
-                               "\"accepted_surrogate_pair\": \"\\uD801\\udc37\", \n"
-                               "\"unicode\": \"\\uA66D\", \n"
-                               "\"unicode_U+1FFFE_nonchar\": \"\\uD83F\\uDFFE\", \n"
-                               "\"backslash_and_u_escaped_zero\": \"\\\\u0000\", \n"
-                               "\"three-byte-utf-8\": \"\\u0821\", \n"
-                               "\"backslash_doublequotes\": \"\\\"\", \n"
-                               "\"uescaped_newline\": \"new\\u000Aline\", \n"
-                               "\"unicode_escaped_double_quote\": \"\\u0022\", \n"
-                               "\"double_escape_a\": \"\\\\a\", \n"
-                               "\"comments\": \"a/*b*/c/*d//e\", \n"
-                               "\"space\": \" \", \n"
-                               "\"uEscape\": \"\\u0061\\u30af\\u30EA\\u30b9\", \n"
-                               "\"unicode_U+200B_ZERO_WIDTH_SPACE\": \"\\u200B\", \n"
-                               "\"u+2028_line_sep\": \"\u2028\", \n"
-                               "\"two-byte-utf-8\": \"\\u0123\", \n"
-                               "\"unicodeEscapedBackslash\": \"\\u005C\", \n"
-                               "\"unicode_U+2064_invisible_plus\": \"\\u2064\", \n"
-                               "\"escaped_control_character\": \"\\u0012\", \n"
-                               "\"simple_ascii\": \"asd \", \n"
-                               "\"unicode_U+10FFFE_nonchar\": \"\\uDBFF\\uDFFE\", \n"
-                               "\"utf8\": \"€𝄞\", \n"
-                               "\"unescaped_char_delete\": \"\u007F\", \n"
-                               "\"surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF\": \"\\uD834\\uDd1e\", \n"
-                               "\"double_escape_n\": \"\\\\n\", \n"
-                               "\"with_del_character\": \"a\u007Fa\", \n"
-                               "\"nonCharacterInUTF-8_U+FFFF\": \"\uFFFF\", \n"
-                               "\"accepted_surrogate_pairs\": \"\\ud83d\\ude39\\ud83d\\udc8d\", \n"
-                               "\"in_array_with_leading_space\": \"asd\", \n"
-                               "\"nonCharacterInUTF-8_U+10FFFF\": \"􏿿\", \n"
-                               "\"one-byte-utf-8\": \"\\u002c\", \n"
-                               "\"unicode_2\": \"⍂㈴⍂\", \n"
-                               "\"unicode_U+FDD0_nonchar\": \"\\uFDD0\", \n"
-                               "\"nbsp_uescaped\": \"new\\u00A0line\", \n"
-                               "\"unicode_U+FFFE_nonchar\": \"\\uFFFE\", \n"
-                               "\"reservedCharacterInUTF-8_U+1BFFF\": \"𛿿\", \n"
-                               "\"u+2029_par_sep\": \"\u2029\"}";
+      std::string string_json = string(utd["xparser"]["string_json"]);
 
       std::map < string, string > string_results({{"1_2_3_bytes_UTF-8_sequences", "\u0060\u012a\u12AB"},
                                                   {"allowed_escapes", "\"\\/\b\f\n\r\t"}, {"pi", "π"}, {"escaped_noncharacter", "\uFFFF"},
@@ -1454,29 +1443,7 @@ namespace unittest {
     {
       check_function = "JSON";
       check_description = "test number parsing (double, long long)";
-      std::string number_json= "{\"0e+1\":0e+1,\n"
-                                "\"0e1\":0e1,\n"
-                                "\"after_space\": 4,\n"
-                                "\"double_close_to_zero\":-0.000000000000000000000000000000000000000000000000000000000000000000000000000001,\n"
-                                "\"double_too_close_to_zero\":-1E-400,\n"
-                                "\"int_with_exp\":20e1,\n"
-                                "\"minus_zero\":-0,\n"
-                                "\"negative_int\":-123,\n"
-                                "\"negative_one\":-1,\n"
-                                "\"real_capital_e_neg_exp\":1E-2,\n"
-                                "\"real_capital_e_pos_exp\":1E+2,\n"
-                                "\"real_capital_e\":1E22,\n"
-                                "\"real_exponent\":123e45,\n"
-                                "\"real_fraction_exponent\":123.456e78,\n"
-                                "\"real_neg_exp\":1e-2,\n"
-                                "\"real_pos_exponent\":1e+2,\n"
-                                "\"simple_int\":123,\n"
-                                "\"simple_real\":123.456789,\n"
-                                "\"number\":123e65,\n"
-                                "\"true\":true,\n"
-                                "\"false\":false,\n"
-                                "\"null\":null,\n"
-                                "}";
+      std::string number_json = string(utd["xparser"]["number_json"]);
 
       aurostd::JSON::object jo = aurostd::JSON::loadString(number_json);
 
@@ -1521,11 +1488,7 @@ namespace unittest {
     {
       check_function = "JSON";
       check_description = "test parsing xvector<";
-      std::string number_json= "{\"xvector_double\" : [923.49445786, -441.74004105, 465.49355057, 96.15610686, 557.6834903 , 147.6777196 , 871.81485459, 287.89958188, 863.66132302, 876.36635155],\n"
-                               " \"xvector_ll\" : [449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152],\n"
-                               " \"xvector_ull\" : [449644208, 252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152],\n"
-                               " \"xvector_mixed\" : [449644208, -441.74004105, 465.49355057, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152],\n"
-                               " \"xvector_nan\" : [449644208, -441.74004105, null, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152]}";
+      std::string number_json = string(utd["xparser"]["vector_number_json"]);
 
       aurostd::JSON::object jo = aurostd::JSON::loadString(number_json);
 
@@ -1567,16 +1530,7 @@ namespace unittest {
       check_function = "JSON";
       check_description = "test parsing xmatrix<";
 
-      std::string matrix_json = "{\n"
-                                "  \"xmatrix_double_mix\": \n"
-                                "     [[ 2.85899214e+07, 2.70836286e+04,              82,  7.47207733e+08,  4.67299748e+04, -6.25361399e+09, 8.00388892e+08],\n"
-                                "      [-2.50841390e+04, 1.86048071e+07,  7.18691607e+04, -7.18492121e+00,  5.11971140e+02,  8.97364584e+06, 1.68446225e+02],\n"
-                                "      [ 4.94590604e+08, 1.89067109e+09,  4.64803095e+00,  7.74359909e+00,            5465,  1.37944663e+02, 1.37565108e+08],\n"
-                                "      [           8499, 1.73734230e+03,  3.28957479e+08, -5.41490015e+03,  5.52617678e+00,  2.64034084e+09, 4.76561709e+01],\n"
-                                "      [ 3.31904798e+04,     2288175298, -2.96213531e+07,  1.22631199e+02, -8.83941811e+00, -2.17327450e+04, 3.77389069e+03],\n"
-                                "      [-2.98263326e+04, 5.39915781e+05,  1.28198687e+09,  2.69529424e+07,  7.47855186e+01,      1538912783, 2.55027330e+02]]\n"
-                                "}";
-
+      std::string matrix_json = string(utd["xparser"]["matrix_json"]);
       aurostd::JSON::object jo = aurostd::JSON::loadString(matrix_json);
 
       xmatrix<double> xmd_exp = {{ 2.85899214e+07, 2.70836286e+04,              82,  7.47207733e+08,  4.67299748e+04, -6.25361399e+09, 8.00388892e+08},
@@ -1603,17 +1557,7 @@ namespace unittest {
     {
       check_function = "JSON";
       check_description = "test parsing std:map<string,";
-      std::string map_json= "{\"map\": {\n"
-                            "    \"VNZPC\": 2,\n"
-                            "    \"HQPZP\": -2472285305.2312846,\n"
-                            "    \"DUKPG\": 24171,\n"
-                            "    \"NUJYO\": -108940230,\n"
-                            "    \"MDPSG\": 15011078.748e-5,\n"
-                            "    \"UKYVK\": 1072982.12214322,\n"
-                            "    \"UCZSX\": 825.8070164E2,\n"
-                            "    \"SQBER\": -2056,\n"
-                            "    \"XGPXD\": 853427.8245249396,\n"
-                            "    \"UASBY\": 4474520688 } }";
+      std::string map_json = string(utd["xparser"]["map_json"]);
 
       std::map<string, double> md_exp = {{"VNZPC", 2},
                                          {"HQPZP", -2472285305.2312846},
@@ -1667,11 +1611,7 @@ namespace unittest {
       check_function = "JSON";
       check_description = "test parsing vector<";
 
-      std::string vector_json = "{\"mixed_vector\": [{\"VNZPC\": 2, \"HQPZP\": -2472285305.2312846, \"DUKPG\": 24171}, 568E-8, 152.324, 784, \"A string\", true, false, null, [\"A\", \"nested\", \"list\"]],\n"
-                                " \"number_vector\": [449644208, 441.74004105, 465.49355057, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152],\n"
-                                " \"string_vector\": [\"First w\\\"ord\", \"Second word\", \"Last word\"],\n"
-                                " \"bool>\": [true, false, false, false, true],\n"
-                                " \"bool> mixed\": [1, null, 0.0, 0, true]}";
+      std::string vector_json = string(utd["xparser"]["vector_mixed_json"]);
 
       aurostd::JSON::object jo = aurostd::JSON::loadString(vector_json);
       std::vector<std::string> vs_res = jo["string_vector"];
@@ -2247,78 +2187,12 @@ namespace unittest {
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 1: parse structure with known settings" << std::endl;
 
     // CrO3 was a problematic structure in the past
-    str_cif =
-      "data_Cr4O12\n"
-      "_pd_phase_name Cr4O12\n"
-      "_cell_length_a 5.743\n"
-      "_cell_length_b 8.557\n"
-      "_cell_length_c 4.789\n"
-      "_cell_angle_alpha 90.\n"
-      "_cell_angle_beta 90.\n"
-      "_cell_angle_gamma 90.\n"
-      "_cell_volume 235.35\n"
-      "_cell_formula_units_Z 4\n"
-      "_space_group_name_H-M_alt 'A m a 2'\n"
-      "_space_group_IT_number 40\n"
-      "loop_\n"
-      "_space_group_symop_id\n"
-      "_space_group_symop_operation_xyz\n"
-      "1 'x+1/2,-y,z'\n"
-      "2 '-x+1/2,y,z'\n"
-      "3 '-x,-y,z'\n"
-      "4 'x,y,z'\n"
-      "5 'x+1/2,-y+1/2,z+1/2'\n"
-      "6 '-x+1/2,y+1/2,z+1/2'\n"
-      "7 '-x,-y+1/2,z+1/2'\n"
-      "8 'x,y+1/2,z+1/2'\n"
-      "loop_\n"
-      "_atom_type_symbol\n"
-      "_atom_type_oxidation_number\n"
-      "Cr6+ 6\n"
-      "O2- -2\n"
-      "loop_\n"
-      "_atom_site_label\n"
-      "_atom_site_type_symbol\n"
-      "_atom_site_symmetry_multiplicity\n"
-      "_atom_site_Wyckoff_symbol\n"
-      "_atom_site_fract_x\n"
-      "_atom_site_fract_y\n"
-      "_atom_site_fract_z\n"
-      "_atom_site_B_iso_or_equiv\n"
-      "_atom_site_occupancy\n"
-      "Cr1 Cr6+ 4 b 0.25 0.09676 0.5 . 1.\n"
-      "O1 O2- 4 a 0. 0. 0.3841 . 1.\n"
-      "O2 O2- 4 b 0.25 0.2677 0.3755 . 1.\n"
-      "O3 O2- 4 b 0.25 0.6078 0.3284 . 1.\n";
-
-    str_poscar =
-      "Cr4O12\n"
-      "1.000000\n"
-      "   5.74300000000000   0.00000000000000   0.00000000000000\n"
-      "   0.00000000000000   8.55700000000000   0.00000000000000\n"
-      "   0.00000000000000   0.00000000000000   4.78900000000000\n"
-      "4 12\n"
-      "Direct(16) [A4B12]\n"
-      "   0.25000000000000   0.09676000000000   0.50000000000000  Cr\n"
-      "   0.75000000000000   0.90324000000000   0.50000000000000  Cr\n"
-      "   0.25000000000000   0.59676000000000   0.00000000000000  Cr\n"
-      "   0.75000000000000   0.40324000000000   0.00000000000000  Cr\n"
-      "   0.00000000000000   0.00000000000000   0.38410000000000  O \n"
-      "   0.50000000000000   0.00000000000000   0.38410000000000  O \n"
-      "   0.00000000000000   0.50000000000000   0.88410000000000  O \n"
-      "   0.50000000000000   0.50000000000000   0.88410000000000  O \n"
-      "   0.25000000000000   0.26770000000000   0.37550000000000  O \n"
-      "   0.75000000000000   0.73230000000000   0.37550000000000  O \n"
-      "   0.25000000000000   0.76770000000000   0.87550000000000  O \n"
-      "   0.75000000000000   0.23230000000000   0.87550000000000  O \n"
-      "   0.25000000000000   0.60780000000000   0.32840000000000  O \n"
-      "   0.75000000000000   0.39220000000000   0.32840000000000  O \n"
-      "   0.25000000000000   0.10780000000000   0.82840000000000  O \n"
-      "   0.75000000000000   0.89220000000000   0.82840000000000  O \n";
+    str_cif = string(utd["xstructure_parser"]["cif_CrO3"]);
+    str_poscar = string(utd["xstructure_parser"]["poscar_CrO3"]);
 
     check_function = "xstructure::operator<<";
     check_description = "Parsing CIF file with recognized setting (CrO3)";
-    
+
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [1] Parsing CIF file with recognized setting (CrO3)" << std::endl;
     aurostd::StringstreamClean(xstrss);
     xstrss << str_cif;
@@ -2409,99 +2283,8 @@ namespace unittest {
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 2: parse structure with unrecognized (old) settings" << std::endl;
     check_description = "Parsing CIF file with unrecognized setting (GePt3)";
     aurostd::StringstreamClean(xstrss);
-    str_cif =
-      "data_Ge8Pt24\n"
-      "_pd_phase_name Ge8Pt24\n"
-      "_cell_length_a 7.93\n"
-      "_cell_length_b 7.767\n"
-      "_cell_length_c 7.767\n"
-      "_cell_angle_alpha 90.\n"
-      "_cell_angle_beta 90.06\n"
-      "_cell_angle_gamma 90.\n"
-      "_cell_volume 478.39\n"
-      "_cell_formula_units_Z 8\n"
-      "_space_group_name_H-M_alt 'F 1 2/m 1'\n"
-      "_space_group_IT_number 12\n"
-      "loop_\n"
-      "_space_group_symop_id\n"
-      "_space_group_symop_operation_xyz\n"
-      "1 '-x, -y, -z'\n"
-      "2 'x, -y, z'\n"
-      "3 '-x, y, -z'\n"
-      "4 'x, y, z'\n"
-      "5 '-x, -y+1/2, -z+1/2'\n"
-      "6 'x, -y+1/2, z+1/2'\n"
-      "7 '-x, y+1/2, -z+1/2'\n"
-      "8 'x, y+1/2, z+1/2'\n"
-      "9 '-x+1/2, -y, -z+1/2'\n"
-      "10 'x+1/2, -y, z+1/2'\n"
-      "11 '-x+1/2, y, -z+1/2'\n"
-      "12 'x+1/2, y, z+1/2'\n"
-      "13 '-x+1/2, -y+1/2, -z'\n"
-      "14 'x+1/2, -y+1/2, z'\n"
-      "15 '-x+1/2, y+1/2, -z'\n"
-      "16 'x+1/2, y+1/2, z'\n"
-      "loop_\n"
-      "_atom_type_symbol\n"
-      "_atom_type_oxidation_number\n"
-      "Pt0+ 0\n"
-      "Ge0+ 0\n"
-      "loop_\n"
-      "_atom_site_label\n"
-      "_atom_site_type_symbol\n"
-      "_atom_site_symmetry_multiplicity\n"
-      "_atom_site_Wyckoff_symbol\n"
-      "_atom_site_fract_x\n"
-      "_atom_site_fract_y\n"
-      "_atom_site_fract_z\n"
-      "_atom_site_B_iso_or_equiv\n"
-      "_atom_site_occupancy\n"
-      "Pt1 Pt0+ 8 g 0. 0.2 0. . 1.\n"
-      "Pt2 Pt0+ 8 h 0.25 0.25 0.25 . 1.\n"
-      "Pt3 Pt0+ 8 i 0. 0. 0.3 . 1.\n"
-      "Ge1 Ge0+ 8 i 0.25 0. 0. . 1.\n";
-
-    str_poscar =
-      "Ge8Pt24\n"
-      "1.0000000\n"
-      "7.93000000000000   0.00000000000000   0.00000000000000\n"
-      "0.00000000000000   7.76700000000000   0.00000000000000\n"
-      "-0.00813358189357   0.00000000000000   7.76699574126609\n"
-      "Ge Pt\n"
-      "8 24\n"
-      "Direct(32) [A8B24]\n"
-      "0.25000000000000   0.00000000000000   0.00000000000000  Ge\n"
-      "0.75000000000000   0.00000000000000   0.00000000000000  Ge\n"
-      "0.75000000000000   0.50000000000000   0.50000000000000  Ge\n"
-      "0.25000000000000   0.50000000000000   0.50000000000000  Ge\n"
-      "0.25000000000000   0.00000000000000   0.50000000000000  Ge\n"
-      "0.75000000000000   0.00000000000000   0.50000000000000  Ge\n"
-      "0.25000000000000   0.50000000000000   0.00000000000000  Ge\n"
-      "0.75000000000000   0.50000000000000   0.00000000000000  Ge\n"
-      "0.00000000000000   0.70000000000000   0.50000000000000  Pt\n"
-      "0.50000000000000   0.80000000000000   0.50000000000000  Pt\n"
-      "0.50000000000000   0.20000000000000   0.50000000000000  Pt\n"
-      "0.50000000000000   0.30000000000000   0.00000000000000  Pt\n"
-      "0.50000000000000   0.70000000000000   0.00000000000000  Pt\n"
-      "0.25000000000000   0.25000000000000   0.25000000000000  Pt\n"
-      "0.00000000000000   0.00000000000000   0.30000000000000  Pt\n"
-      "0.00000000000000   0.20000000000000   0.00000000000000  Pt\n"
-      "0.00000000000000   0.00000000000000   0.70000000000000  Pt\n"
-      "0.00000000000000   0.50000000000000   0.20000000000000  Pt\n"
-      "0.00000000000000   0.50000000000000   0.80000000000000  Pt\n"
-      "0.50000000000000   0.00000000000000   0.20000000000000  Pt\n"
-      "0.50000000000000   0.00000000000000   0.80000000000000  Pt\n"
-      "0.50000000000000   0.50000000000000   0.70000000000000  Pt\n"
-      "0.50000000000000   0.50000000000000   0.30000000000000  Pt\n"
-      "0.25000000000000   0.75000000000000   0.25000000000000  Pt\n"
-      "0.75000000000000   0.75000000000000   0.75000000000000  Pt\n"
-      "0.75000000000000   0.25000000000000   0.75000000000000  Pt\n"
-      "0.25000000000000   0.25000000000000   0.75000000000000  Pt\n"
-      "0.75000000000000   0.25000000000000   0.25000000000000  Pt\n"
-      "0.25000000000000   0.75000000000000   0.75000000000000  Pt\n"
-      "0.75000000000000   0.75000000000000   0.25000000000000  Pt\n"
-      "0.00000000000000   0.80000000000000   0.00000000000000  Pt\n"
-      "0.00000000000000   0.30000000000000   0.50000000000000  Pt\n";
+    str_cif = string(utd["xstructure_parser"]["cif_Ge8Pt24"]);
+    str_poscar = string(utd["xstructure_parser"]["poscar_Ge8Pt24"]);
 
     bool quiet_tmp = XHOST.QUIET;
     XHOST.QUIET = !LDEBUG;  // Suppress warnings
@@ -2625,44 +2408,7 @@ namespace unittest {
     //    hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
 
     //create input structure
-    xstr_str =
-      "FeO\n"
-      "1.0\n"
-      "  0.000000   4.736235   0.000000\n"
-      "  4.101698  -2.368118   0.000000\n"
-      "  0.000000   0.000000  13.492372\n"
-      "12 18\n"
-      "Direct\n"
-      "   0.33333333333332   0.66666666666665   0.31943934568918  Fe\n"
-      "  -0.00000000000002  -0.00000000000001   0.65277267902252  Fe\n"
-      "   0.66666666666665   0.33333333333332   0.98610601235585  Fe\n"
-      "   0.66666666666668   0.33333333333335   0.18056065431082  Fe\n"
-      "   0.33333333333335   0.66666666666668   0.51389398764415  Fe\n"
-      "   0.00000000000002   0.00000000000001   0.84722732097748  Fe\n"
-      "  -0.00000000000001  -0.00000000000001   0.15277363902251  Fe\n"
-      "   0.66666666666665   0.33333333333332   0.48610697235585  Fe\n"
-      "   0.33333333333332   0.66666666666665   0.81944030568918  Fe\n"
-      "   0.33333333333335   0.66666666666668   0.01389302764415  Fe\n"
-      "   0.00000000000001   0.00000000000001   0.34722636097749  Fe\n"
-      "   0.66666666666668   0.33333333333335   0.68055969431082  Fe\n"
-      "   0.00000000000000   0.31486811660227   0.25000000000000  O \n"
-      "   0.66666666666667   0.64820144993561   0.58333333333333  O \n"
-      "   0.33333333333333   0.98153478326894   0.91666666666667  O \n"
-      "   0.68513188339780   0.68513188339776   0.24999999999999  O \n"
-      "   0.35179855006446   0.01846521673110   0.58333333333332  O \n"
-      "   0.01846521673113   0.35179855006443   0.91666666666665  O \n"
-      "   0.31486811660220  -0.00000000000004   0.25000000000001  O \n"
-      "   0.98153478326887   0.33333333333330   0.58333333333335  O \n"
-      "   0.64820144993554   0.66666666666663   0.91666666666668  O \n"
-      "   0.35179771006447   0.33333333333337   0.08333333333332  O \n"
-      "   0.01846437673113   0.66666666666670   0.41666666666665  O \n"
-      "   0.68513104339780   0.00000000000004   0.74999999999999  O \n"
-      "   0.98153562326887   0.64820228993557   0.08333333333335  O \n"
-      "   0.64820228993553   0.98153562326890   0.41666666666668  O \n"
-      "   0.31486895660220   0.31486895660224   0.75000000000001  O \n"
-      "   0.66666666666667   0.01846437673106   0.08333333333333  O \n"
-      "   0.33333333333333   0.35179771006440   0.41666666666667  O \n"
-      "   0.00000000000000   0.68513104339773   0.75000000000000  O \n";
+    xstr_str = string(utd["xstructure"]["poscar_FeO"]);
     aurostd::StringstreamClean(xstrss);
     xstrss << xstr_str;
     xstructure xstr_in;
@@ -2676,44 +2422,7 @@ namespace unittest {
     }
 
     //create xstr_slab (correct answer)
-    xstr_str =
-      "FeO\n"
-      "1.0\n"
-      " -4.73623366665202   0.00000000000000   0.00000000000000\n"
-      " -9.47247466669728  21.24210623923067   0.00000000000000\n"
-      " -2.36811866667432   3.16803536641816   2.60528076661565\n"
-      "12 18\n"
-      "Direct\n"
-      "   0.66666667      0.31943935     0.38890928   Fe\n"
-      "  -0.00000000      0.65277268     0.38890928   Fe\n"
-      "   0.33333333      0.98610601     0.38890928   Fe\n"
-      "   0.33333333      0.18056065     0.61109072   Fe\n"
-      "   0.66666667      0.51389399     0.61109072   Fe\n"
-      "   0.00000000      0.84722732     0.61109072   Fe\n"
-      "  -0.00000000      0.15277364     0.38890544   Fe\n"
-      "   0.33333333      0.48610697     0.38890544   Fe\n"
-      "   0.66666667      0.81944031     0.38890544   Fe\n"
-      "   0.66666667      0.01389303     0.61109456   Fe\n"
-      "   0.00000000      0.34722636     0.61109456   Fe\n"
-      "   0.33333333      0.68055969     0.61109456   Fe\n"
-      "   0.31486812      0.25000000     0.00000000   O \n"
-      "   0.64820145      0.58333333     0.00000000   O \n"
-      "   0.98153478      0.91666667     0.00000000   O \n"
-      "   0.68513188      0.25000000     0.31486812   O \n"
-      "   0.01846522      0.58333333     0.31486812   O \n"
-      "   0.35179855      0.91666667     0.31486812   O \n"
-      "  -0.00000000      0.25000000     0.68513188   O \n"
-      "   0.33333333      0.58333333     0.68513188   O \n"
-      "   0.66666667      0.91666667     0.68513188   O \n"
-      "   0.33333333      0.08333333     0.31486896   O \n"
-      "   0.66666667      0.41666667     0.31486896   O \n"
-      "   0.00000000      0.75000000     0.31486896   O \n"
-      "   0.64820229      0.08333333     0.68513104   O \n"
-      "   0.98153562      0.41666667     0.68513104   O \n"
-      "   0.31486896      0.75000000     0.68513104   O \n"
-      "   0.01846438      0.08333333     0.00000000   O \n"
-      "   0.35179771      0.41666667     0.00000000   O \n"
-      "   0.68513104      0.75000000     0.00000000   O \n";
+    xstr_str = string(utd["xstructure"]["poscar_FeO_slab"]);
     xstructure xstr_slab_correct;
     aurostd::StringstreamClean(xstrss);
     xstrss << xstr_str;
