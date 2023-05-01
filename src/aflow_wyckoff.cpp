@@ -14,14 +14,15 @@
 // all vector./matrix must be loaded before
 
 void SpaceGroupOptionRequired(uint &spacegroup, uint &option) {
-  cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
+  string function_name = XPID + "SpaceGroupOptionRequired():";
+  cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
   if(option==0 || option>3) {
     option=1;
-    cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
   if(option==3) {
     option=2;
-    cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
 }
 
@@ -61,7 +62,7 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   if (spacegroup_in < 1 || spacegroup_in > 230) {
     string message = "Invalid space group " + aurostd::utype2string<uint>(spacegroup_in);
-    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message,_VALUE_RANGE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_VALUE_RANGE_);
   }
 
   if(LDEBUG) cerr << "WyckoffPOSITIONS [0]" << endl;

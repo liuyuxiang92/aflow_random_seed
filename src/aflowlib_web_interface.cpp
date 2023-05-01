@@ -269,9 +269,6 @@ namespace aflowlib {
     vNsgroup.clear();for(uint i=0;i<b.vNsgroup.size();i++) vNsgroup.push_back(b.vNsgroup.at(i));  // apennsy
     vsgroup.clear();for(uint i=0;i<b.vsgroup.size();i++) vsgroup.push_back(b.vsgroup.at(i));  // apennsy
     vstr.clear();for(uint i=0;i<b.vstr.size();i++) vstr.push_back(b.vstr.at(i));  // apennsy
-    // details from EntryLoader //HE20220913
-    el_source_type=b.el_source_type;
-    el_source=b.el_source;
   }
 
 
@@ -553,9 +550,6 @@ namespace aflowlib {
     vNsgroup.clear();  // apennsy
     vsgroup.clear();  // apennsy
     vstr.clear();  // apennsy
-    // details from EntryLoader //HE20220913
-    el_source_type.clear();
-    el_source.clear();
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
@@ -568,7 +562,7 @@ namespace aflowlib {
     stringstream oss;
     if(!aurostd::FileExist(file)) { //SC20190813
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " not found =" + file;
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     string entry;
     aurostd::efile2string(file,entry);
@@ -965,7 +959,7 @@ namespace aflowlib {
           stringstream message;
           message << "Could not read ael_stiffness_tensor: wrong number of rows"
                   << " (found " << rows.size() << ", need 6).";
-          throw aurostd::xerror(__AFLOW_FILE__, function, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         } else {
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(rows[i], r, ",");
@@ -974,7 +968,7 @@ namespace aflowlib {
               message << "Could not read ael_stiffness_tensor: wrong number of columns"
                       << " in row " << (i + 1)
                       << " (found " << rows.size() << ", need 6).";
-              throw aurostd::xerror(__AFLOW_FILE__, function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             } else {
               for (int j = 0; j < 6; j++) {
                 tensor[i + 1][j + 1] = r[j];
@@ -993,7 +987,7 @@ namespace aflowlib {
           stringstream message;
           message << "Could not read ael_compliance_tensor: wrong number of rows"
                   << " (found " << rows.size() << ", need 6).";
-          throw aurostd::xerror(__AFLOW_FILE__, function, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         } else {
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(rows[i], r, ",");
@@ -1002,7 +996,7 @@ namespace aflowlib {
               message << "Could not read ael_compliance_tensor: wrong number of columns"
                       << " in row " << (i + 1)
                       << " (found " << rows.size() << ", need 6).";
-              throw aurostd::xerror(__AFLOW_FILE__, function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             } else {
               for (int j = 0; j < 6; j++) {
                 tensor[i + 1][j + 1] = r[j];
@@ -1067,6 +1061,7 @@ namespace aflowlib {
   // LoadWeb
   uint _aflowlib_entry::url2aflowlib(const string& _url,ostream& oss,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "_aflowlib_entry::url2aflowlib():";
     string url=_url;
     if(url.empty()) {cerr << "ERROR - _aflowlib_entry::url2aflowlib: url.empty()" << endl;return 0;}
     string entry;
@@ -1077,7 +1072,7 @@ namespace aflowlib {
       aurostd::StringSubst(url,"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"");
       if(!aurostd::url2string(url+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,entry,verbose)){return 0;}  //CO, this is a dud
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " entry=" << entry << endl;} //CO20180528
+    if(LDEBUG) {cerr << soliloquy << " entry=" << entry << endl;} //CO20180528
     return Load(entry,oss);
   }
 
@@ -1406,6 +1401,7 @@ namespace aflowlib {
 
   // aflowlib2string
   string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
+    string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
     //  string eendl="\n";
 
@@ -3848,6 +3844,7 @@ namespace aflowlib {
   void _aflowlib_entry::correctBadDatabase(ofstream& FileMESSAGE,bool verbose,ostream& oss){
     //CO20180828 - LIB2 also contains unaries //so far we only know of bad binaries
     //APENNSY neglect - LIB2 only //CO20180828 - LIB2 also contains unaries  //binaries only
+    string soliloquy = XPID + "_aflowlib_entry::correctBadDatabase():";
     stringstream message;
     if(vspecies_pp.size()==1 || vspecies_pp.size()==2) {
       string pseudoA="",pseudoB="";
@@ -3862,7 +3859,7 @@ namespace aflowlib {
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         if(verbose){
           message << "Fixing enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       //gamma_IrV
@@ -3873,7 +3870,7 @@ namespace aflowlib {
         enthalpy_atom -= 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // HfPd
@@ -3884,7 +3881,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3899,7 +3896,7 @@ namespace aflowlib {
         enthalpy_atom += 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3910,7 +3907,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
     }
@@ -4173,6 +4170,7 @@ namespace aflowlib {
   }
   string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common){  //CO20200404
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "_aflowlib_entry::getPathAURL():";
     stringstream message;
     string path = "";
     if (aurl.empty()) {return path;}
@@ -4182,7 +4180,7 @@ namespace aflowlib {
     if(0){
       if (tokens.size() != 2) {
         message << "Odd AURL format for entry " << auid << ": " << aurl;
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
         return path;
       }
     }
@@ -4199,7 +4197,7 @@ namespace aflowlib {
         path_full=path;
         aurostd::StringSubst(path_full,"_RAW","_LIB");
         path_full=server+"/"+path_full;
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " attempt 1 path=" << path_full << endl;}
+        if(LDEBUG){cerr << soliloquy << " attempt 1 path=" << path_full << endl;}
         if(aurostd::IsDirectory(path_full)){return path_full;}
       }
 
@@ -4211,7 +4209,7 @@ namespace aflowlib {
         aurostd::StringSubst(path_full,"ICSD_WEB","ICSD/LIB"); //CO20200223
         aurostd::StringSubst(path_full,"_RAW","/LIB");
         path_full=server+"/"+path_full;
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " attempt 2 path=" << path_full << endl;}
+        if(LDEBUG){cerr << soliloquy << " attempt 2 path=" << path_full << endl;}
         if(aurostd::IsDirectory(path_full)){return path_full;}
       }
 
@@ -4219,7 +4217,7 @@ namespace aflowlib {
       if(1){
         server="/www";
         path_full=server+"/"+path;
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " attempt 3 path=" << path_full << endl;}
+        if(LDEBUG){cerr << soliloquy << " attempt 3 path=" << path_full << endl;}
         if(aurostd::IsDirectory(path_full)){return path_full;}
       }
     }
@@ -4235,9 +4233,10 @@ namespace aflowlib {
   }
   vector<string> _aflowlib_entry::getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss){  //CO20200404
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::getSpeciesAURL():";
     stringstream message;
 
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     vector<string> vspecies;
     if(aurl.empty()){return vspecies;}
@@ -4247,13 +4246,13 @@ namespace aflowlib {
     //erase first item (aflowlib.duke.edu), join others, assume we're okay...
     tokens.erase(tokens.begin());
     string path=aurostd::joinWDelimiter(tokens,":");
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
+    if(LDEBUG){cerr << soliloquy << " path=" << path << endl;}
 
     //split by /
     aurostd::string2tokens(path,tokens,"/");
     if(tokens.size()<4){
       message << "Odd AURL format for entry " << auid << ": " << aurl;
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return vspecies;
     }
     string species_string="";
@@ -4270,7 +4269,7 @@ namespace aflowlib {
     }
 
     vspecies=aurostd::getElements(species_string);
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
+    if(LDEBUG){cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
     return vspecies;
   }
 }
@@ -4284,30 +4283,31 @@ namespace aflowlib {
   string _aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
     //CO20200624 - THIS IS HOW WE CREATE AUID FOR POCC STRUCTURES
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile():";
     stringstream message;
 
-    if(aurl.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AURL has not been calculated",_INPUT_MISSING_);}
+    if(aurl.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AURL has not been calculated",_INPUT_MISSING_);}
 
     string system_name=KBIN::ExtractSystemName(directory);
-    if(system_name.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No system name found",_FILE_CORRUPT_);}
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " system_name=" << system_name << endl;}
+    if(system_name.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name found",_FILE_CORRUPT_);}
+    if(LDEBUG){cerr << soliloquy << " system_name=" << system_name << endl;}
     system_name=pocc::addDefaultPOCCTOL2string(system_name);
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " system_name(with TOL)=" << system_name << endl;}
+    if(LDEBUG){cerr << soliloquy << " system_name(with TOL)=" << system_name << endl;}
 
     _aflags aflags;aflags.Directory=directory;
     pocc::POccCalculator pcalc(aflags);
     pcalc.loadDataIntoCalculator();
-    if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+    if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
     vector<string> vauid_aruns;
     string aurl_arun="";
     for(uint i=0;i<pcalc.m_ARUN_directories.size();i++){
       aurl_arun=aurl+"/"+pcalc.m_ARUN_directories[i];
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " m_ARUN_directories[" << i << "]=" << pcalc.m_ARUN_directories[i] << endl;
-        cerr << __AFLOW_FUNC__ << " m_ARUN_directories[" << i << "].aurl=" << aurl_arun << endl;
+        cerr << soliloquy << " m_ARUN_directories[" << i << "]=" << pcalc.m_ARUN_directories[i] << endl;
+        cerr << soliloquy << " m_ARUN_directories[" << i << "].aurl=" << aurl_arun << endl;
       }
       vauid_aruns.push_back(VASPdirectory2auid(aurostd::CleanFileName(directory+"/"+pcalc.m_ARUN_directories[i]),aurl_arun));
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_ARUN_directories[" << i << "].auid=" << vauid_aruns.back() << endl;}
+      if(LDEBUG){cerr << soliloquy << " m_ARUN_directories[" << i << "].auid=" << vauid_aruns.back() << endl;}
     }
 
     stringstream sscontent_json;
@@ -4324,7 +4324,7 @@ namespace aflowlib {
     uint64_t crc=0;
 
     metadata_auid_json="{"+aurostd::joinWDelimiter(vcontent_json,",")+"}";
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
+    if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
     //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
     crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
     auid="aflow:"+aurostd::crc2string(crc);
@@ -4332,17 +4332,17 @@ namespace aflowlib {
     //find conflicts
     string aurl_found="";
     if(aflowlib::auid2present(auid,aurl_found,1)){
-      if(LDEBUG) cerr << __AFLOW_FUNC__ << " conflict auid=" << auid << endl;	
-      message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
+      if(LDEBUG) cerr << soliloquy << " conflict auid=" << auid << endl;	
+      message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
       if(aurl_found!=aurl) { // avoid conflict with yourself
         salt++;
         metadata_auid_json=POCCdirectory2MetadataAUIDjsonfile(directory,salt);
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
+        if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
         //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
         crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
         auid="aflow:"+aurostd::crc2string(crc);
       } else {
-        message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
+        message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
       }
     }
 
@@ -4350,6 +4350,7 @@ namespace aflowlib {
   }
   string VASPdirectory2auid(const string& directory,const string& aurl){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowlib::VASPdirectory2auid():";
     stringstream message;
 
     string auid="";
@@ -4369,24 +4370,24 @@ namespace aflowlib {
         vfiles2.push_back("OUTCAR"+XHOST.vext.at(iext));
       }
 
-      if(LDEBUG) cerr << __AFLOW_FUNC__ << " [0]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [0]" << endl;
 
       for(uint i=0;i<vfiles2.size();i++) 
         if(aurostd::FileExist(directory+"/"+vfiles2.at(i)))
           crc=aurostd::crc64(crc,aurostd::efile2string(directory+"/"+vfiles2.at(i))); // DONT TOUCH THIS
       auid="aflow:"+aurostd::crc2string(crc);
 
-      if(LDEBUG) cerr << __AFLOW_FUNC__ << " [1]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [1]" << endl;
 
-      if(LDEBUG) cerr << __AFLOW_FUNC__ << " auid=" << auid << endl;
+      if(LDEBUG) cerr << soliloquy << " auid=" << auid << endl;
       conflict=FALSE;
       string aurl_found="";
       if(aflowlib::auid2present(auid,aurl_found,1)) {
-        if(LDEBUG) cerr << __AFLOW_FUNC__ << " conflict auid=" << auid << endl;	
-        message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_); //CO20200624
+        if(LDEBUG) cerr << soliloquy << " conflict auid=" << auid << endl;	
+        message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_); //CO20200624
         if(aurl_found!=aurl) { // avoid conflict with yourself
           string salt="AUID_salt["+aurostd::utype2string<long double>(aurostd::get_useconds())+"]";
-          message << "CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_WARNING_); //CO20200624
+          message << "CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_WARNING_); //CO20200624
           string file=vfiles2.at(0);
           //
           for(uint iext=0;iext<XHOST.vext.size();iext++) { aurostd::StringSubst(file,XHOST.vext.at(iext),""); }
@@ -4396,7 +4397,7 @@ namespace aflowlib {
           //
           conflict=TRUE; // recheck
         } else {
-          message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_); //CO20200624
+          message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_); //CO20200624
         }
       }
     }
@@ -4622,7 +4623,7 @@ namespace aflowlib {
     bool VERBOSE_LOCAL=(FALSE || XHOST.DEBUG);
     if(vaflowlib_entry.size()==0) {
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " file not found";
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     vsgroup.clear();vNsgroup.clear();
 
@@ -4631,7 +4632,7 @@ namespace aflowlib {
     if(XGNDSTATE_HOLES==0)  // SAFE NO HOLES IN THE XMATRIX
       if(vaflowlib_entry.size()==0) {
         message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " file not found";
-        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
     if(XGNDSTATE_HOLES==1)  // ALLOW HOLES WITH FAKE VALUES
       if(vaflowlib_entry.size()==0) {
@@ -4647,7 +4648,7 @@ namespace aflowlib {
         aurostd::string2tokens(vaflowlib_entry.at(i),tokens,",");
         if(tokens.size()==0) {
           message = "geometry not enough tokens";
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
         if(tokens.size()==3) { // ok
           vsgroup.clear();
@@ -4691,7 +4692,7 @@ namespace aflowlib { // move to web interface
 
     if(mode!="AFLOWLIB_AUID2AURL" && mode!="AFLOWLIB_AURL2AUID" && mode!="AFLOWLIB_AUID2LOOP" && mode!="AFLOWLIB_AURL2LOOP") {
       message = "wrong mode=" + mode;
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if(XHOST_vAUID.size()==0) { init::InitGlobalObject("vLIBS"); }
     if(XHOST_vAURL.size()==0) { init::InitGlobalObject("vLIBS"); }
@@ -4701,7 +4702,7 @@ namespace aflowlib { // move to web interface
       message += "    XHOST_vAUID.size()=" + aurostd::utype2string<uint>(XHOST_vAUID.size()) + '\n';
       message += "    XHOST_vAURL.size()=" + aurostd::utype2string<uint>(XHOST_vAURL.size()) + '\n';
       message += "    XHOST_vLOOP.size()=" + aurostd::utype2string<uint>(XHOST_vLOOP.size());
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     out="";
     for(uint i=0;i<XHOST_vAUID.size()&&out.empty();i++) {
@@ -4722,7 +4723,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XPID << "aflowlib::AflowlibLocator: BEGIN" << endl;
     if(mode!="AFLOWLIB_AUID2AURL" && mode!="AFLOWLIB_AURL2AUID" && mode!="AFLOWLIB_AUID2LOOP" && mode!="AFLOWLIB_AURL2LOOP") {
       string message = "wrong mode=" + mode;
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -4864,6 +4865,7 @@ namespace aflowlib {
     // Performs AFLUX call based on summons input
     // switched to aurostd::xhttp //HE20220407
     bool LDEBUG=(false || XHOST.DEBUG);
+    string function_name = XPID + "AFLUXCall():";
     string url = "http://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
     if(LDEBUG) {
       cerr << __AFLOW_FUNC__ << ": Summons = " << summons << endl;
@@ -4875,13 +4877,13 @@ namespace aflowlib {
     string response = aurostd::httpGet(url, status_code);
     if (status_code < 200 || status_code >= 400) {
       string message = "Bad status code for AFLUX request (" + aurostd::utype2string<int>(status_code) + ").";
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_HTTP_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_HTTP_);
     }
     if ((response.find("Lux Fail") != string::npos)
       || (response.find("DB Fail") != string::npos)
       || (response.find("Count Fail") != string::npos)) {
       string message = "Bad response: " + response + ".";
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return response;
   }
@@ -4913,7 +4915,7 @@ namespace aflowlib {
         aurostd::string2tokens(fields[i],key_value,"=");
         if(key_value.size()<2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){
           string message = "Cannot find key-value pair splitting on \"=\" for the following field: \"" + fields[i] + "\".";
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         std::pair<string,string> property; 
         property.first = aurostd::RemoveWhiteSpaces(key_value[0]);  // key 
@@ -5128,7 +5130,7 @@ namespace aflowlib {
         space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
     else { // need to get enantiomorph too
@@ -5151,7 +5153,7 @@ namespace aflowlib {
         space_group_summons += ":" + aurostd::utype2string<int>(enantiomorph_space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
 
@@ -5173,6 +5175,7 @@ namespace aflowlib {
 namespace aflowlib {
   uint WEB_Aflowlib_Entry(string options,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "aflowlib::WEB_Aflowlib_Entry():";
     if(LDEBUG) cout << XPID << "aflowlib::WEB_Aflowlib_Entry: begin<br>" << endl;
 
     stringstream num_prec;

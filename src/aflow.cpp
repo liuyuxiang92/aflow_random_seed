@@ -56,6 +56,7 @@
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 int main(int _argc,char **_argv) {
+  string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
@@ -162,46 +163,47 @@ int main(int _argc,char **_argv) {
 
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
+      string soliloquy = XPID + "test_xmatrix()::";
       bool LDEBUG=TRUE;// TRUE;
       xmatrix<double> mat;
       mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
       mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
       mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;}
+      if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
       //getxmat()
       xmatrix<double> submat;
       mat.getxmatInPlace(submat,2,3,2,3);
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " submat=" << endl;cerr << submat << endl;}
+      if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
       //setmat()
       mat.setmat(submat,1,1); //do nothing
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " replacing with submat at 1,1" << endl;
-        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
+        cerr << soliloquy << " replacing with submat at 1,1" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
       xvector<double> xv;
       xv(1)=2;xv(2)=3;xv(3)=4;
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " xv=" << xv << endl;}
+      if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
       mat.setmat(xv,1,false); //row
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " replacing with xv at row=1" << endl;
-        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
+        cerr << soliloquy << " replacing with xv at row=1" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
       mat.setmat(xv,2,true); //col
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " replacing with xv at col=2" << endl;
-        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
+        cerr << soliloquy << " replacing with xv at col=2" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
       //setrow()
       mat.setrow(xv,2);
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " replacing with xv at row=2" << endl;
-        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
+        cerr << soliloquy << " replacing with xv at row=2" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
       //setcol()
       mat.setcol(xv,3);
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " replacing with xv at col=3" << endl;
-        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
+        cerr << soliloquy << " replacing with xv at col=3" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
       return 1;
     }
@@ -235,7 +237,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
+      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
         cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
@@ -398,6 +400,11 @@ int main(int _argc,char **_argv) {
     if(!Arun && (aurostd::args2flag(argv,cmds,"--mosfet") || aurostd::args2attachedflag(argv,"--mosfet="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
+      return 0; //CO20180419
+    }
+    if(!Arun && (aurostd::args2flag(argv,cmds,"--multiplexer") || aurostd::args2attachedflag(argv,"--multiplexer="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::MULTIPLEXER(aurostd::args2attachedutype<int>(argv,"--multiplexer=",0),TRUE);
       return 0; //CO20180419
     }
     if(!Arun && (aurostd::args2flag(argv,cmds,"--mail2scan") || aurostd::args2attachedflag(argv,"--mail2scan="))) {
@@ -598,13 +605,13 @@ int main(int _argc,char **_argv) {
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
-  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, re.where(), re.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   //[OBSOLETE]catch(AFLOWLogicError& le){
-  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, le.where(), le.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
@@ -989,6 +996,7 @@ namespace aflow {
 // pflow --icsd_nopartialocc | pflow --icsd2proto > README_LIBRARY_ICSD$1.TXT
 
 
+//#include "/home/auro/work/AFLOW3_AURO/aflow_auro.cpp"
 //#include "../AFLOW3_AURO/aflow_auro.cpp"
 
 // ***************************************************************************
@@ -996,6 +1004,12 @@ namespace aflow {
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE) {
     if(VERBOSE) cerr << XPID << "aflowlib::MOSFET mode=" << mode << endl;
+    return 0;
+  }
+}
+namespace aflowlib {
+  uint MULTIPLEXER(int mode,bool VERBOSE) {
+    if(VERBOSE) cerr << XPID << "aflowlib::MULTIPLEXER mode=" << mode << endl;
     return 0;
   }
 }

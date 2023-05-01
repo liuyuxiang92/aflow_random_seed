@@ -273,9 +273,6 @@ namespace aflowlib {
       vector<uint> vNsgroup;                            // vNsgroups
       vector<string> vsgroup;                           // vsgroups
       vector<xstructure> vstr;                          // vstructures
-      // details from EntryLoader //HE20220913
-      string el_source_type;
-      string el_source;
       // functions
       bool FixDescription(void);                        // fix description names
       void GetSGROUP(string aflowlibentry);             // disassemble SG
@@ -512,7 +509,7 @@ class _outreach {
     vector<string> vauthor;
     vector<string> vcorrespondingauthor;
     string title;
-    string journal,link,arxiv,supplementary; 
+    string journal,link,arxiv,supplementary,supplementary_url; 
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
@@ -814,16 +811,12 @@ namespace aflowlib {
       void loadAFLUXMatchbook(const std::map<std::string, std::string> & matchbook);
       void loadRestAPIQueries(const std::vector<std::string> & queries, bool full_url=false);
       void loadFiles(const std::vector<std::string> & files);
-      void loadFiles(const std::string & file_path);
-      void loadFolders(const std::vector<std::string> & folders);
-      void loadFolders(const std::string & folder_path);
-      void loadText(const std::vector<std::string> & raw_data_lines, const std::string & source="");
-      void loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content, const std::string & source="");
+      void loadText(const std::vector<std::string> & raw_data_lines);
+      void loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content);
 
       // Source setter and getter
       bool setSource(EntryLoader::Source new_source);
       EntryLoader::Source getSource() const;
-      std::string getSourceString() const;
 
       // Getter for raw data
       std::vector<std::string> getRawSqliteWhere(const std::string & where) const;
@@ -890,6 +883,7 @@ namespace aflowlib {
 // will be moved near LI2RAW
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE);
+  uint MULTIPLEXER(int mode,bool VERBOSE);
   uint MAIL2SCAN(string library,bool VERBOSE);
   uint LIB2SCRUB(string library,bool VERBOSE);
   bool LIB2AUID(string entry,bool TEST,bool _VERBOSE);

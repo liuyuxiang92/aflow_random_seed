@@ -80,6 +80,7 @@ namespace KBIN {
   // Sets all APL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "loadDefaultsAPL():";
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
@@ -128,7 +129,7 @@ namespace KBIN {
     //opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // OBSOLETE ME20200507
     if (LDEBUG) {
       for (uint i = 0; i < aplflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << " key: " << aplflags[i].keyword << ", xscheme: " << aplflags[i].xscheme << ", option: " << aplflags[i].option << std::endl;
+        std::cerr << soliloquy << " key: " << aplflags[i].keyword << ", xscheme: " << aplflags[i].xscheme << ", option: " << aplflags[i].option << std::endl;
       }
     }
     return aplflags;
@@ -173,6 +174,7 @@ namespace KBIN {
   void readParametersAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "readParametersAPL():";
     string key, entry, xvaspflag;
     vector<bool> supercell_method(4, false);
     for (uint i = 0; i < module_opts.aplflags.size(); i++) {
@@ -283,7 +285,7 @@ namespace KBIN {
     }
     if (LDEBUG) {
       for (uint i = 0; i < module_opts.aplflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << "  " << module_opts.aplflags[i].keyword << " = " << module_opts.aplflags[i].xscheme << std::endl;
+        std::cerr << soliloquy << "  " << module_opts.aplflags[i].keyword << " = " << module_opts.aplflags[i].xscheme << std::endl;
       }
     }
   }
@@ -294,6 +296,7 @@ namespace KBIN {
   // Sets all AAPL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "loadDefaultsAAPL():";
     vector<aurostd::xoption> aaplflags;
     aurostd::xoption opt;
     opt.keyword="BTE"; opt.xscheme = DEFAULT_AAPL_BTE; aaplflags.push_back(opt); opt.clear();
@@ -312,7 +315,7 @@ namespace KBIN {
     opt.keyword="KPPRA_AAPL"; opt.xscheme = utype2string<int>(-1); aaplflags.push_back(opt);
     if (LDEBUG) {
       for (uint i = 0; i < aaplflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << " key: " << aaplflags[i].keyword << ", xscheme: " << aaplflags[i].xscheme << ", option: " << aaplflags[i].option << std::endl;
+        std::cerr << soliloquy << " key: " << aaplflags[i].keyword << ", xscheme: " << aaplflags[i].xscheme << ", option: " << aaplflags[i].option << std::endl;
       }
     }
     return aaplflags;
@@ -345,6 +348,7 @@ namespace KBIN {
   void readParametersAAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "readParametersAAPL():";
     string key, entry, xvaspflag;
     for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
       key = module_opts.aaplflags[i].keyword;
@@ -369,7 +373,7 @@ namespace KBIN {
     }
     if (LDEBUG) {
       for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << "  " << module_opts.aaplflags[i].keyword << " = " << module_opts.aaplflags[i].xscheme << std::endl;
+        std::cerr << soliloquy << "  " << module_opts.aaplflags[i].keyword << " = " << module_opts.aaplflags[i].xscheme << std::endl;
       }
     }
   }
@@ -381,6 +385,7 @@ namespace KBIN {
   // Sets all AEL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAEL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "loadDefaultsAEL():";
     vector<aurostd::xoption> aelflags;
     aurostd::xoption opt;
     opt.keyword="STRAIN_SYMMETRY"; opt.option = DEFAULT_AEL_STRAIN_SYMMETRY; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
@@ -404,7 +409,7 @@ namespace KBIN {
     opt.keyword="DIRNAME_ARUN"; opt.option = DEFAULT_AEL_DIRNAME_ARUN; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();    
     if (LDEBUG) {
       for (uint i = 0; i < aelflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << " key: " << aelflags[i].keyword << ", xscheme: " << aelflags[i].xscheme << ", option: " << aelflags[i].option << std::endl;
+        std::cerr << soliloquy << " key: " << aelflags[i].keyword << ", xscheme: " << aelflags[i].xscheme << ", option: " << aelflags[i].option << std::endl;
       }
     }
     return aelflags;
@@ -442,6 +447,7 @@ namespace KBIN {
   // Sets all AGL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAGL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy = XPID + "loadDefaultsAGL():";
     vector<aurostd::xoption> aglflags;
     aurostd::xoption opt;
     opt.keyword="AEL_POISSON_RATIO"; opt.option = DEFAULT_AGL_AEL_POISSON_RATIO; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
@@ -469,7 +475,7 @@ namespace KBIN {
 
     if (LDEBUG) {
       for (uint i = 0; i < aglflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << " key: " << aglflags[i].keyword << ", xscheme: " << aglflags[i].xscheme << ", option: " << aglflags[i].option << std::endl;
+        std::cerr << soliloquy << " key: " << aglflags[i].keyword << ", xscheme: " << aglflags[i].xscheme << ", option: " << aglflags[i].option << std::endl;
       }
     }
     return aglflags;
@@ -510,6 +516,7 @@ namespace KBIN {
   // Sets all QHA flags to their default values.
   vector<aurostd::xoption> loadDefaultsQHA() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="loadDefaultsQHA():";
     vector<aurostd::xoption> qhaflags;
     aurostd::xoption opt;
     opt.keyword="MODE"; opt.xscheme = DEFAULT_QHA_MODE; qhaflags.push_back(opt); opt.clear();
@@ -530,7 +537,7 @@ namespace KBIN {
 
     if (LDEBUG) {
       for (uint i = 0; i < qhaflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << " key: " << qhaflags[i].keyword << ", xscheme: " << qhaflags[i].xscheme << ", option: " << qhaflags[i].option << std::endl;
+        std::cerr << soliloquy << " key: " << qhaflags[i].keyword << ", xscheme: " << qhaflags[i].xscheme << ", option: " << qhaflags[i].option << std::endl;
       }
     }
     return qhaflags;
@@ -563,6 +570,7 @@ namespace KBIN {
   void readParametersQHA(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="readParametersQHA():";
     string key="", entry="", xvaspflag="";
     for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
       key = module_opts.qhaflags[i].keyword;
@@ -581,7 +589,7 @@ namespace KBIN {
 
     if (LDEBUG) {
       for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
-        std::cerr << __AFLOW_FUNC__ << "  " << module_opts.qhaflags[i].keyword << " = " << module_opts.qhaflags[i].xscheme << std::endl;
+        std::cerr << soliloquy << "  " << module_opts.qhaflags[i].keyword << " = " << module_opts.qhaflags[i].xscheme << std::endl;
       }
     }
   }
