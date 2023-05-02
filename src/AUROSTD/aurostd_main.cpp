@@ -3969,6 +3969,26 @@ namespace aurostd {
     // stringstreamIN.clear();stringstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.size();  // return FALSE if something got messed up
   }
+  uint trimEmptyEdges(vector<string>& vstringout){  //CO20230502
+    uint count=vstringout.size();
+    //start with front
+    while(vstringout.size()){
+      if(vstringout.front().find_first_not_of("\t\n ")!=string::npos){ //CO20230502 - fast way to check for empty string //!aurostd::RemoveWhiteSpaces(vstringout.front()).empty())
+        break;
+      }
+      vstringout.erase(vstringout.begin());
+      count--;
+    }
+    //now back
+    while(vstringout.size()){
+      if(vstringout.back().find_first_not_of("\t\n ")!=string::npos){ //CO20230502 - fast way to check for empty string //aurostd::RemoveWhiteSpaces(vstringout.back()).empty())
+        break;
+      }
+      vstringout.pop_back();
+      count--;
+    }
+    return count;
+  }
   uint string2vectorstring(const string& stringIN,vector<string> &vstringout,bool consecutive,bool trim_edges) {  //CO20170613
     //CO mods 20170613
     //we are adding functionality here, because string2tokens will treat "\n\n" same as "\n", but not "\n \n"
@@ -3976,24 +3996,7 @@ namespace aurostd {
     //trim_edges will remove delimiters from beginning and end, similar to consecutive=false behavior
     //return aurostd::string2tokens(stringIN,vstringout,"\n",true);
     uint count=aurostd::string2tokens(stringIN,vstringout,"\n",consecutive);
-    if(trim_edges){
-      //start with front
-      while(vstringout.size()){
-        if(!aurostd::RemoveWhiteSpaces(vstringout.front()).empty()){
-          break;
-        }
-        vstringout.erase(vstringout.begin());
-        count--;
-      }
-      //now back
-      while(vstringout.size()){
-        if(!aurostd::RemoveWhiteSpaces(vstringout.back()).empty()){
-          break;
-        }
-        vstringout.pop_back();
-        count--;
-      }
-    }
+    if(trim_edges){count=trimEmptyEdges(vstringout);}
     return count;
   }
 
@@ -6075,7 +6078,7 @@ namespace aurostd {
     return substring2string(input.str(),strsub1,instance,RemoveWS,RemoveComments);
   }
 
-  uint substring2stringInnerLoop(const string& _strline,bool& read,vector<string>& vlines,vector<string>& tokens,const string& strsub1,const string& strsub2,bool RemoveComments) { //CO20230502 - helper function for substring2strings()
+  uint substring2stringInnerLoop(const string& _strline,bool& read,vector<string>& vlines,vector<string>& tokens,const string& strsub1,const string& strsub2,bool RemoveComments,bool trim_edges) { //CO20230502 - helper function for substring2strings()
     bool LDEBUG=false;
     string strline=_strline,strline2="",strline3="";
     bool found_strsub1=false,found_strsub2=false;
@@ -6108,6 +6111,7 @@ namespace aurostd {
             cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
           }
           vlines.push_back(strline2);
+          if(trim_edges){trimEmptyEdges(vlines);} //CO20230502
           tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
           vlines.clear();
         }
@@ -6136,6 +6140,7 @@ namespace aurostd {
         }
         vlines.push_back(strline2);
         if(found_strsub2){
+          if(trim_edges){trimEmptyEdges(vlines);} //CO20230502
           tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
           if(LDEBUG){
             for(uint i=0;i<vlines.size();i++){cerr << __AFLOW_FUNC__ << " vlines[i=" << i << "]=" << vlines[i] << endl;}
@@ -6634,7 +6639,7 @@ namespace aurostd {
     return vstringout.size();
   }
 
-  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments,bool trim_edges) { //CO20230502
     //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
     //[CO20230502 - OBSOLETE]return vstringout.size();
     //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
@@ -6651,18 +6656,19 @@ namespace aurostd {
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
       if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
       //
-      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments);
+      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments,trim_edges); //CO20230502
       //
     }
     input.clear();input.seekg(0);
+    uint count=vstringout.size();
     if(LDEBUG){
-      for(uint i=0;i<vstringout.size();i++) {
+      for(uint i=0;i<count;i++) {
         cerr << __AFLOW_FUNC__ << " vstringout[i=" << i << "]=\"" <<  vstringout[i] << "\"" << endl;
       }
     }
-    return vstringout.size();
+    return count;
   }
-  uint substring2strings(const string& _input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  uint substring2strings(const string& _input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments,bool trim_edges) {  //CO20230502
     //[SD20220520 - OBSOLETE]bool LDEBUG=(FALSE || XHOST.DEBUG);
     //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << RemoveWS << endl;
     //[SD20220520 - OBSOLETE]string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
@@ -6706,20 +6712,21 @@ namespace aurostd {
       strline=vlines2[iline];
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
       //
-      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments);
+      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments,trim_edges); //CO20230502
       //
     }
+    uint count=vstringout.size();
     if(LDEBUG){
-      for(uint i=0;i<vstringout.size();i++) {
+      for(uint i=0;i<count;i++) {
         cerr << __AFLOW_FUNC__ << " vstringout[i=" << i << "]=\"" <<  vstringout[i] << "\"" << endl;
       }
     }
-    return vstringout.size();
+    return count;
   }
-  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments,bool trim_edges) { //CO20230502
     //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
     //[CO20230502 - OBSOLETE]return vstringout.size();
-    return aurostd::substring2strings(input.str(),vstringout,strsub1,strsub2,instance,RemoveWS,RemoveComments);
+    return aurostd::substring2strings(input.str(),vstringout,strsub1,strsub2,instance,RemoveWS,RemoveComments,trim_edges);  //CO20230502
   }
 
   template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //SD202205020

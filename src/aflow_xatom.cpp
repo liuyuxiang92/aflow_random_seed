@@ -4359,6 +4359,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(vinput.size()==0) {
     throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180420
+    
+  if(LDEBUG){ //CO20230502
+    for(uint i=0;i<vinput.size();i++){
+      cerr << __AFLOW_FUNC__ << " vinput[i=" << i << "]=\"" << vinput[i] << "\"" << endl;
+    }
+  }
 
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   throw aurostd::xerror(__AFLOW_FILE__,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
   string sstring,stmp;
