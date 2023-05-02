@@ -6174,7 +6174,7 @@ namespace aurostd {
       for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
     }
     else if(instance>0) {
-      strstream << tokens[instance]; //[CO20230501 - OBSOLETE]tokens[tokens.size()-1];
+      strstream << tokens[instance-1]; //[CO20230501 - OBSOLETE]tokens[tokens.size()-1];
     }
     else if(instance<0) { //CO20230501 - if instance<0, then we need to get full tokens to see how many to subtract
       uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,instance);
@@ -6696,7 +6696,7 @@ namespace aurostd {
     //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
     //[CO20230502 - OBSOLETE]return vstringout.size();
     //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
-    bool LDEBUG=false;
+    bool LDEBUG=FALSE;
     string input=_input;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
