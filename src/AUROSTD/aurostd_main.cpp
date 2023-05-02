@@ -5644,6 +5644,10 @@ namespace aurostd {
     // in the string (match_all) or none have (!match_all)
     return match_all;
   }
+  
+  bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
+  }
 
   bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all) {
     for (uint i = 0; i < substrings.size(); i++) {
@@ -5658,10 +5662,6 @@ namespace aurostd {
     // Code only gets here when all substrings are
     // in the string (match_all) or none have (!match_all)
     return match_all;
-  }
-
-  bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
-    return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
   /// @brief Determines whether a specific value exists inside a list
@@ -5975,6 +5975,10 @@ namespace aurostd {
   //n==0 returns all entries, starts counting from 1, negative numbers go backwards
   //Original substring2string always returned just the first entry
   //When two substrings are present strsub1 is the start keyword and strsub2 is the stop keyword
+  //CO20230502 - another rewrite for strsub1 and strsub2
+  //substring2string() with strsub1 grabs everything on the line
+  //substring2string() with strsub1 and strsub2 grabs everything in between
+  //substring2strings() with strsub1 and strsub2 now handles newlines within entries of the return vector, as well as start/stop tags within the same line
   string substring2string(ifstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
     //substring2string and kvpair2string are similar but distinct
     //substring2string will match any strsub1 and return everything AFTER strsub1
@@ -6071,112 +6075,195 @@ namespace aurostd {
     return substring2string(input.str(),strsub1,instance,RemoveWS,RemoveComments);
   }
 
-  string substring2string(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
-    bool LDEBUG=FALSE;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
-    string strline="";
-    input.clear();input.seekg(0);
-    vector<string> vlines,tokens;
-    bool read=FALSE;
-    int iter=0;
-    while(getline(input,strline) && (instance==0 || iter!=instance)) {
-      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
-      if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
-      if(read==FALSE && strline.find(strsub1)!=string::npos) {
-        vlines.push_back(strline.substr(strline.find(strsub1)+strsub1.length()));
-        read=TRUE;
-      }
-      else if(read==TRUE && strline.find(strsub2)!=string::npos) {
-        vlines.push_back(strline.substr(0,strline.find(strsub2)));
-        read=FALSE;
-        tokens.push_back(aurostd::vectorstring2string(vlines));
-        vlines.clear();
-        iter++;
-      }
-      else if(read) {
-        vlines.push_back(strline);
+  uint substring2stringInnerLoop(const string& _strline,bool& read,vector<string>& vlines,vector<string>& tokens,const string& strsub1,const string& strsub2,bool RemoveComments) { //CO20230502 - helper function for substring2strings()
+    bool LDEBUG=false;
+    string strline=_strline,strline2="",strline3="";
+    bool found_strsub1=false,found_strsub2=false;
+    if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
+    if(read==FALSE && strline.find(strsub1)!=string::npos) {
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline.find(strsub1)!=string::npos" << endl;}
+      //CO20230501 - fixing in case strsub1 and strsub2 are in the same line
+      while(strline.find(strsub1)!=string::npos){
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " (WHILE LOOP START)" << endl;
+          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
+        strline2=strline.substr(strline.find(strsub1)+strsub1.length());
+        strline="";
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " strline2=" << strline2 << endl;
+          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+        }
+        if(strline2.find(strsub2)==string::npos){
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline2.find(strsub2)==string::npos" << endl;}
+          read=TRUE;
+          vlines.push_back(strline2);
+        }
+        else{
+          strline3=strline2.substr(0,strline2.find(strsub2));
+          strline =strline2.substr(strline2.find(strsub2)+strsub2.length());
+          strline2=strline3;
+          if(LDEBUG){
+            cerr << __AFLOW_FUNC__ << " strline2.find(strsub2)!=string::npos" << endl;
+            cerr << __AFLOW_FUNC__ << " strline2=" << strline2 << endl;
+            cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+          }
+          vlines.push_back(strline2);
+          tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
+          vlines.clear();
+        }
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " (WHILE LOOP END)" << endl;}
       }
     }
-    input.clear();input.seekg(0);
+    else if(read==TRUE && strline.find(strsub2)!=string::npos) {
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline.find(strsub2)!=string::npos)" << endl;}
+      //CO20230501 - fixing in case strsub1 and strsub2 are in the same line
+      while(!strline.empty() || strline.find(strsub2)!=string::npos){
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " (WHILE LOOP START)" << endl;
+          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+        }
+        found_strsub2=(strline.find(strsub2)!=string::npos);
+        strline2=strline;
+        strline="";
+        if(found_strsub2){
+          strline3=strline2.substr(0,strline2.find(strsub2));
+          strline =strline2.substr(strline2.find(strsub2)+strsub2.length());
+          strline2=strline3;
+        }
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " strline2=" << strline2 << endl;
+          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+        }
+        vlines.push_back(strline2);
+        if(found_strsub2){
+          tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
+          if(LDEBUG){
+            for(uint i=0;i<vlines.size();i++){cerr << __AFLOW_FUNC__ << " vlines[i=" << i << "]=" << vlines[i] << endl;}
+            for(uint i=0;i<tokens.size();i++){cerr << __AFLOW_FUNC__ << " tokens[i=" << i << "]=" << tokens[i] << endl;}
+          }
+          vlines.clear();
+          if(strline.empty()){read=FALSE;}
+        }
+        if(!strline.empty()){
+          found_strsub1=(strline.find(strsub1)!=string::npos);
+          if(found_strsub1){
+            strline=strline.substr(strline.find(strsub1)+strsub1.length());
+          }
+        }
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " read=" << read << endl;
+          cerr << __AFLOW_FUNC__ << " (WHILE LOOP END)" << endl;
+        }
+      }
+    }
+    else if(read) {
+      vlines.push_back(strline);
+    }
+    return tokens.size();
+  }
+
+  string substring2stringConsolidate(const vector<string>& tokens,const int instance){  //CO20230502 - helper function for substring2strings()
     if(tokens.size()==0 || (uint)aurostd::abs(instance)>tokens.size()) {return "";}
     stringstream strstream;
     if(instance==0) {
       for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
     }
     else if(instance>0) {
-      strstream << tokens[tokens.size()-1];
+      strstream << tokens[instance]; //[CO20230501 - OBSOLETE]tokens[tokens.size()-1];
     }
-    else if(instance<0) {
+    else if(instance<0) { //CO20230501 - if instance<0, then we need to get full tokens to see how many to subtract
       uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,instance);
       strstream << tokens[i];
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
     return strstream.str();
   }
 
-  string substring2string(const string& _input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  string substring2string(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
     bool LDEBUG=FALSE;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
-    string input=_input;
-    if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
-    if(input.find(strsub1)==string::npos || input.find(strsub2)==string::npos) {return "";}
-    stringstream strstream;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
     vector<string> tokens;
-    vector<uint> vstart, vstop;
-    aurostd::string2vectorstring(input,tokens);
-    uint istart=0,istop=0;
-    int iter=0;
-    if(instance>0) {
-      for(uint i=0;i<tokens.size();i++) {
-        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
-        if(tokens[i].find(strsub2)!=string::npos) {
-          istop=i-1;
-          if(instance==iter) {vstop.push_back(istop);break;}
-        }
-        if(tokens[i].find(strsub1)!=string::npos) {
-          iter++;
-          istart=i+1;
-          if(instance==iter) {vstart.push_back(istart);}
-        }
-      }
-    }
-    else if(instance<0) {
-      for(int i=tokens.size()-1;i>=0;i--) {
-        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
-        if(tokens[i].find(strsub2)!=string::npos) {
-          iter--;
-          istop=i-1;
-          if(instance==iter) {vstop.push_back(istop);}
-        }
-        if(tokens[i].find(strsub1)!=string::npos) {
-          istart=i+1;
-          if(instance==iter) {vstart.push_back(istart);break;}
-        }
-      }
-    }
-    else { //instance==0
-      for(uint i=0;i<tokens.size();i++) {
-        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
-        if(tokens[i].find(strsub2)!=string::npos) {
-          istop=i-1;
-          vstop.push_back(istop);
-        }
-        if(tokens[i].find(strsub1)!=string::npos) {
-          istart=i+1;
-          vstart.push_back(istart);
-        }
-      }
-    }
-    if(vstop.empty()) {return "";}
-    if(vstop.size()!=vstart.size()) {vstart.pop_back();} // remove unfinished start
-    for(uint i=0;i<vstart.size();i++) {
-      for(uint j=vstart[i];j<=vstop[i];j++) {strstream << tokens[j] << endl;}
-    }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
-    return strstream.str();
+    aurostd::substring2strings(input,tokens,strsub1,strsub2,instance,RemoveWS,RemoveComments);
+    string output=substring2stringConsolidate(tokens,instance);
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << output << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return output;
   }
+
+  string substring2string(const string& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+    vector<string> tokens;
+    aurostd::substring2strings(input,tokens,strsub1,strsub2,instance,RemoveWS,RemoveComments);
+    string output=substring2stringConsolidate(tokens,instance);
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << output << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return output;
+  }
+  
+  //[CO20230501 - OBSOLETE]string substring2string(const string& _input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  //[CO20230501 - OBSOLETE]  bool LDEBUG=FALSE;
+  //[CO20230501 - OBSOLETE]  if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+  //[CO20230501 - OBSOLETE]  string input=_input;
+  //[CO20230501 - OBSOLETE]  if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+  //[CO20230501 - OBSOLETE]  if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+  //[CO20230501 - OBSOLETE]  if(input.find(strsub1)==string::npos || input.find(strsub2)==string::npos) {return "";}
+  //[CO20230501 - OBSOLETE]  stringstream strstream;
+  //[CO20230501 - OBSOLETE]  vector<string> tokens;
+  //[CO20230501 - OBSOLETE]  vector<uint> vstart, vstop;
+  //[CO20230501 - OBSOLETE]  aurostd::string2vectorstring(input,tokens);
+  //[CO20230501 - OBSOLETE]  uint istart=0,istop=0;
+  //[CO20230501 - OBSOLETE]  int iter=0;
+  //[CO20230501 - OBSOLETE]  if(instance>0) {
+  //[CO20230501 - OBSOLETE]    for(uint i=0;i<tokens.size();i++) {
+  //[CO20230501 - OBSOLETE]      if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub2)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        istop=i-1;
+  //[CO20230501 - OBSOLETE]        if(instance==iter) {vstop.push_back(istop);break;}
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub1)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        iter++;
+  //[CO20230501 - OBSOLETE]        istart=i+1;
+  //[CO20230501 - OBSOLETE]        if(instance==iter) {vstart.push_back(istart);}
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]    }
+  //[CO20230501 - OBSOLETE]  }
+  //[CO20230501 - OBSOLETE]  else if(instance<0) {
+  //[CO20230501 - OBSOLETE]    for(int i=tokens.size()-1;i>=0;i--) {
+  //[CO20230501 - OBSOLETE]      if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub2)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        iter--;
+  //[CO20230501 - OBSOLETE]        istop=i-1;
+  //[CO20230501 - OBSOLETE]        if(instance==iter) {vstop.push_back(istop);}
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub1)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        istart=i+1;
+  //[CO20230501 - OBSOLETE]        if(instance==iter) {vstart.push_back(istart);break;}
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]    }
+  //[CO20230501 - OBSOLETE]  }
+  //[CO20230501 - OBSOLETE]  else { //instance==0
+  //[CO20230501 - OBSOLETE]    for(uint i=0;i<tokens.size();i++) {
+  //[CO20230501 - OBSOLETE]      if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub2)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        istop=i-1;
+  //[CO20230501 - OBSOLETE]        vstop.push_back(istop);
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]      if(tokens[i].find(strsub1)!=string::npos) {
+  //[CO20230501 - OBSOLETE]        istart=i+1;
+  //[CO20230501 - OBSOLETE]        vstart.push_back(istart);
+  //[CO20230501 - OBSOLETE]      }
+  //[CO20230501 - OBSOLETE]    }
+  //[CO20230501 - OBSOLETE]  }
+  //[CO20230501 - OBSOLETE]  if(vstop.empty()) {return "";}
+  //[CO20230501 - OBSOLETE]  if(vstop.size()!=vstart.size()) {vstart.pop_back();} // remove unfinished start
+  //[CO20230501 - OBSOLETE]  for(uint i=0;i<vstart.size();i++) {
+  //[CO20230501 - OBSOLETE]    for(uint j=vstart[i];j<=vstop[i];j++) {strstream << tokens[j] << endl;}
+  //[CO20230501 - OBSOLETE]  }
+  //[CO20230501 - OBSOLETE]  if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+  //[CO20230501 - OBSOLETE]  return strstream.str();
+  //[CO20230501 - OBSOLETE]}
 
   string substring2string(const stringstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) { 
     return substring2string(input.str(),strsub1,strsub2,instance,RemoveWS,RemoveComments);
@@ -6547,11 +6634,35 @@ namespace aurostd {
     return vstringout.size();
   }
 
-  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
-    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    //[CO20230502 - OBSOLETE]return vstringout.size();
+    //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
+    bool LDEBUG=false;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+    vstringout.clear();
+    string strline="";
+    input.clear();input.seekg(0);
+    vector<string> vlines;
+    int iter=0;
+    bool read=FALSE;
+    while(getline(input,strline) && (instance<=0 || iter<instance)) {
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
+      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
+      //
+      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments);
+      //
+    }
+    input.clear();input.seekg(0);
+    if(LDEBUG){
+      for(uint i=0;i<vstringout.size();i++) {
+        cerr << __AFLOW_FUNC__ << " vstringout[i=" << i << "]=\"" <<  vstringout[i] << "\"" << endl;
+      }
+    }
     return vstringout.size();
   }
-  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
+  uint substring2strings(const string& _input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
     //[SD20220520 - OBSOLETE]bool LDEBUG=(FALSE || XHOST.DEBUG);
     //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << RemoveWS << endl;
     //[SD20220520 - OBSOLETE]string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
@@ -6576,12 +6687,39 @@ namespace aurostd {
     //[SD20220520 - OBSOLETE]}
     //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << strsub2 << " " << vstringout.size() << " " << RemoveWS << endl;
     //[SD20220520 - OBSOLETE]return vstringout.size();
-    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    //[CO20230502 - OBSOLETE]return vstringout.size();
+    //CO20230502 - another rewrite to handle newlines within start/stop tags, and start/stop tags within the same line
+    bool LDEBUG=false;
+    string input=_input;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+    vstringout.clear();
+    if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(input,'"');}
+    if(input.find(strsub1)==string::npos && input.find(strsub2)==string::npos) {return vstringout.size();}
+    string strline="";
+    vector<string> vlines,vlines2;
+    aurostd::string2vectorstring(input,vlines2);
+    int iter=0;
+    bool read=false;
+    for(uint iline=0;iline<vlines2.size() && (instance<=0 || iter<instance);iline++){
+      strline=vlines2[iline];
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
+      //
+      iter=substring2stringInnerLoop(strline,read,vlines,vstringout,strsub1,strsub2,RemoveComments);
+      //
+    }
+    if(LDEBUG){
+      for(uint i=0;i<vstringout.size();i++) {
+        cerr << __AFLOW_FUNC__ << " vstringout[i=" << i << "]=\"" <<  vstringout[i] << "\"" << endl;
+      }
+    }
     return vstringout.size();
   }
-  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
-    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
-    return vstringout.size();
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    //[CO20230502 - OBSOLETE]vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    //[CO20230502 - OBSOLETE]return vstringout.size();
+    return aurostd::substring2strings(input.str(),vstringout,strsub1,strsub2,instance,RemoveWS,RemoveComments);
   }
 
   template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //SD202205020

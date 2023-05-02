@@ -1809,7 +1809,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
   // ---------------------------------------------------------------------------
   // used to find the total number of structures
   vector<string> start_string;
-  aurostd::substring2strings(input_stream.str(),start_string,START);
+  aurostd::substring2strings(input_stream.str(),start_string,string(START),string(STOP)); //CO20230502
 
   message << "Loading " << start_string.size() << " structures in file ... ";
   pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);

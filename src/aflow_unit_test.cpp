@@ -1268,6 +1268,19 @@ namespace unittest {
       vector<string> expected_vstring = {"==48", "==49", "==50"};
       checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
     }
+    
+    // ---------------------------------------------------------------------------
+    // Check | substring2strings //CO20230502
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::substring2strings()";
+      check_description = "return all the matches as vector of strings";
+      string test_string = "[START]1234\n 4321[STOP] 456[START] 789 \n 987 [STOP]\n[START]4321 [STOP]654[START]987[STOP]";
+      vector<string> calculated_vstring;
+      aurostd::substring2strings(test_string, calculated_vstring, string("[START]"), string("[STOP]")); //CO20230502 - without string(), compiler picks the wrong overload...
+      vector<string> expected_vstring = {"1234\n 4321"," 789 \n 987 ","4321 ","987"};
+      checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
