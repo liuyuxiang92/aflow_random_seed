@@ -1505,5 +1505,6 @@ check_aflow_exits:
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
 unit_test:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --makefile && $(MAKE)
 	./aflow --unit_test
 ###################################################################################################
