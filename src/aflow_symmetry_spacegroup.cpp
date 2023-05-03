@@ -1083,7 +1083,7 @@ uint xstructure::GetPrimitiveCell(void) {
     //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
     //DX20210129 [OBSOLETE]     tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
     //DX20210129 [OBSOLETE]   }
-    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom);
+    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom,false);  //CO20230319 - add by type
     //DX20210129 [OBSOLETE] }
   }
   //DX20210129 [OBSOLETE] (*this).num_each_type = numtypes;
@@ -1727,7 +1727,7 @@ namespace SYM {
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] xstr_out.species.clear();
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] // Add new atomic basis
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c],false); //CO20230319 - add by type
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] }
 
         //DX20210315 [OBSOLETE]//DX20190410 START

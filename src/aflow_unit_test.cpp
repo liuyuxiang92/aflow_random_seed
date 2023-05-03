@@ -156,7 +156,6 @@ namespace unittest {
     xchk.task_description = "entryLoader functions";
     test_functions["entry_loader"] = xchk;
 
-
     // ovasp
     //Not working yet because we cannot load OUTCARs via the RestAPI
     //xchk = initializeXCheck();
@@ -1269,6 +1268,19 @@ namespace unittest {
       vector<string> expected_vstring = {"==48", "==49", "==50"};
       checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
     }
+    
+    // ---------------------------------------------------------------------------
+    // Check | substring2strings //CO20230502
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::substring2strings()";
+      check_description = "return all the matches as vector of strings";
+      string test_string = "[START]1234\n 4321[STOP] 456[START] 789 \n 987 [STOP]\n[START]4321 [STOP]654[START]987[STOP]";
+      vector<string> calculated_vstring;
+      aurostd::substring2strings(test_string, calculated_vstring, string("[START]"), string("[STOP]")); //CO20230502 - without string(), compiler picks the wrong overload...
+      vector<string> expected_vstring = {"1234\n 4321"," 789 \n 987 ","4321 ","987"};
+      checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
+    }
 
     // ---------------------------------------------------------------------------
     // Check | kvpair2string //SD20220525
@@ -2092,7 +2104,7 @@ namespace unittest {
     // Check | number of created AEs
     check_description = "number of created AEs";
     checkEqual(uint(AE.size()), uint(6), check_function, check_description, passed_checks, results);
-
+    
     // ---------------------------------------------------------------------------
     // Check | point index mapping
     check_description = "point index mapping";
@@ -2185,6 +2197,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Test 1: parse structure with known settings
     // ---------------------------------------------------------------------------
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 1: parse structure with known settings" << std::endl;
 
     // CrO3 was a problematic structure in the past
     str_cif = string(utd["xstructure_parser"]["cif_CrO3"]);
@@ -2192,22 +2205,29 @@ namespace unittest {
 
     check_function = "xstructure::operator<<";
     check_description = "Parsing CIF file with recognized setting (CrO3)";
+
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [1] Parsing CIF file with recognized setting (CrO3)" << std::endl;
     aurostd::StringstreamClean(xstrss);
     xstrss << str_cif;
-    xstr_cif = xstructure(xstrss);
+    try {xstr_cif = xstructure(xstrss);} 
+    catch(aurostd::xerror& excpt) {errors.push_back("Could not generate CrO3");}
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [2] Parsing CIF file with recognized setting (CrO3)" << std::endl;
 
     aurostd::StringstreamClean(xstrss);
     xstrss << str_poscar;
     xstr_poscar = xstructure(xstrss);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [3] Parsing CIF file with recognized setting (CrO3)" << std::endl;
 
     // ---------------------------------------------------------------------------
     // test: parse structure
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " test: parse structure" << std::endl;
     expected_bool = true;
     calculated_bool = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
     checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // test: compare Wyckoff positions
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " test: compare Wyckoff positions" << std::endl;
     check_description = "Compare parsed Wyckoff positions of CrO3";
     vector<wyckoffsite_ITC> vwyckoff(4);
     xvector<double> coords;
@@ -2273,6 +2293,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Test 2: parse structure with unrecognized (old) settings
     // ---------------------------------------------------------------------------
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Test 2: parse structure with unrecognized (old) settings" << std::endl;
     check_description = "Parsing CIF file with unrecognized setting (GePt3)";
     aurostd::StringstreamClean(xstrss);
     str_cif = string(utd["xstructure_parser"]["cif_Ge8Pt24"]);
@@ -2454,6 +2475,56 @@ namespace unittest {
     calculated_bool = compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
     checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // Check | GetStandardPrimitive //CO20230220
+    // ---------------------------------------------------------------------------
+
+    //create xstr_str
+    xstr_str =
+      "O Co Sr\n"
+      "1.00000000000000\n"
+      "  5.4205419737648093    0.0000000000000000    0.0000000000000000\n"
+      "  0.0000000000000000    5.4205419737648093    0.0000000000000000\n"
+      "  0.0000000000000000    0.0000000000000000    7.6623790337915390\n"
+      "O    Co   Sr\n"
+      "12    4    4\n"
+      "Direct\n"
+      "  0.7499997640097504  0.2500002359902496  0.5000000000000000\n"
+      "  0.2500002359902496  0.7499997640097504  0.5000000000000000\n"
+      "  0.2499997640097504  0.7500002359902496  0.0000000000000000\n"
+      "  0.7500002359902496  0.2499997640097504  0.0000000000000000\n"
+      "  0.7499997640097504  0.7499997640097504  0.5000000000000000\n"
+      "  0.2500002359902496  0.2500002359902496  0.5000000000000000\n"
+      "  0.2499997640097504  0.2499997640097504  0.0000000000000000\n"
+      "  0.7500002359902496  0.7500002359902496  0.0000000000000000\n"
+      "  0.5000000000000000  0.5000000000000000  0.7499999723900999\n"
+      "  0.0000000000000000  0.0000000000000000  0.7500000276099001\n"
+      "  0.0000000000000000  0.0000000000000000  0.2499999723900999\n"
+      "  0.5000000000000000  0.5000000000000000  0.2500000276099001\n"
+      "  0.0000000000000000  0.0000000000000000  0.5000000000000000\n"
+      "  0.5000000000000000  0.5000000000000000  0.0000000000000000\n"
+      "  0.5000000000000000  0.5000000000000000  0.5000000000000000\n"
+      "  0.0000000000000000  0.0000000000000000  0.0000000000000000\n"
+      "  0.5000000000000000  0.0000000000000000  0.7500000000000000\n"
+      "  0.0000000000000000  0.5000000000000000  0.7500000000000000\n"
+      "  0.5000000000000000  0.0000000000000000  0.2500000000000000\n"
+      "  0.0000000000000000  0.5000000000000000  0.2500000000000000\n";
+    aurostd::StringstreamClean(xstrss);
+    xstrss << xstr_str;
+    try {
+      xstrss >> xstr_in;          //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    } catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+
+    // ---------------------------------------------------------------------------
+    // test 1: expand cell
+    // create 3x1x1 supercell expansion matrix
+    check_function = "xstructure::GetStandardPrimitive()";
+    check_description = "resolve primitive cell and find Bravais lattice type";
+    xstr_in.GetStandardPrimitive();
+    
+    expected_bool = true;
+    calculated_bool = (xstr_in.bravais_lattice_type=="CUB");
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
   }
 
 }

@@ -1951,7 +1951,7 @@ namespace slab {
               newatom.fpos[j]=ListSiteDirectCoordWRTslab[k][AtomInLayer[OrderLayers[Layer]][i][2]][j];
             }
             newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); //CO20180202
-            str_out.AddAtom(newatom);
+            str_out.AddAtom(newatom,false); //CO20230319 - add by type
           }
         }
       }

@@ -2020,7 +2020,7 @@ bool xOUTCAR::GetXStructure() {
   xstr.FixLattices();
   //xstr.atoms=atoms;
   for(uint i=0;i<atoms.size();i++){
-    xstr.AddAtom(atoms[i]);
+    xstr.AddAtom(atoms[i],false); //CO20230319 - add by type
     xstr.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); //default!
   }
   xstr.MakeBasis();
@@ -4285,7 +4285,7 @@ bool xOUTCAR::GetIonicStepsData(){
               vatoms[iatom].name=species_pp[itype];
               vatoms[iatom].name_is_given=(!vatoms[iatom].name.empty());
               vatoms[iatom].fpos=xstr.c2f*vatoms[iatom].cpos;
-              xstr.AddAtom(vatoms[iatom]);
+              xstr.AddAtom(vatoms[iatom],false);  //CO20230319 - add by type
               xstr.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
               iatom++;
             }

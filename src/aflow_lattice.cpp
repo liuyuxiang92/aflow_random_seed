@@ -2197,7 +2197,7 @@ namespace LATTICE {
       //xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
       //str_reciprocal_in.lattice=str_sp.klattice;str_reciprocal_in.FixLattices();
       //str_reciprocal_in.title="NO_RECURSION";
-      //_atom atom;str_reciprocal_in.AddAtom(atom);
+      //_atom atom;str_reciprocal_in.AddAtom(atom,false); //CO20230319 - add by type
       //// LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
       //int ss=0; //JX
       //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
@@ -2396,7 +2396,7 @@ namespace LATTICE {
       _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
       _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       _str_in.sym_eps_no_scan=_str_sp.sym_eps_no_scan=_str_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20180222 - added sym_eps change count
-      _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
+      _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom,false); //CO20230319 - add by type
       //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
       //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
       //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
@@ -2453,7 +2453,7 @@ namespace LATTICE {
     str_sp.bravais_lattice_system=str_sp.bravais_lattice_system;
     xstructure _str_in,_str_sp,_str_sc;
     _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
-    _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
+    _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom,false); //CO20230319 - add by type
     LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc);
     str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
     str_in.bravais_lattice_lattice_variation_type=_str_sp.bravais_lattice_variation_type;

@@ -930,13 +930,14 @@ namespace qca {
         }
       }
       std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
+      //CO20230319 - DX, I believe this code is obsolete now that I patch AddAtom() with add_species, keep for safety
       itype = 0;
       atoms[0].type = itype;
       for (size_t j = 1; j < atoms.size(); j++) {
         if (atoms[j].name != atoms[j - 1].name) {itype++;}
         atoms[j].type = itype;
       }
-      str_pocc.AddAtom(atoms);
+      str_pocc.AddAtom(atoms,true); //CO20230319 - add by species
       // Enumerate unique superlattices
       pocc::POccCalculator pcalc(str_pocc);
       pcalc.calculateHNF();

@@ -245,7 +245,7 @@ namespace aurostd {
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO20180409
 
   template<class utype> bool
-    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary
+    iszero(const xvector<utype>&, double tol=(double)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary  //CO20230313 - utype clang warnings
 
 }
 

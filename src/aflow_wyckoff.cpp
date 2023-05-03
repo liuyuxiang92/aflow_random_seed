@@ -49,7 +49,7 @@ xvector<double> wv(const double &x,const double &y,const double &z) {
 void wa(_atom& a,xstructure &str) {
   a=BringInCell(a,str.lattice);
   a.cpos=F2C(str.lattice,a.fpos);
-  str.AddAtom(a);  
+  str.AddAtom(a,false); //CO20230319 - add by type
 }
 
 // ----------------------------------------------------------------------------

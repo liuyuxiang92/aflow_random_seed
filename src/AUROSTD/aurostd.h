@@ -889,9 +889,9 @@ namespace aurostd {
   uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520 - rewritten
   uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
   uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
-  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
-  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520 - rewritten
-  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance=0,bool RemoveWS=false,bool RemoveComments=true,bool trim_edges=true); //SD20220520  //CO20230502 - give instance here to speed up aurostd::substring2string(), default instance==0 //CO20230502 - trim_edges is the default behavior of substring2string()
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance=0,bool RemoveWS=false,bool RemoveComments=true,bool trim_edges=true); //SD20220520 - rewritten  //CO20230502 - give instance here to speed up aurostd::substring2string(), default instance==0 //CO20230502 - trim_edges is the default behavior of substring2string()
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,const int instance=0,bool RemoveWS=false,bool RemoveComments=true,bool trim_edges=true); //SD20220520  //CO20230502 - give instance here to speed up aurostd::substring2string(), default instance==0 //CO20230502 - trim_edges is the default behavior of substring2string()
   template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //SD202205020
   template<typename utype> uint substring2utypes(const string& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD202205020 - added utype
   template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD202205020 - added utype
@@ -1512,7 +1512,7 @@ namespace aurostd {
 //DX20170803 - Add Matrix print out
 namespace aurostd {
   // [OBSOLETE] string xmatDouble2String(const xmatrix<double>& xmat_in, bool roff=false);
-  string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);  //CO20230313 - utype clang warnings
   // ME20220324
   template <typename utype>
     string xmat2String(const xmatrix<utype>& mat_in);
@@ -1526,16 +1526,16 @@ namespace aurostd {
 
 namespace aurostd {
   // [OBSOLETE] vector<string> vecDouble2vecString(const vector<double>& vin, bool roff=false);
-  vector<string> vecDouble2vecString(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
-  string vecDouble2String(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  vector<string> vecDouble2vecString(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);  //CO20230313 - utype clang warnings
+  string vecDouble2String(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM); //CO20230313 - utype clang warnings
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
-  vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
-  string xvecDouble2String(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);  //CO20230313 - utype clang warnings
+  string xvecDouble2String(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM); //CO20230313 - utype clang warnings
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff=false);
-  deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
-  string vecDouble2String(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
-  // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);  //CO20230313 - utype clang warnings
+  string vecDouble2String(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);  //CO20230313 - utype clang warnings
+  // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=(double)AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM); //CO20230313 - utype clang warnings
 }
 
 namespace aurostd {
