@@ -27,9 +27,9 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     steps:
     - uses: actions/checkout@v2
-    - name: recreate makefile
-      run: cd src && ./aflow --makefile
     - name: make
       run: make -j -C src
     - name: run unit_test
       run: ./src/aflow --unit_test aurostd,database,structure
+    - name: recreate makefile
+      run: cd src && ./aflow --makefile && make -j
