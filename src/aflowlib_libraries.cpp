@@ -7506,7 +7506,7 @@ namespace aflowlib {
 // Added by CT20181212
 namespace aflowlib {
   bool LIB2LIB(const string& options,bool flag_FORCE,bool LOCAL) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20200624
+    bool LDEBUG=(true || XHOST.DEBUG); //CO20200624
     stringstream message;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " options=" << options << endl;
@@ -7816,7 +7816,30 @@ namespace aflowlib {
 
     }
 
+    //[START - KT+KC 20230504]
+    string aflowin = aurostd::file2string("tmp_aflow.in"); //KT20230504 - change back to aflow.in when done testing
+    string patched_aflowin=aflowin;
+    if(!aurostd::substring2bool(aflowin, "[POSCAR_ORIG]PATCHED=")){
+      // correcting POSCAR.orig
+      string poscar_orig = aurostd::substring2string(aflowin,"[VASP_POSCAR_MODE_EXPLICIT]START", "[VASP_POSCAR_MODE_EXPLICIT]STOP",1);
+      cerr << poscar_orig<< endl; //[KT20230504 - added for debugging]
+      aurostd::string2file(poscar_orig, "temp_poscar_orig");
+      // updating patched_aflowin 
+      patched_aflowin = patched_aflowin + "[POSCAR_ORIG]PATCHED=" + aurostd::utype2string<long int>(aurostd::get_date())+"\n";
+    }
+    if(!aurostd::substring2bool(aflowin, "[AFLOW_QMVASP]PATCHED=")){
+      // ...
+      aurostd::xoption vpflow;  //dummy
+      pflow::QMVASP(vpflow); // test KC
+      aurostd::TmpDirectoryCreate("tmp");
+      // updating patched_aflowin 
+      patched_aflowin = patched_aflowin + "[AFLOW_QMVASP]PATCHED=" + aurostd::utype2string<long int>(aurostd::get_date())+"\n";
+    }
+    if (patched_aflowin != aflowin){aurostd::string2file(patched_aflowin, "tmp_aflow.in");}
+    //[STOP- KT+KC 20230504]
+
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
+    exit(0); //KT20230504 - added exit for testing
     return TRUE;
   }
 }
