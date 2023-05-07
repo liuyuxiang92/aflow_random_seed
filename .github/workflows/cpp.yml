@@ -32,4 +32,4 @@ jobs:
     - name: run unit_test
       run: ./src/aflow --unit_test aurostd,database,structure
     - name: recreate makefile
-      run: cd src && ls && ls DATA/ && ./aflow --makefile && make -j
+      run: cd src && ./aflow --makefile && make -j

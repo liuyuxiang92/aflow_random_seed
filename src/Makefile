@@ -927,6 +927,8 @@ redata: datainstall
 .PHONY: clean_autogen
 clean_autogen:
 	rm -rf aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+#CO20230507 - keep python/json/js files here as transitory branches still generate these files
+	rm -rf aflow_cce_python.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_sym_python.cpp aflow_xtalfinder_python.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_requirements.cpp aflowlib_webapp_bands.cpp aflowlib_webapp_entry.cpp
 ###################################################################################################
 
 ###################################################################################################
