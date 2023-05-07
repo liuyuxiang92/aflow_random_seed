@@ -126,6 +126,7 @@ namespace init {
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
+    //[CO20220906 - MOVED UP]XHOST.argv.clear();for(uint i=0;i<argv.size();i++)  XHOST.argv.push_back(argv.at(i));
 
     // IMMEDIATELY
     XHOST.QUIET=XHOST.QUIET_GLOBAL=aurostd::args2flag(argv,cmds,"--quiet|-q");  //CO20220630 - global allows headless server, do not modify inside
@@ -1165,6 +1166,7 @@ namespace init {
 namespace init {
   string InitLoadString(string str2load,bool LVERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " init::InitLoadString BEGIN " << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " str2load=" << str2load << endl; 
 
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
@@ -1189,14 +1191,6 @@ namespace init {
         //	if(LDEBUG) cerr << __AFLOW_FUNC__ << " out.length()=" << out.length() << endl;
         out=aurostd::execute2string(XHOST.home+"/work/AFLOW3/aflow_data"+" "+str2load);
         if(LDEBUG) cerr << __AFLOW_FUNC__ << " out.length()=" << out.length() << endl;
-        // 	vector<string> vout;aurostd::string2vectorstring(out,vout);
-        // 	if(LDEBUG) cerr << __AFLOW_FUNC__ << " vout.size()=" << vout.size() << endl;
-        // 	for(uint i=0;i<vout.size();i+=3) {
-        // 	  if(aurostd::substring2bool(vout.at(i),"LIB6") || aurostd::substring2bool(vout.at(i+1),"LIB6") || aurostd::substring2bool(vout.at(i+2),"LIB6")) 
-        // 	    cout << vout.at(i) << "    " << vout.at(i+1) << "    " << vout.at(i+2) << endl;
-        // 	}
-        // 	//       if(LDEBUG) cerr << __AFLOW_FUNC__ << " out=" << out << endl; 
-        // if(LDEBUG) cerr << __AFLOW_FUNC__ << " str2load=" << str2load << endl;
       } else {
         //	cerr <<  __AFLOW_FUNC__ << " [2] " << endl;
         if(LDEBUG) {cerr << __AFLOW_FUNC__ << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
@@ -1318,59 +1312,10 @@ namespace init {
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_Library_CALCULATED_LIB8_LIB.size()=" << XHOST_Library_CALCULATED_LIB8_LIB.size() << endl;
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl;
     }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " init::InitLoadString END " << endl;
     return out; 
   }
 } // namespace init
-
-// [OBSOLETE] bool vAURL_cutout(vector<string>& vvAURL,string cutout,bool LVERBOSE) {
-// [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
-// [OBSOLETE]   stringstream sss;
-// [OBSOLETE]   if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
-// [OBSOLETE]   vector<string> tokens;
-// [OBSOLETE]   aurostd::string2tokens(cutout,tokens,"|");
-// [OBSOLETE]   string aus;
-// [OBSOLETE]   if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
-// [OBSOLETE]   for(uint i=0;i<tokens.size();i++) {
-// [OBSOLETE]     for(uint j=0;j<XHOST_vAURL.size();j++) {
-// [OBSOLETE]       aus=XHOST_vAURL.at(j);
-// [OBSOLETE]       if(aurostd::substring2bool(aus,tokens.at(i))) {
-// [OBSOLETE]         aurostd::StringSubst(aus,tokens.at(i),"");
-// [OBSOLETE]         aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
-// [OBSOLETE]         aurostd::StringSubst(aus,"materials.duke.edu:","");
-// [OBSOLETE]         vvAURL.push_back(aus);
-// [OBSOLETE]       }
-// [OBSOLETE]     }
-// [OBSOLETE]   }
-// [OBSOLETE]   return true;
-// [OBSOLETE] }
-// [OBSOLETE] 
-// [OBSOLETE] string vAURL_cutout(string cutout,bool LVERBOSE) {
-// [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
-// [OBSOLETE]   stringstream sss;
-// [OBSOLETE]   if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
-// [OBSOLETE]   if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
-// [OBSOLETE]   vector<string> tokens;
-// [OBSOLETE]   aurostd::string2tokens(cutout,tokens,"|");
-// [OBSOLETE]   string aus;
-// [OBSOLETE]   if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
-// [OBSOLETE]   for(uint i=0;i<tokens.size();i++) {
-// [OBSOLETE]     for(uint j=0;j<XHOST_vAURL.size();j++) {
-// [OBSOLETE]       aus=XHOST_vAURL.at(j);
-// [OBSOLETE]       if(aurostd::substring2bool(aus,tokens.at(i))) {
-// [OBSOLETE]         aurostd::StringSubst(aus,tokens.at(i),"");
-// [OBSOLETE]         aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
-// [OBSOLETE]         aurostd::StringSubst(aus,"materials.duke.edu:","");
-// [OBSOLETE] 	sss << aus << endl;
-// [OBSOLETE]       }
-// [OBSOLETE]     }
-// [OBSOLETE]   }
-// [OBSOLETE]   return sss.str();
-// [OBSOLETE] }
 
 // ***************************************************************************
 // init::InitGlobalObject
@@ -1459,17 +1404,21 @@ namespace init {
     if(str=="AFLOW_PSEUDOPOTENTIALS") { if(XHOST_AFLOW_PSEUDOPOTENTIALS.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS;}} // LOADED TXTS
     if(str=="AFLOW_PSEUDOPOTENTIALS_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT;}} // LOADED TXTS
     if(str=="AFLOW_PSEUDOPOTENTIALS_LIST_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT;}} // LOADED TXTS
+
     if(str=="f144468a7ccc2d3a72ba44000715efdb") {
       if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) {
         //	cerr << "init::InitGlobalObject" << " [1a]" << endl;
         XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
-        //	cerr << "init::InitGlobalObject" << " [1b]" << endl;
+	//cerr << "init::InitGlobalObject" << " [1b]" << endl;
         return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       } else {
         //	cerr << "init::InitGlobalObject" << " [2]" << endl;
         return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       }
-    } // LOADED TXTS
+    }
+
+		      
+    // LOADED TXTS
     // [OBSOLETE] if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
     // [OBSOLETE] if(str=="decf00ca3ad2fe494eea8e543e929068") { if(XHOST_decf00ca3ad2fe494eea8e543e929068.empty()) { return XHOST_decf00ca3ad2fe494eea8e543e929068=init::InitLoadString(str,LVERBOSE);} else { return XHOST_decf00ca3ad2fe494eea8e543e929068;}} // LOADED TXTS
 

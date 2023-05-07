@@ -404,6 +404,11 @@ int main(int _argc,char **_argv) {
       aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
       return 0; //CO20180419
     }
+    if(!Arun && (aurostd::args2flag(argv,cmds,"--multiplexer") || aurostd::args2attachedflag(argv,"--multiplexer="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::MULTIPLEXER(aurostd::args2attachedutype<int>(argv,"--multiplexer=",0),TRUE);
+      return 0; //CO20180419
+    }
     if(!Arun && (aurostd::args2flag(argv,cmds,"--mail2scan") || aurostd::args2attachedflag(argv,"--mail2scan="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::MAIL2SCAN(aurostd::args2attachedstring(argv,"--mail2scan=","/var/mail/auro"),TRUE);
@@ -996,6 +1001,7 @@ namespace aflow {
 // pflow --icsd_nopartialocc | pflow --icsd2proto > README_LIBRARY_ICSD$1.TXT
 
 
+//#include "/home/auro/work/AFLOW3_AURO/aflow_auro.cpp"
 //#include "../AFLOW3_AURO/aflow_auro.cpp"
 
 // ***************************************************************************
@@ -1003,6 +1009,12 @@ namespace aflow {
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE) {
     if(VERBOSE) cerr << XPID << "aflowlib::MOSFET mode=" << mode << endl;
+    return 0;
+  }
+}
+namespace aflowlib {
+  uint MULTIPLEXER(int mode,bool VERBOSE) {
+    if(VERBOSE) cerr << XPID << "aflowlib::MULTIPLEXER mode=" << mode << endl;
     return 0;
   }
 }
