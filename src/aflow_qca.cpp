@@ -704,7 +704,10 @@ namespace qca {
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
     aurostd::RemoveFile(rundirpath + "/maps.log");
-    chdir(rundirpath.c_str());
+    if(chdir(rundirpath.c_str())!=0){ //CO20230507 - compiler warning on gitrunner
+      message << "chdir failed";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
     string tmpfile = aurostd::TmpStrCreate(), logstring = "";
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
     message << "Running ATAT cluster expansion";
@@ -721,7 +724,10 @@ namespace qca {
       aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
-    chdir(cdirpath.c_str());
+    if(chdir(cdirpath.c_str())!=0){ //CO20230507 - compiler warning on gitrunner
+      message << "chdir failed";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
   }
 
   /// @brief reads the coefficient of variation
