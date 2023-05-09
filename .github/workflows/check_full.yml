@@ -1,0 +1,16 @@
+name: AFLOW Full Checks
+run-name: Full Checks
+on:
+  pull_request:
+    types: [review_requested]
+jobs:
+  Full_Test:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - uses: actions/checkout@v3
+      - name: make
+        run: make -C src
+      - name: make check_full
+        run: |
+          cd src
+          make check_full

@@ -1,0 +1,16 @@
+name: AFLOW Unit-Test Checks
+run-name: Unit Test
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+jobs:
+  Unit_Test:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - uses: actions/checkout@v3
+      - name: make
+        run: make -C src
+      - name: make unit_test
+        run: |
+          cd src
+          make unit_test
