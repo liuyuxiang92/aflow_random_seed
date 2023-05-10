@@ -13513,8 +13513,8 @@ namespace pflow {
 // ***************************************************************************
 //CO20180703 - revamped for vpflow, and fixed INCAR search issue
 namespace pflow {
-  bool QMVASP(aurostd::xoption& vpflow) {return QMVASP_20210813(vpflow);}  //CO20180703
-  bool QMVASP_20210813(aurostd::xoption& vpflow) {  //CO20180703
+  bool QMVASP(aurostd::xoption& vpflow, bool use_tmp_dir) {return QMVASP_20210813(vpflow, use_tmp_dir);}  //KT20230509
+  bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir) {  //CO20180703
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     if(vpflow.flag()){;}  //keep busy
@@ -13524,6 +13524,12 @@ namespace pflow {
     if(XHOST.vflag_control.flag("DIRECTORY")) {directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
     if(directory.empty()){directory=".";}
     if(!aurostd::IsDirectory(directory)){cerr << __AFLOW_FUNC__ << " invalid directory input" << endl;return FALSE;}
+    //[START KT20230509] - assign directory for vasp analysis
+    string temp_directory=directory;
+    if (use_tmp_dir) {
+      temp_directory = aurostd::TmpDirectoryCreate("temp");
+    }
+    //[STOP KT20230509]
 
     //organize runs, e.g., .static, .relax2
     vector<string> vruns;
@@ -13540,7 +13546,7 @@ namespace pflow {
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match
     string ext="",vCAR="",vCAR_compressed="";
     _xvasp xvasp;
-    xvasp.Directory=directory;
+    xvasp.Directory=temp_directory; //KT20230509
     for(uint j=0;j<vruns.size();j++){
       ext=vruns[j];aurostd::StringSubst(ext,".","");
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " checking run=" << aurostd::toupper(ext) << endl;}
@@ -13562,21 +13568,21 @@ namespace pflow {
           return FALSE;
         }
       }
-      //now write!
+      //now write! 
       for(uint i=0;i<vCARs.size();i++){
         vCAR=directory+"/"+vCARs[i]+vruns[j];
         aurostd::EFileExist(vCAR,vCAR_compressed);  //get compressed variant
-        aurostd::execute(aurostd::GetCatCommand(vCAR_compressed)+" "+vCAR_compressed+" > "+directory+"/"+vCARs[i]);
+        aurostd::execute(aurostd::GetCatCommand(vCAR_compressed)+" "+vCAR_compressed+" > "+temp_directory+"/"+vCARs[i]); //KT20230509
       }
-      cout << __AFLOW_FUNC__ << " Performing dir=" << directory << " run=" << aurostd::toupper(ext) << endl;
+      cout << __AFLOW_FUNC__ << " Performing dir=" << temp_directory << " run=" << aurostd::toupper(ext) << endl; //KT20230509
       xvasp.AnalyzeLabel=ext;
-      xvasp.str=xstructure(directory+"/CONTCAR",IOAFLOW_AUTO);
+      xvasp.str=xstructure(temp_directory+"/CONTCAR",IOAFLOW_AUTO); //KT20230509
       KBIN::VASP_Analyze(xvasp,TRUE);
-      if(!aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_QMVASP_OUT)){
-        cerr << __AFLOW_FUNC__ << directory+"/"+DEFAULT_AFLOW_QMVASP_OUT << " was not successfully generated" << endl;
+      if(!aurostd::FileExist(temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT)){ //KT20230509
+        cerr << __AFLOW_FUNC__ << temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT << " was not successfully generated" << endl; //KT20230509
         return FALSE;
       }
-      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs[i]);}
+      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(temp_directory+"/"+vCARs[i]);} //KT20230509
     }
 
     //zip in style of vCAR
@@ -13586,12 +13592,19 @@ namespace pflow {
           if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
             if(!XHOST.vzip.at(k).empty()){
               aurostd::execute(XHOST.command(XHOST.vzip.at(k))+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
+              //[START KT20230509] - move zip to lib and remove temp directory
+              if (use_tmp_dir) {
+                aurostd::file2directory(temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+".xz", directory);
+                aurostd::RemoveDirectory(temp_directory);
+              }
+              //[STOP KT20230509]
               return TRUE;
             }
           }
         }
       }
     }
+
     return true;
   }
   bool QMVASP_20210101(aurostd::xoption& vpflow) {  //CO20180703
