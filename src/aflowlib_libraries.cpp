@@ -7506,7 +7506,7 @@ namespace aflowlib {
 // Added by CT20181212
 namespace aflowlib {
   bool LIB2LIB(const string& options,bool flag_FORCE,bool LOCAL) {
-    bool LDEBUG=(true || XHOST.DEBUG); //CO20200624
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20200624
     stringstream message;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " options=" << options << endl;
