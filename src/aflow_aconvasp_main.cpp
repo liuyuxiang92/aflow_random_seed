@@ -13568,7 +13568,7 @@ namespace pflow {
           return FALSE;
         }
       }
-      //now write! 
+      //now write!
       for(uint i=0;i<vCARs.size();i++){
         vCAR=directory+"/"+vCARs[i]+vruns[j];
         aurostd::EFileExist(vCAR,vCAR_compressed);  //get compressed variant
@@ -13604,7 +13604,6 @@ namespace pflow {
         }
       }
     }
-
     return true;
   }
   bool QMVASP_20210101(aurostd::xoption& vpflow) {  //CO20180703
