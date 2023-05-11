@@ -379,7 +379,7 @@ namespace pflow {
   void PYTHON_MODULES(const vector<string>& vmodules, ostream& oss=std::cout);  //ME20211103
   void PYTHON_MODULES(const vector<string>& vmodules, ofstream& FileMESSAGE, ostream& oss=std::cout);  //ME20211103
   bool QMVASP(aurostd::xoption& vpflow, bool use_tmp_dir = false);  //vector<string> argv); //CO20180703
-  bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir);  //CO20180703
+  bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir=false);  //CO20180703
   bool QMVASP_20210101(aurostd::xoption& vpflow);  //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader
