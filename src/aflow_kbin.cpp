@@ -1088,12 +1088,6 @@ namespace KBIN {
 
     if(kflags.KBIN_MPI_NCPUS<1) kflags.KBIN_MPI_NCPUS=1;                                              // DEFAULT NCPUS=troubles
 
-    if(kflags.KBIN_MPI_NCPUS==1) {
-      kflags.KBIN_MPI=FALSE;
-      aus << "00000  MESSAGE MPI: found NCPUS=1 " << Message(__AFLOW_FILE__,aflags) << endl;
-      aus << "00000  MESSAGE MPI: going back to SERIAL execution " << Message(__AFLOW_FILE__,aflags) << endl;
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-    }
     if(kflags.KBIN_MPI) {
       // get (string) kflags.KBIN_MPI_START
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",TRUE)) {
