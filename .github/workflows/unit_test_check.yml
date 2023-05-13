@@ -1,6 +1,16 @@
-name: AFLOW Unit-Test Checks
+# WS20230512
+#
+# UNIT TEST
+#
+# Run unit_test when a pull request is edited
+#
+
+name: AFLOW inhouse build Unit Test Checks
+#c++ builds: https://github.community/t/conditional-matrices/17206
+
 run-name: Unit Test
-on:
+
+on: # Run unit_test whenever a pull request is opened or committed to
   pull_request:
     types: [opened, reopened, synchronize, edited]
 jobs:

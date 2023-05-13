@@ -1,6 +1,16 @@
-name: AFLOW Full Checks
+# WS20230512
+#
+# FULL CHECKS
+#
+# Run check_full when a review is requested to a pull request (allows for manual running of check_full)
+#
+
+name: AFLOW inhouse build Full Checks
+#c++ builds: https://github.community/t/conditional-matrices/17206
+
 run-name: Full Checks
-on:
+
+on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
   pull_request:
     types: [review_requested]
 jobs:
