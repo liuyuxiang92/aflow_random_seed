@@ -7818,21 +7818,22 @@ namespace aflowlib {
 
     //[START KT20230504]
     string aflowin = aurostd::file2string(_AFLOWIN_);
-    string patched_aflowin=aflowin;
+    stringstream patched_aflowin_ss;
+    patched_aflowin_ss << aflowin;
     if(!aurostd::substring2bool(aflowin, "[POSCAR_ORIG]PATCHED=")){
       // correcting POSCAR.orig
       string poscar_orig = aurostd::substring2string(aflowin,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,1);
       aurostd::string2file(poscar_orig, "POSCAR.orig");
-      // updating patched_aflowin 
-      patched_aflowin = patched_aflowin + "[POSCAR_ORIG]PATCHED=" + aurostd::utype2string<long int>(aurostd::get_date())+"\n";
+      // updating patched_aflowin_ss 
+      patched_aflowin_ss << "[POSCAR_ORIG]PATCHED=" << aurostd::utype2string<long int>(aurostd::get_date()) << endl;
     }
     if(!aurostd::substring2bool(aflowin, "[AFLOW_QMVASP]PATCHED=")){
       aurostd::xoption vpflow; //dummy
       pflow::QMVASP(vpflow, true);
-      // updating patched_aflowin 
-      patched_aflowin = patched_aflowin + "[AFLOW_QMVASP]PATCHED=" + aurostd::utype2string<long int>(aurostd::get_date())+"\n";
+      // updating patched_aflowin_ss 
+      patched_aflowin_ss << "[AFLOW_QMVASP]PATCHED=" << aurostd::utype2string<long int>(aurostd::get_date()) << endl;
     }
-    if (patched_aflowin != aflowin){aurostd::string2file(patched_aflowin, _AFLOWIN_);}
+    if (patched_aflowin_ss.str() != aflowin){aurostd::stringstream2file(patched_aflowin_ss, _AFLOWIN_);}
     //[STOP KT20230504]
 
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
