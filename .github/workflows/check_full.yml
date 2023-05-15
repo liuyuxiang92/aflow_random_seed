@@ -7,6 +7,7 @@
 
 name: AFLOW inhouse build Full Checks
 #c++ builds: https://github.community/t/conditional-matrices/17206
+#env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
 run-name: Full Checks
 
