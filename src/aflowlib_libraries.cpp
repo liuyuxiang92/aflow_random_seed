@@ -7819,7 +7819,7 @@ namespace aflowlib {
     //[START KT20230504]
     string aflowin = aurostd::file2string(_AFLOWIN_);
     stringstream patched_aflowin_ss;
-    patched_aflowin_ss << aflowin;
+    aurostd::file2stringstream(_AFLOWIN_, patched_aflowin_ss);
     if(!aurostd::substring2bool(aflowin, "[POSCAR_ORIG]PATCHED=")){
       // correcting POSCAR.orig
       string poscar_orig = aurostd::substring2string(aflowin,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,1);
