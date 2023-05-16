@@ -13514,8 +13514,8 @@ namespace pflow {
 //CO20180703 - revamped for vpflow, and fixed INCAR search issue
 //KT20230516 - moved vasp analysis into temp directory
 namespace pflow {
-  bool QMVASP(aurostd::xoption& vpflow, bool use_tmp_dir) {return QMVASP_20210813(vpflow, use_tmp_dir);}  //CO20180703
-  bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir) {  //CO20180703
+  bool QMVASP(aurostd::xoption& vpflow, bool use_tmp_dir) {return QMVASP_20210813(vpflow, use_tmp_dir);}  //CO20180703  //KT20230516
+  bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir) {  //CO20180703  //KT20230516
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     if(vpflow.flag()){;}  //keep busy
