@@ -9,14 +9,14 @@ name: AFLOW inhouse build Full Checks
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-run-name: Full Checks
+#[CO20230516 - needed?]run-name: Full Checks
 
 on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
   workflow_dispatch:
   pull_request:
     types: [review_requested]
 jobs:
-  Full_Test:
+  check_full:
     runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v3
