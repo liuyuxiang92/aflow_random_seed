@@ -12,6 +12,7 @@ name: AFLOW inhouse build Full Checks
 run-name: Full Checks
 
 on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
+  workflow_dispatch:
   pull_request:
     types: [review_requested]
 jobs:
