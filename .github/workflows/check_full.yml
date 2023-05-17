@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: make
-        run: make -C src
+        run: make -j -C src
       - name: make check_full
         run: |
           cd src
