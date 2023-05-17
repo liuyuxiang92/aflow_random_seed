@@ -9,14 +9,14 @@ name: AFLOW inhouse build Unit Test Checks
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-run-name: Unit Test
+#[CO20230516 - needed?]run-name: Unit Test
 
 on: # Run unit_test whenever a pull request is opened or committed to
   workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronize, edited]
 jobs:
-  Unit_Test:
+  check_unit-test:
     runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v3
