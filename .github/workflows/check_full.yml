@@ -18,7 +18,7 @@ on: # Run when a reviewer is requested to a pull request (action performed on Gi
 jobs:
   check_full:
     runs-on: [self-hosted, Linux, X64]
-    if: ${{ github.event.requested_team.name == 'check_full'}}
+#    if: ${{ github.event.requested_team.name == 'check_full'}}
     steps:
       - uses: actions/checkout@v3
       - name: make
