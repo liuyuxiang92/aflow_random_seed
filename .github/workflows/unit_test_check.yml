@@ -21,8 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: make
-        run: make -C src
+        run: make -j -C src
       - name: make unit_test
         run: |
           cd src
-          make unit_test
+          ./aflow --unit_test aurostd,database,structure
+#[CO20230516 - too long]          make unit_test
+      - name: recreate makefile
+        run: |
+          cd src
+          ./aflow --makefile
+          make -j
