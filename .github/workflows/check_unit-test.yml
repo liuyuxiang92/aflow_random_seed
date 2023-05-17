@@ -25,7 +25,7 @@ jobs:
       - name: make unit_test
         run: |
           cd src
-          ./aflow --unit_test aurostd,database,structure
+          ./aflow --np=$((`grep -c ^processor /proc/cpuinfo`-2)) --unit_test aurostd,database,structure
 #[CO20230516 - too long]          make unit_test
       - name: recreate makefile
         run: |
