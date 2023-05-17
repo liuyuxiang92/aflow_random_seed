@@ -1513,7 +1513,11 @@ check_aflow_exits:
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
 unit_test:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --unit_test
+ifeq ($(UNAME),Darwin)
+	./aflow --np=4 --unit_test
+else
+	./aflow --np=$$(($$(grep -c ^processor /proc/cpuinfo)-2)) --unit_test
+endif
 #CO20231112 - proto runs for a LONG time, make its own test
 unit_test_1:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
