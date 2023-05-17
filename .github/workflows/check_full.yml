@@ -14,8 +14,6 @@ name: aflow++ inhouse build check_full
 on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
   workflow_dispatch:
   push:
-  pull_request:
-    types: [review_requested]
 jobs:
   check_full:
     runs-on: [self-hosted, Linux, X64]
