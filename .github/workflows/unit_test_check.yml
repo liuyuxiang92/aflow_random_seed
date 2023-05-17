@@ -12,6 +12,7 @@ name: AFLOW inhouse build Unit Test Checks
 run-name: Unit Test
 
 on: # Run unit_test whenever a pull request is opened or committed to
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronize, edited]
 jobs:
