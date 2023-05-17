@@ -5,7 +5,7 @@
 # Run check_full when a review is requested to a pull request (allows for manual running of check_full)
 #
 
-name: aflow++ inhouse build check_full
+name: aflow++ inhouse build check_full_PR
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
@@ -16,7 +16,7 @@ on: # Run when a reviewer is requested to a pull request (action performed on Gi
   pull_request:
     types: [review_requested]
 jobs:
-  check_full:
+  check_full_PR:
     runs-on: [self-hosted, Linux, X64]
 #    if: ${{ github.event.requested_team.name == 'check_full' }}
     steps:
