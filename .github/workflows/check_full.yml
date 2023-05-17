@@ -5,7 +5,7 @@
 # Run check_full when a review is requested to a pull request (allows for manual running of check_full)
 #
 
-name: AFLOW inhouse build Full Checks
+name: aflow++ inhouse build: check_full
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
