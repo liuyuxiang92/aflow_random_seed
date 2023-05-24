@@ -493,7 +493,7 @@ namespace aurostd {
   string GetCatCommand(const string& CompressedFileName); //CO20210315
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
-  bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
+  bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN,bool remove_existing=false); // with default //CO20230524 - remove_existing
   bool ZIP2ZIP(string dir,string from,string to,bool=TRUE,const string& = "");
   bool BZ2XZ(string dir,bool=TRUE,const string& = "");
   bool GZ2XZ(string dir,bool=TRUE,const string& = "");

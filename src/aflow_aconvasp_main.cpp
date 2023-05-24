@@ -13518,11 +13518,10 @@ namespace pflow {
   bool QMVASP_20210813(aurostd::xoption& vpflow, bool use_tmp_dir) {  //CO20180703  //KT20230516
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(vpflow.flag()){;}  //keep busy
-
     //fix directory
     string directory="";
     if(XHOST.vflag_control.flag("DIRECTORY")) {directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
+    if(vpflow.flag("QMVASP::DIRECTORY")) {directory=vpflow.getattachedscheme("QMVASP::DIRECTORY");} //CO20230524 - allowing for the directory to be passed in as well
     if(directory.empty()){directory=".";}
     if(!aurostd::IsDirectory(directory)){cerr << __AFLOW_FUNC__ << " invalid directory input" << endl;return FALSE;}
     //[START KT20230509] - assign directory for vasp analysis

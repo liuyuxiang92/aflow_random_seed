@@ -2274,10 +2274,10 @@ namespace aurostd {
       if(GetCompressionExtension(CompressedFileName)==GetCompressionExtension(FileNameOUT)) {return TRUE;}
       return FALSE;
     }
-    if(substring2bool(CompressedFileName,".xz")) {CompressFile(FileNameOUT,"xz");return TRUE;}
-    if(substring2bool(CompressedFileName,".bz2")) {CompressFile(FileNameOUT,"bzip2");return TRUE;}
-    if(substring2bool(CompressedFileName,".gz")) {CompressFile(FileNameOUT,"gzip");return TRUE;}
-    if(substring2bool(CompressedFileName,".zip")) {CompressFile(FileNameOUT,"zip");return TRUE;}
+    if(substring2bool(CompressedFileName,".xz")) {CompressFile(FileNameOUT,"xz",true);return TRUE;} //CO20230524 - MatchCompressed ALWAYS removes_existing
+    if(substring2bool(CompressedFileName,".bz2")) {CompressFile(FileNameOUT,"bzip2",true);return TRUE;} //CO20230524 - MatchCompressed ALWAYS removes_existing
+    if(substring2bool(CompressedFileName,".gz")) {CompressFile(FileNameOUT,"gzip",true);return TRUE;} //CO20230524 - MatchCompressed ALWAYS removes_existing
+    if(substring2bool(CompressedFileName,".zip")) {CompressFile(FileNameOUT,"zip",true);return TRUE;} //CO20230524 - MatchCompressed ALWAYS removes_existing
     return FALSE;
   }
 
@@ -2426,15 +2426,17 @@ namespace aurostd {
     return FALSE;
   }
 
-  bool CompressFile(const string& _file,const string& command) {  // "" compliant SC20190401
+  bool CompressFile(const string& _file,const string& command,bool remove_existing) {  // "" compliant SC20190401  //CO20230524 - removing existing zip file if found
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string file(CleanFileName(_file));
-    //  cerr << "aurostd::CompressFile FileName=[" << FileName << "]  command=[" << command << "]" << endl;
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " [" << file << "]  command=[" << command << "]" << endl;}
     if(aurostd::substring2bool(command,"bzip2") || aurostd::substring2bool(command,"bz2")  || aurostd::substring2bool(command,".bz2")) {
       if(!aurostd::IsCommandAvailable("bzip2")) {
         cerr << "ERROR - aurostd::CompressFile: command \"bzip2\" is necessary !" << endl;
         return FALSE;
       }   
-      // [OBSOLETE]     if(FileExist(file+".bz2")) {aurostd::execute("rm -f \""+file+".bz2\"");}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " BZ2  FileName=[" << file << "]  command=[" << command << "]" << endl;}
+      if(remove_existing && FileExist(file+".bz2")) {aurostd::execute("rm -f \""+file+".bz2\"");}  //CO20230524 - DO NOT REMOVE without explanation, breaks aurostd::MatchCompressed()
       if(file.find(".bz2")==string::npos) aurostd::execute("bzip2 -9qf \""+file+"\"");
       return TRUE;
     }
@@ -2443,8 +2445,8 @@ namespace aurostd {
         cerr << "ERROR - aurostd::CompressFile: command \"xz\" is necessary !" << endl;
         return FALSE;
       }   
-      // [OBSOLETE]     if(FileExist(file+".xz")) {aurostd::execute("rm -f \""+file+".xz\"");}
-      //    cerr << "aurostd::CompressFile XZ  FileName=[" << FileName << "]  command=[" << command << "]" << endl;
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " XZ  FileName=[" << file << "]  command=[" << command << "]" << endl;}
+      if(remove_existing && FileExist(file+".xz")) {aurostd::execute("rm -f \""+file+".xz\"");}  //CO20230524 - DO NOT REMOVE without explanation, breaks aurostd::MatchCompressed()
       if(file.find(".xz")==string::npos) aurostd::execute("xz -9qf -q \""+file+"\""); // twice -q to avoid any verbosity
       return TRUE;
     }
@@ -2453,7 +2455,8 @@ namespace aurostd {
         cerr << "ERROR - aurostd::CompressFile: command \"gzip\" is necessary !" << endl;
         return FALSE;
       }   
-      // [OBSOLETE]     if(FileExist(file+".gz")) {aurostd::execute("rm -f \""+file+".gz\"");}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " GZIP  FileName=[" << file << "]  command=[" << command << "]" << endl;}
+      if(remove_existing && FileExist(file+".gz")) {aurostd::execute("rm -f \""+file+".gz\"");}  //CO20230524 - DO NOT REMOVE without explanation, breaks aurostd::MatchCompressed()
       if(file.find(".gz")==string::npos) aurostd::execute("gzip -9qf \""+file+"\"");
       return TRUE;
     }
@@ -2462,8 +2465,8 @@ namespace aurostd {
         cerr << "ERROR - aurostd::ZipFile: command \"zip\" is necessary !" << endl;
         return FALSE;
       }
-      // [OBSOLETE]     if(FileExist(file+".zip")) {cerr << file << ".zip" << endl;}
-      if(FileExist(file+".zip")) {aurostd::execute("rm -f \""+file+".zip\"");}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ZIP  FileName=[" << file << "]  command=[" << command << "]" << endl;}
+      if(remove_existing && FileExist(file+".zip")) {aurostd::execute("rm -f \""+file+".zip\"");}  //CO20230524 - DO NOT REMOVE without explanation, breaks aurostd::MatchCompressed()
       if(file.find(".zip")==string::npos) aurostd::execute("zip -9qm \""+file+".zip\" \""+file+"\"");
       return TRUE;
     }
