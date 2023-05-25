@@ -1201,7 +1201,7 @@ namespace aflowlib {
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB1=" << XHOST_LIBRARY_LIB1 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB1")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
-      if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
+      if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB3=" << XHOST_LIBRARY_LIB3 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB3")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB4=" << XHOST_LIBRARY_LIB4 << endl;
@@ -1923,7 +1923,10 @@ namespace aflowlib {
       //if(LDEBUG)
       cout << __AFLOW_FUNC__ << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
       // **----------------------------------------------------------------------------
-      if(XHOST.hostname=="nietzsche.mems.duke.edu" && (XHOST.user=="auro"||XHOST.user=="common"||XHOST.user=="stefano")){  //CO20200624 - cannot create these links otherwise
+      if(
+          (XHOST.hostname=="nietzsche.mems.duke.edu" && (XHOST.user=="auro"||XHOST.user=="common"||XHOST.user=="stefano")) ||
+          ((XHOST.hostname=="bellatrix" || XHOST.hostname=="mintaka") && (XHOST.user=="aflow")) ||
+          FALSE){  //CO20200624 - cannot create these links otherwise
         // **----------------------------------------------------------------------------
         // NEW BUT STILL DOING
         string directory_AUID="";

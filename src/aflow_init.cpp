@@ -602,7 +602,7 @@ namespace init {
     }
 
     // get position JSONL
-    if(aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/aflow:00.jsonl") && aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/aflow:ff.jsonl")) {XHOST_LIBRARY_JSONL=DEFAULT_AFLOW_DB_DATA_PATH;} // check 00 and ff for being sure
+    if(aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/"+getAUIDPrefix()+":00.jsonl") && aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/"+getAUIDPrefix()+":ff.jsonl")) {XHOST_LIBRARY_JSONL=DEFAULT_AFLOW_DB_DATA_PATH;} // check 00 and ff for being sure  //CO20230525 - generalizing for arbitrary prefix
     // DEBUG cerr << "vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
     // DEBUG   for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) cerr << "vAFLOW_PROJECTS_DIRECTORIES.at(i)=" << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;
 
@@ -1766,6 +1766,11 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
   throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
   return FALSE;
+}
+string getAUIDPrefix(){ //CO20230525
+  string prefix="aflow";
+  if(XHOST.hostname=="bellatrix"||XHOST.hostname=="mintaka"){prefix="s4e";}
+  return prefix;
 }
 
 // ***************************************************************************

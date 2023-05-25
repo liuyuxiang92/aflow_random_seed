@@ -4384,7 +4384,7 @@ namespace aflowlib {
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
     //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
     crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
-    auid="aflow:"+aurostd::crc2string(crc);
+    auid=getAUIDPrefix()+":"+aurostd::crc2string(crc);  //CO20230525 - prefix
 
     //find conflicts
     string aurl_found="";
@@ -4397,7 +4397,7 @@ namespace aflowlib {
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
         //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
         crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
-        auid="aflow:"+aurostd::crc2string(crc);
+        auid=getAUIDPrefix()+":"+aurostd::crc2string(crc);  //CO20230525 - prefix
       } else {
         message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
       }
@@ -4431,7 +4431,8 @@ namespace aflowlib {
       for(uint i=0;i<vfiles2.size();i++) 
         if(aurostd::FileExist(directory+"/"+vfiles2.at(i)))
           crc=aurostd::crc64(crc,aurostd::efile2string(directory+"/"+vfiles2.at(i))); // DONT TOUCH THIS
-      auid="aflow:"+aurostd::crc2string(crc);
+      string prefix="aflow";
+      auid=getAUIDPrefix()+":"+aurostd::crc2string(crc);  //CO20230525 - prefix
 
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " [1]" << endl;
 
@@ -4509,7 +4510,9 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "aflowlib::auid2present: BEGIN mode=" << mode << endl;
     string loop="",json="";aurl="";
-    if(auid=="" || auid.size()!=22) { cerr << XPID << "aflowlib::auid2present: auid.size() needs to be 22 characters long" << endl; return FALSE;}
+    if(auid=="" || 
+        !((getAUIDPrefix()=="s4e"&&auid.size()==20) || (getAUIDPrefix()=="aflow"&&auid.size()==22))
+        ) { cerr << XPID << "aflowlib::auid2present: auid.size() needs to be 20/22 characters long" << endl; return FALSE;}
 
     // [OBSOLETE]    if(mode==0) {
     // [OBSOLETE]    if(XHOST_vAUID.size()==0 || XHOST_vAURL.size()==0) init::InitGlobalObject("vLIBS","",FALSE);
@@ -4524,7 +4527,12 @@ namespace aflowlib {
     // [OBSOLETE]   }
     if(mode==1) { // PICK THIS ONE DEFAULT
       //  bool aflowlib::auid2present(string auid,string& aurl)
-      string jsonl_file=XHOST_LIBRARY_JSONL+"/"; for(uint i=0;i<8;i++) jsonl_file+=auid.at(i); jsonl_file+=".jsonl";
+      string jsonl_file=XHOST_LIBRARY_JSONL+"/"; //[CO20230525 - generalizing for arbtirary]for(uint i=0;i<8;i++) jsonl_file+=auid.at(i); jsonl_file+=".jsonl";
+      //CO20230525 START
+      string::size_type loc=auid.find(':');
+      if(loc==string::npos){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "no namespace delimiter found", _FILE_NOT_FOUND_);}
+      jsonl_file+=auid.substr(0,loc+3)+".jsonl";
+      //CO20230525 STOP
       bool found=FALSE;
       jsonl_file=aurostd::CleanFileName(jsonl_file);
       for(uint i=0;i<XHOST.vext.size()&&aurl.empty()&&!found;i++) {
@@ -4577,7 +4585,14 @@ namespace aflowlib {
   uint auid2vauid(const string auid, deque<string>& vauid) {                // splits the auid into vauid
     vauid.clear();
     //    vauid.push_back(auid.substr(0,6)); for(uint i=6;i<=20;i+=2) vauid.push_back(auid.substr(i,2));  // splitting aflow:/ab/cd..
-    vauid.push_back(auid.substr(0,8)); for(uint i=8;i<=20;i+=2) vauid.push_back(auid.substr(i,2));  // splitting aflow:ab/cd..
+    //[CO20230525 - obsolete]vauid.push_back(auid.substr(0,8)); for(uint i=8;i<=20;i+=2) vauid.push_back(auid.substr(i,2));  // splitting aflow:ab/cd..
+
+    //CO20230525 - generalizing for arbitrary namespace
+    string::size_type loc=auid.find(':');
+    if(loc==string::npos){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "no namespace delimiter found", _FILE_NOT_FOUND_);}
+    vauid.push_back(auid.substr(0,loc+3));
+    for(uint i=loc+3;i<auid.length();i+=2) vauid.push_back(auid.substr(i,2)); //splitting NAMESPACE:ab/cd...
+
     return vauid.size();
   }
 
@@ -5315,15 +5330,19 @@ namespace aflowlib {
       // **********************************************************************************************************
       // ME20200707 - Also check for AUIDs without the aflow: prefix
       string option_orig = option;
-      if ((option.size() == 16) && aurostd::_ishex(option)) option = "aflow:" + option;
-      if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
+      if ((option.size() == 16) && aurostd::_ishex(option)) option = getAUIDPrefix() + ":" + option;  //CO20230525 - prefix
+      if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),getAUIDPrefix()+":")) { // CHECK AUID  //CO20230525 - prefix
         if(LDEBUG) cout << "WEB_Aflowlib_Entry: option=" << option << endl;
         string auid=aurostd::tolower(option);
         if(auid.size()!=22) {
           errormsg="aflowlib::WEB_Aflowlib_Entry:_error_on_size_of_auid="+auid;
         } else {
           // NEW
-          directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+          directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"; //[CO20230525 - generalizing for arbitrary prefix]+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+          //CO20230525 START - generalizing for arbitrary prefix
+          deque<string> vauid;auid2vauid(auid,vauid);
+          directory_AUID_LIB+=aurostd::joinWDelimiter(vauid,"/");
+          //CO20230525 STOP - generalizing for arbitrary prefix
           directory_AUID_WEB=directory_AUID_LIB+"/WEB";
           directory_AUID_RAW=directory_AUID_LIB+"/RAW";
           directory_AUID_LIB=directory_AUID_LIB+"/LIB";

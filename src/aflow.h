@@ -1155,6 +1155,7 @@ uint AFLOW_monitor(const vector<string>& argv);
 double AFLOW_checkMEMORY(const string& progname="",double=102.0);
 bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
+string getAUIDPrefix(void); //CO20230525
 string aflow_get_time_string(void);
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
