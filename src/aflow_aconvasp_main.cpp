@@ -13525,9 +13525,10 @@ namespace pflow {
     if(directory.empty()){directory=".";}
     if(!aurostd::IsDirectory(directory)){cerr << __AFLOW_FUNC__ << " invalid directory input" << endl;return FALSE;}
     //[START KT20230509] - assign directory for vasp analysis
-    string temp_directory=directory;
+    string directory_processing=directory;
     if (use_tmp_dir) {
-      temp_directory = aurostd::TmpDirectoryCreate("qmvasp_redo");
+      directory_processing = aurostd::TmpDirectoryCreate("qmvasp_redo");
+      cout << __AFLOW_FUNC__ << " Processing in dir=" << directory_processing << endl; //CO20230525
     }
     //[STOP KT20230509]
 
@@ -13545,8 +13546,7 @@ namespace pflow {
     //go through runs sequentially to fill in aflow.qmvasp.out
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match
     string ext="",vCAR="",vCAR_compressed="";
-    _xvasp xvasp;
-    xvasp.Directory=temp_directory; //KT20230509
+    _xvasp xvasp;xvasp.Directory=directory_processing; //KT20230509
     for(uint j=0;j<vruns.size();j++){
       ext=vruns[j];aurostd::StringSubst(ext,".","");
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " checking run=" << aurostd::toupper(ext) << endl;}
@@ -13572,38 +13572,40 @@ namespace pflow {
       for(uint i=0;i<vCARs.size();i++){
         vCAR=directory+"/"+vCARs[i]+vruns[j];
         aurostd::EFileExist(vCAR,vCAR_compressed);  //get compressed variant
-        aurostd::execute(aurostd::GetCatCommand(vCAR_compressed)+" "+vCAR_compressed+" > "+temp_directory+"/"+vCARs[i]); //KT20230509
+        aurostd::execute(aurostd::GetCatCommand(vCAR_compressed)+" "+vCAR_compressed+" > "+directory_processing+"/"+vCARs[i]); //KT20230509
       }
-      cout << __AFLOW_FUNC__ << " Performing dir=" << temp_directory << " run=" << aurostd::toupper(ext) << endl; //KT20230509
+      cout << __AFLOW_FUNC__ << " Performing dir=" << directory << " run=" << aurostd::toupper(ext) << endl; //KT20230509
       xvasp.AnalyzeLabel=ext;
-      xvasp.str=xstructure(temp_directory+"/CONTCAR",IOAFLOW_AUTO); //KT20230509
+      xvasp.str=xstructure(directory_processing+"/CONTCAR",IOAFLOW_AUTO); //KT20230509
       KBIN::VASP_Analyze(xvasp,TRUE);
-      if(!aurostd::FileExist(temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT)){ //KT20230509
-        cerr << __AFLOW_FUNC__ << temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT << " was not successfully generated" << endl; //KT20230509
+      if(!aurostd::FileExist(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT)){ //KT20230509
+        cerr << __AFLOW_FUNC__ << directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT << " was not successfully generated" << endl; //KT20230509
         return FALSE;
       }
-      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(temp_directory+"/"+vCARs[i]);} //KT20230509
+      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory_processing+"/"+vCARs[i]);} //KT20230509
     }
 
     //zip in style of vCAR
-    for(uint i=0;i<vCARs.size();i++){
-      for(uint j=0;j<vruns.size();j++){
-        for(uint k=0;k<XHOST.vext.size();k++){
+    for(uint i=0;i<vCARs.size()&&aurostd::FileExist(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT);i++){  //CO20230525 - adding short-circuit for faster return
+      for(uint j=0;j<vruns.size()&&aurostd::FileExist(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT);j++){  //CO20230525 - adding short-circuit for faster return
+        for(uint k=0;k<XHOST.vext.size()&&aurostd::FileExist(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT);k++){ //CO20230525 - adding short-circuit for faster return
           if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
             if(!XHOST.vzip.at(k).empty()){
-              aurostd::execute(XHOST.command(XHOST.vzip.at(k))+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
-              //[START KT20230509] - move zip to lib and remove temp directory
-              if (use_tmp_dir) {
-                aurostd::file2directory(temp_directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+".xz", directory);
-                aurostd::RemoveDirectory(temp_directory);
-              }
-              //[STOP KT20230509]
-              return TRUE;
+              aurostd::CompressFile(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT,XHOST.vzip.at(k),true); //CO20230525
+              if(use_tmp_dir) {aurostd::file2directory(directory_processing+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(k), directory);}   //KT20230509
+              //[CO20230525 - removing to return below]return TRUE;
             }
           }
         }
       }
     }
+    //[START KT20230509] - move zip to lib and remove temp directory
+    if (use_tmp_dir) {
+#ifndef _AFLOW_TEMP_PRESERVE_
+      aurostd::RemoveDirectory(directory_processing);
+#endif
+    }
+    //[STOP KT20230509]
     return true;
   }
   bool QMVASP_20210101(aurostd::xoption& vpflow) {  //CO20180703

@@ -6710,7 +6710,7 @@ namespace aflowlib {
         data.aflow_version=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
         aurostd::StringSubst(data.aflow_version,"(","");aurostd::StringSubst(data.aflow_version,")","");
       }
-      if(data.aflow_version.empty() && aurostd::substring2bool(vlock[iline]," DIRECTORY ") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
+      if(data.aflow_version.empty() && aurostd::substring2bool(vlock[iline]," DIRECTORY ") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) { //CO20230525
         aurostd::string2tokens(vlock[iline],vtokens,"-");tmp=vtokens[0];
         aurostd::string2tokens(tmp,vtokens);
         data.aflow_version=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
