@@ -7837,7 +7837,7 @@ namespace aflowlib {
       //CO20230524 - compress if necessary
       aurostd::MatchCompressed(poscar_orig_filename_compressed, poscar_orig_filename);
       // updating patched_aflowin_ss 
-      patched_aflowin_ss << "[POSCAR_ORIG]PATCHED=" << aurostd::utype2string<long int>(aurostd::get_date()) << endl;
+      patched_aflowin_ss << "[POSCAR_ORIG]PATCHED=" << aurostd::get_datetime(true) << endl;
     }
     if(!aurostd::substring2bool(aflowin, "[AFLOW_QMVASP]PATCHED=")){
       cout << __AFLOW_FUNC__ << " Patching aflow.qmvasp.out of " << directory_LIB << endl;
@@ -7845,7 +7845,7 @@ namespace aflowlib {
       vpflow.flag("QMVASP::DIRECTORY",true);vpflow.push_attached("QMVASP::DIRECTORY",directory_LIB);  //CO20230524 - adding directory
       pflow::QMVASP(vpflow, true);
       // updating patched_aflowin_ss 
-      patched_aflowin_ss << "[AFLOW_QMVASP]PATCHED=" << aurostd::utype2string<long int>(aurostd::get_date()) << endl;
+      patched_aflowin_ss << "[AFLOW_QMVASP]PATCHED=" << aurostd::get_datetime(true) << endl;
     }
     if(patched_aflowin_ss.str() != aflowin){aurostd::stringstream2file(patched_aflowin_ss, directory_LIB+"/"+_AFLOWIN_);}
     //[STOP KT20230504]

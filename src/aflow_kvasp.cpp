@@ -4865,12 +4865,12 @@ namespace KBIN {
     strstream << "[KBIN_ANALYZE]START_" << xvasp.AnalyzeLabel << endl;
     if(xvasp.AnalyzeLabel!="dielectric_static" && xvasp.AnalyzeLabel!="dielectric_dynamic") {
       strstream << "[AFLOW] **************************************************************************************************************************" << endl;
-      strstream << "# POSITION                                       TOTAL-FORCE (eV/Angst)               " << endl;
+      strstream << "#  POSITION                                                    TOTAL-FORCE (eV/Angst)               " << endl;
       strstream << "[AFLOW] **************************************************************************************************************************" << endl;
       strstream.precision(_DOUBLE_WRITE_PRECISION_);  //CO20200731 - 12
       for(uint i=0;i<xvasp.str.atoms.size();i++) {   // clear        (from the previous step)
-        for(uint j=1;j<=3;j++) {if(abs(xvasp.str.qm_positions.at(i)[j])<10.0) strstream << " ";if(xvasp.str.qm_positions.at(i)[j]>=0.0) strstream << " "; strstream << "   " << xvasp.str.qm_positions.at(i)[j] << " ";}
-        for(uint j=1;j<=3;j++) {if(abs(xvasp.str.qm_forces.at(i)[j])<10.0) strstream << " ";if(xvasp.str.qm_forces.at(i)[j]>=0.0) strstream << " "; strstream << "   " << xvasp.str.qm_forces.at(i)[j] << " ";}
+        for(uint j=1;j<=3;j++) {if(abs(xvasp.str.qm_positions[i][j])<10.0) strstream << " ";if(!std::signbit(xvasp.str.qm_positions[i][j])) strstream << " "; strstream << "   " << xvasp.str.qm_positions[i][j] << " ";}
+        for(uint j=1;j<=3;j++) {if(abs(xvasp.str.qm_forces[i][j])<10.0) strstream << " ";if(!std::signbit(xvasp.str.qm_forces[i][j])) strstream << " "; strstream << "   " << xvasp.str.qm_forces[i][j] << " ";}
         strstream << endl;
       }
       strstream << "[AFLOW] **************************************************************************************************************************" << endl;
