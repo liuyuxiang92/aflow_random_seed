@@ -13527,7 +13527,7 @@ namespace pflow {
     //[START KT20230509] - assign directory for vasp analysis
     string temp_directory=directory;
     if (use_tmp_dir) {
-      temp_directory = aurostd::TmpDirectoryCreate("temp");
+      temp_directory = aurostd::TmpDirectoryCreate("qmvasp_redo");
     }
     //[STOP KT20230509]
 
