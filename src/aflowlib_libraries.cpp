@@ -6704,12 +6704,19 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (START) = " << ((data.vaflowlib_date.size()>0)?data.vaflowlib_date[0]:"unavailable") << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (END) = " << ((data.vaflowlib_date.size()>1)?data.vaflowlib_date[1]:"unavailable") << endl;
     // ---------------------------------------------------------------
-    for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++)
-      if(aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
+    for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++){
+      if(data.aflow_version.empty() && aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
         aurostd::string2tokens(vlock[iline],vtokens);
         data.aflow_version=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
         aurostd::StringSubst(data.aflow_version,"(","");aurostd::StringSubst(data.aflow_version,")","");
       }
+      if(data.aflow_version.empty() && aurostd::substring2bool(vlock[iline]," DIRECTORY ") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
+        aurostd::string2tokens(vlock[iline],vtokens,"-");tmp=vtokens[0];
+        aurostd::string2tokens(tmp,vtokens);
+        data.aflow_version=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
+        aurostd::StringSubst(data.aflow_version,"(","");aurostd::StringSubst(data.aflow_version,")","");
+      }
+    }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_version = " << ((data.aflow_version.size())?data.aflow_version:"unavailable") << endl;
     // XHOST.CPU_Model ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_Model.empty();iline++)
