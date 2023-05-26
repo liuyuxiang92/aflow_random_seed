@@ -1201,7 +1201,7 @@ namespace aflowlib {
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB1=" << XHOST_LIBRARY_LIB1 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB1")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
-      if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
+      if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB3=" << XHOST_LIBRARY_LIB3 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB3")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " XHOST_LIBRARY_LIB4=" << XHOST_LIBRARY_LIB4 << endl;
@@ -1915,6 +1915,7 @@ namespace aflowlib {
 
     // CHECK FOR AUID-WEB-LINKS
     //      LDEBUG=TRUE;
+    string directory_tmp="";  //CO20230526
     if (!LOCAL) {
       if(LDEBUG) cout << __AFLOW_FUNC__ << " flag_WEB=" << flag_WEB << endl;
       if(LDEBUG) cout << __AFLOW_FUNC__ << " directory_LIB=" << directory_LIB << endl;
@@ -1982,6 +1983,19 @@ namespace aflowlib {
             }
           }
         }
+        
+        //CO20230526 START - crawl up the directories until common and chmod them too
+        aurostd::ChmodFile("755",directory_AUID_LIB);
+        aurostd::ChmodFile("755",directory_AUID_RAW);
+        aurostd::ChmodFile("755",directory_AUID_WEB);
+        directory_tmp=directory_AUID_LIB;
+        while(directory_tmp!=init::AFLOW_Projects_Directories("AUID")){
+          directory_tmp=aurostd::dirname(directory_tmp);
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+directory_tmp << "\"\"" << endl;}
+          aurostd::ChmodFile("755",directory_tmp);
+        }
+        //CO20230526 STOP - crawl up the directories until common and chmod them too
+
       }
 
 
@@ -2016,6 +2030,14 @@ namespace aflowlib {
       if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
+    //CO20230526 START - crawl up the directories until common and chmod them too
+    directory_tmp=directory_RAW;
+    while(directory_tmp!=PROJECT_LIBRARY){
+      directory_tmp=aurostd::dirname(directory_tmp);
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+directory_tmp << "\"\"" << endl;}
+      aurostd::ChmodFile("755",directory_tmp);
+    }
+    //CO20230526 STOP - crawl up the directories until common and chmod them too
 
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_RAW+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type f"),Chmod_Files);
@@ -2031,6 +2053,14 @@ namespace aflowlib {
         if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
         aurostd::ChmodFile("755",Chmod_Files[i]);
       }
+      //CO20230526 START - crawl up the directories until common and chmod them too
+      directory_tmp=directory_WEB;
+      while(directory_tmp!=PROJECT_LIBRARY){
+        directory_tmp=aurostd::dirname(directory_tmp);
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+directory_tmp << "\"\"" << endl;}
+        aurostd::ChmodFile("755",directory_tmp);
+      }
+      //CO20230526 STOP - crawl up the directories until common and chmod them too
 
       //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_WEB+"\" -type f`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type f"),Chmod_Files);
@@ -2046,6 +2076,14 @@ namespace aflowlib {
       if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
+    //CO20230526 START - crawl up the directories until common and chmod them too
+    directory_tmp=directory_LIB;
+    while(directory_tmp!=PROJECT_LIBRARY){
+      directory_tmp=aurostd::dirname(directory_tmp);
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " \"" << XHOST.command("chmod")+" 755 \""+directory_tmp << "\"\"" << endl;}
+      aurostd::ChmodFile("755",directory_tmp);
+    }
+    //CO20230526 STOP - crawl up the directories until common and chmod them too
 
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_LIB+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_LIB+"\" -type f"),Chmod_Files);
