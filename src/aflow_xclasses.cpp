@@ -312,7 +312,7 @@ std::string _XHOST::command(const string& command) {
       return vcmd.at(i);
     }// found before.. only == otherwise cat gets confused with bzcat
   }
-  //next check if we can find the command in PATH or somewher else common //CO20180705
+  //next check if we can find the command in PATH or somewhere else common //CO20180705
   if(aurostd::IsCommandAvailableModify(_command)) {
     pthread_mutex_lock(&mutex_XAFLOW_XHOST);
     // pthread_mutex_unlock(&mutex_XAFLOW_XHOST);
