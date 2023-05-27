@@ -13,7 +13,7 @@ name: aflow++ inhouse build check_full
 
 on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
   workflow_dispatch:
-  push:
+  #[CO20230527 - check_full depends on API, which can be very slow...]push:
 jobs:
   check_full:
     runs-on: [self-hosted, Linux, X64]
