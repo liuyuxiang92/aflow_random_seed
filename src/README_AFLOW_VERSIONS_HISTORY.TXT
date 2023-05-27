@@ -1,6 +1,7 @@
 3.2.15 - 2023/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.15.tar.xz
         -- patching url2string to be robust to firewalls (CO)
+        -- patching POSCAR.orig and aflow.qmvasp.out in LIB2LIB() (KT+KC+CO)
 3.2.14 - 2023/10/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
         -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
@@ -11,7 +12,7 @@
         -- added RDF to pocc (CO)
         -- patching AddAtom() types vs. names bug (CO)
         -- rearranged QHA code to enable calculation of thermodynamic properties if isEOS and isQHA (CO)
-        -- patching POSCAR.orig and aflow.qmvasp.out in LIB2LIB() (KT+KC+CO)
+        -- added machine settings for machine005 (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
@@ -98,7 +99,6 @@
         -- Added LIB2RAW for APL (ME)
         -- added machine settings for machine004 (DX)
         -- added function to move aflow run to another directory (DX)
-        -- added machine settings for machine004 (DX)
         -- fixed gcc warning (version 4) in SYMBOLICCPLUSPLUS/ (DX)
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
         -- patching xoption::options2entry() clear() issues (CO)
