@@ -2736,17 +2736,17 @@ namespace pflow {
     string command;
     //Look for JmolData.jar first
     if((XHOST.hostname == "nietzsche.mems.duke.edu" || XHOST.hostname == "aflowlib.duke.edu") && aurostd::FileExist("/usr/local/bin/JmolData.jar")) {
-      command = "java -jar /usr/local/bin/JmolData.jar";
+      command = "java -Djava.awt.headless=true -jar /usr/local/bin/JmolData.jar";
       //command="/usr/local/bin/jmol";
     } else if(aurostd::IsCommandAvailable("JmolData.jar")) {
-      command = "java -jar " + XHOST.command("JmolData.jar");
+      command = "java -Djava.awt.headless=true -jar " + XHOST.command("JmolData.jar");
       //Look for jmol instead
     } else if(aurostd::IsCommandAvailable("jmol")) {
       command = XHOST.command("jmol");
     } else if(aurostd::IsCommandAvailable("jmol.sh")) {
       command = XHOST.command("jmol.sh");
     } else if(aurostd::IsCommandAvailable("Jmol.jar")) {
-      command = "java -jar " + XHOST.command("Jmol.jar");
+      command = "java -Djava.awt.headless=true -jar " + XHOST.command("Jmol.jar");
     } else {
       oss << endl;
       oss << __AFLOW_FUNC__ << " ERROR: Unable to locate either JmolData (preferred), jmol, jmol.sh, or Jmol.jar in path." << " "; //<< endl //CO20180502;
