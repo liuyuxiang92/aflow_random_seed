@@ -2505,7 +2505,7 @@ namespace aflowrc {
     aflowrc << "BYTES_MAX_VASP_OUT=" << AFLOWRC_BYTES_MAX_VASP_OUT << " // bytes"   << endl;  //CO20201111
     aflowrc << "MEMORY_MAX_USAGE_RAM=" << AFLOWRC_MEMORY_MAX_USAGE_RAM << " // bytes"   << endl;  //CO20201111
     aflowrc << "MEMORY_MAX_USAGE_SWAP=" << AFLOWRC_MEMORY_MAX_USAGE_SWAP << " // bytes"   << endl;  //CO20201111
-    aflowrc << "FILE_VASP_MONITOR=" << AFLOWRC_FILE_VASP_MONITOR << " // monitor file postfix"   << endl;  //CO20201111
+    aflowrc << "FILE_VASP_MONITOR=\"" << AFLOWRC_FILE_VASP_MONITOR << "\" // monitor file postfix"   << endl;  //CO20201111
     aflowrc << "INTEL_COMPILER_PATHS=" << AFLOWRC_INTEL_COMPILER_PATHS << " // comma-separated paths to search (for sourcing)"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
