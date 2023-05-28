@@ -1255,23 +1255,27 @@ namespace KBIN {
     // Move aflow run (i.e., aflow.in) to a new directory and add a LOCK
     // to the original directory to prevent machine scrubbers from removing
     // DX20210901
-    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+    if(aflags.AFLOW_PERFORM_FILE && ( //CO20230528 - only run in a different directory if aflags.AFLOW_PERFORM_FILE, we should be benchmarking non-HT
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005") ||  //CO20230512
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||  //CO20221027
-        FALSE){
+        FALSE)
+      ){
       //CO20221027 - $HOME and $WORKDIR are for very specific environments
       //$HOME_AFLOW and $WORK_HOME can be generalized for any system
       string subdirectory_orig = aurostd::getenv2string("HOME_AFLOW");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)
       string subdirectory_new = aurostd::getenv2string("WORK_AFLOW"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003/004)
-      if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+      if((subdirectory_orig.empty() && subdirectory_new.empty()) && ( //CO20230528 - if HOME_XXX env variables not already found
+          aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005") ||  //CO20230512
-          FALSE){
+          FALSE)
+          ){
         subdirectory_orig = aurostd::getenv2string("HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)
         subdirectory_new = aurostd::getenv2string("WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003/004)
       }
