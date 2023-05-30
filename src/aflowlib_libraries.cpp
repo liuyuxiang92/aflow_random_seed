@@ -1079,7 +1079,9 @@ namespace aflowlib {
       aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
     } else {
       // build aflowlib_data.aurl
-      aflowlib_data.aurl=AFLOWLIB_SERVER_DEFAULT+":"+directory_LIB;
+      string prefix_aurl=AFLOWLIB_SERVER_DEFAULT; //CO20230530
+      if(XHOST.hostname=="bellatrix"||XHOST.hostname=="mintaka"){prefix_aurl="s4e.ai";}  //CO20230530
+      aflowlib_data.aurl=prefix_aurl+":"+directory_LIB; //CO20230530
 
       if(true){
         //aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
@@ -2046,7 +2048,7 @@ namespace aflowlib {
       aurostd::ChmodFile("644",Chmod_Files[i]);
     }
 
-    if(CHMODWEB) {
+    if(flag_WEB&&CHMODWEB) {
       //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_WEB+"\" -type d`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type d"),Chmod_Files);
       for(uint i=0;i<Chmod_Files.size();i++) {

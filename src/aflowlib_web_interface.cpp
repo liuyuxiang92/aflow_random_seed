@@ -340,6 +340,7 @@ namespace aflowlib {
     catalog.clear();
     data_api="aapi1.2"; // new version of the API
     data_source="aflowlib";
+    if(XHOST.hostname=="bellatrix"||XHOST.hostname=="mintaka"){data_source="s4e";}  //CO20230530
     data_language="";
     error_status.clear();
     author.clear();vauthor.clear();

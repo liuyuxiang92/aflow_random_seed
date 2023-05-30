@@ -1570,7 +1570,7 @@ namespace KBIN {
     // [OBSOLETE] aurostd::StringstreamClean(aus);
     // [OBSOLETE] cerr << "CO " << aurostd::joinWDelimiter(vfiles," ") << endl;
     if(vfiles.size()){  //ATTEMPT 1 - xargs parallelization with -T4
-      //find . -name 'README*' -print0 | xargs -0 -P16 -I{} xz -T4 {}
+      //find . -name 'README*' -print0 | xargs -0 -P16 -I{} xz -9fq -T4 {}
       //-T does not work with -9
       //big compression (space) difference between -8 and -9, negligible between -6 and -8
       //big speed up between -6 and -8, not too much between -8 and -9
