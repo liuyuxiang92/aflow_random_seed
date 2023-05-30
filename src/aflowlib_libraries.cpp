@@ -7865,30 +7865,32 @@ namespace aflowlib {
     }
 
     //[START KT20230504]
-    stringstream patched_aflowin_ss;
-    aurostd::file2stringstream(directory_LIB+"/"+_AFLOWIN_, patched_aflowin_ss);  //CO20230524 - adding directory
-    string aflowin = patched_aflowin_ss.str();
-    if(!aurostd::substring2bool(aflowin, "[POSCAR_ORIG]PATCHED=")){
-      // correcting POSCAR.orig
-      cout << __AFLOW_FUNC__ << " Patching POSCAR.orig of " << directory_LIB << endl;
-      string poscar_orig_filename,poscar_orig_filename_compressed;poscar_orig_filename=poscar_orig_filename_compressed=directory_LIB+"/"+"POSCAR.orig";
-      aurostd::EFileExist(poscar_orig_filename, poscar_orig_filename_compressed); //get compressed filename
-      string poscar_orig = aurostd::substring2string(aflowin,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,1);
-      aurostd::string2file(poscar_orig, poscar_orig_filename); //CO20230524 - adding directory
-      //CO20230524 - compress if necessary
-      aurostd::MatchCompressed(poscar_orig_filename_compressed, poscar_orig_filename);
-      // updating patched_aflowin_ss 
-      patched_aflowin_ss << "[POSCAR_ORIG]PATCHED=" << aurostd::get_datetime(true) << endl;
+    if(!pocc::structuresGenerated(directory_LIB)){ //CO20230530 - do not run if POCC
+      stringstream patched_aflowin_ss;
+      aurostd::file2stringstream(directory_LIB+"/"+_AFLOWIN_, patched_aflowin_ss);  //CO20230524 - adding directory
+      string aflowin = patched_aflowin_ss.str();
+      if(!aurostd::substring2bool(aflowin, "[POSCAR_ORIG]PATCHED=")){
+        // correcting POSCAR.orig
+        cout << __AFLOW_FUNC__ << " Patching POSCAR.orig of " << directory_LIB << endl;
+        string poscar_orig_filename,poscar_orig_filename_compressed;poscar_orig_filename=poscar_orig_filename_compressed=directory_LIB+"/"+"POSCAR.orig";
+        aurostd::EFileExist(poscar_orig_filename, poscar_orig_filename_compressed); //get compressed filename
+        string poscar_orig = aurostd::substring2string(aflowin,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,1);
+        aurostd::string2file(poscar_orig, poscar_orig_filename); //CO20230524 - adding directory
+        //CO20230524 - compress if necessary
+        aurostd::MatchCompressed(poscar_orig_filename_compressed, poscar_orig_filename);
+        // updating patched_aflowin_ss 
+        patched_aflowin_ss << "[POSCAR_ORIG]PATCHED=" << aurostd::get_datetime(true) << endl;
+      }
+      if(!aurostd::substring2bool(aflowin, "[AFLOW_QMVASP]PATCHED=")){
+        cout << __AFLOW_FUNC__ << " Patching aflow.qmvasp.out of " << directory_LIB << endl;
+        aurostd::xoption vpflow;
+        vpflow.flag("QMVASP::DIRECTORY",true);vpflow.push_attached("QMVASP::DIRECTORY",directory_LIB);  //CO20230524 - adding directory
+        pflow::QMVASP(vpflow, true);
+        // updating patched_aflowin_ss 
+        patched_aflowin_ss << "[AFLOW_QMVASP]PATCHED=" << aurostd::get_datetime(true) << endl;
+      }
+      if(patched_aflowin_ss.str() != aflowin){aurostd::stringstream2file(patched_aflowin_ss, directory_LIB+"/"+_AFLOWIN_);}
     }
-    if(!aurostd::substring2bool(aflowin, "[AFLOW_QMVASP]PATCHED=")){
-      cout << __AFLOW_FUNC__ << " Patching aflow.qmvasp.out of " << directory_LIB << endl;
-      aurostd::xoption vpflow;
-      vpflow.flag("QMVASP::DIRECTORY",true);vpflow.push_attached("QMVASP::DIRECTORY",directory_LIB);  //CO20230524 - adding directory
-      pflow::QMVASP(vpflow, true);
-      // updating patched_aflowin_ss 
-      patched_aflowin_ss << "[AFLOW_QMVASP]PATCHED=" << aurostd::get_datetime(true) << endl;
-    }
-    if(patched_aflowin_ss.str() != aflowin){aurostd::stringstream2file(patched_aflowin_ss, directory_LIB+"/"+_AFLOWIN_);}
     //[STOP KT20230504]
 
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
