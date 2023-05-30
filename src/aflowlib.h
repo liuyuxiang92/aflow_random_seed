@@ -20,7 +20,7 @@ using std::vector;
 using std::string;
 
 #define NOSG string("NNN #0")
-#define CHMODWEB FALSE
+#define CHMODWEB true //[CO20230530]FALSE
 #define INF 1E9
 #define ENERGY_ATOM_ERROR_meV 50
 #define PRESSURE_ZERO_ENTHALPY_ENERGY _FLOAT_TOL_ //1e-6
