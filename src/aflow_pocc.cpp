@@ -1018,7 +1018,7 @@ namespace pocc {
   }
 
   void POccCalculator::setAvgRDF(double temperature){
-    bool LDEBUG=(true || _DEBUG_POCC_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     stringstream message;
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
