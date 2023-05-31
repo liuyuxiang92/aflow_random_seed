@@ -1346,7 +1346,16 @@ namespace aflowlib {
     //{ aurostd::DirectoryMake(directory_RAW);aurostd::execute("rm -f \"/"+directory_RAW+"/*\""); } //CO20190321 - the prepending of '/' is BAD, only works for SC but can kill a local users whole computer if "/"+directory_RAW exists
     {
       aurostd::DirectoryMake(directory_RAW);
-      aurostd::RemoveFile(directory_RAW+"/*");
+      //[CO20230530 - dangerous for POCC]aurostd::RemoveFile(directory_RAW+"/*");
+      //CO20230530 - delete all FILES instead
+      vector<string> contents_RAW;
+      aurostd::DirectoryLS(directory_RAW,contents_RAW);
+      for(uint i=0;i<contents_RAW.size();i++){
+        if(!aurostd::IsDirectory(directory_RAW+"/"+contents_RAW[i])){
+          cout << __AFLOW_FUNC__ << " deleting " << directory_RAW+"/"+contents_RAW[i] << endl;
+          aurostd::RemoveFile(directory_RAW+"/"+contents_RAW[i]);
+        }
+      }
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_RAW+"/*\"");
     }
     if(!aurostd::IsDirectory(directory_RAW)) {
@@ -1361,7 +1370,15 @@ namespace aflowlib {
       //if(LOCAL){aurostd::execute("rm -rf \""+directory_WEB+"\"");} //CO20190321 - safer NOT to -rf
       //aurostd::DirectoryMake(directory_WEB);aurostd::execute("rm -f \"/"+directory_WEB+"/*\""); //CO20190321 - the prepending of '/' is BAD, only works for SC but can kill a local users whole computer if "/"+directory_RAW exists
       aurostd::DirectoryMake(directory_WEB);
-      aurostd::RemoveFile(directory_WEB+"/*");
+      //[CO20230530 - dangerous for POCC]aurostd::RemoveFile(directory_WEB+"/*");
+      vector<string> contents_WEB;
+      aurostd::DirectoryLS(directory_WEB,contents_WEB);
+      for(uint i=0;i<contents_WEB.size();i++){
+        if(!aurostd::IsDirectory(directory_WEB+"/"+contents_WEB[i])){
+          cout << __AFLOW_FUNC__ << " deleting " << directory_WEB+"/"+contents_WEB[i] << endl;
+          aurostd::RemoveFile(directory_WEB+"/"+contents_WEB[i]);
+        }
+      }
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_WEB+"/*\"");
       if(!aurostd::IsDirectory(directory_WEB)) {
         cout << __AFLOW_FUNC__ << " directory is skipped because directory_WEB cannot be created: " << directory_WEB << endl;
