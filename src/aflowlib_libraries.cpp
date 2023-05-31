@@ -1878,6 +1878,33 @@ namespace aflowlib {
         if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624
         if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out",directory_WEB); // LINK //CO20200624  //CO20200624 - adding FileExist() check
       }
+      if(perform_POCC) {  //CO20230530
+        //get DOSCAR.pocc + png's
+        vector<string> vfiles;
+        aurostd::DirectoryLS(directory_RAW,vfiles);
+        for(uint i=0;i<vfiles.size();i++){
+          if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+            if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfiles[i]) << endl; cout.flush(); }  //CO20200624
+            aurostd::LinkFile(directory_RAW+"/"+vfiles[i],directory_WEB);  //link the file, no need to de-compress
+          }
+          if(vfiles[i].find("_dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+            if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfiles[i]) << endl; cout.flush(); }  //CO20200624
+            aurostd::LinkFile(directory_RAW+"/"+vfiles[i],directory_WEB);  //link the file, no need to de-compress
+          }
+          if(vfiles[i].find("_dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+            if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfiles[i]) << endl; cout.flush(); }  //CO20200624
+            aurostd::LinkFile(directory_RAW+"/"+vfiles[i],directory_WEB);  //link the file, no need to de-compress
+          }
+          if(vfiles[i].find("_dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+            if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfiles[i]) << endl; cout.flush(); }  //CO20200624
+            aurostd::LinkFile(directory_RAW+"/"+vfiles[i],directory_WEB);  //link the file, no need to de-compress
+          }
+          if (vfiles[i].find("_phdos_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+            if(LDEBUG) { cout << __AFLOW_FUNC__ << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfiles[i]) << endl; cout.flush(); }  //CO20200624
+            aurostd::LinkFile(directory_RAW+"/"+vfiles[i],directory_WEB);  //link the file, no need to de-compress
+          }
+        }
+      }
     } // flag_WEB
 
     // DONE
