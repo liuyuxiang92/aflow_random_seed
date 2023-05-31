@@ -1083,7 +1083,7 @@ namespace pocc {
         pflow::GetRDF(xstr,rdf_all,m_rdf_rmax,m_rdf_nbins,raw_counts,sigma,window_gaussian);
         m_rdf_all+=(*it).m_probability * rdf_all;
       }
-      PrintRDF(xstr,m_rdf_rmax,m_rdf_nbins,rdf_all,*p_oss);
+      if(0){PrintRDF(xstr,m_rdf_rmax,m_rdf_nbins,rdf_all,*p_oss);}
     }
     if(perform_rdf==false){m_rdf_all.clear();return;}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_rdf_all=" << endl << m_rdf_all << endl;}
