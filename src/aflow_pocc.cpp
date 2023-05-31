@@ -1526,7 +1526,11 @@ namespace pocc {
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_species_T"+(*this).getTemperatureString(temperature)+"K");
       xstructure xstr=plotter::getStructureWithNames(plot_opts,*p_FileMESSAGE,xdos.carstring,*p_oss);
-      if(xdos.vDOS.size()==xstr.atoms.size()){plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);}
+      if(LDEBUG){
+        cerr << __AFLOW_FUNC__ << " xdos.vDOS.size()=" << xdos.vDOS.size() << endl;
+        cerr << __AFLOW_FUNC__ << " xstr.atoms.size()=" << xstr.atoms.size() << endl;
+      }
+      if(xdos.vDOS.size()-1==xstr.atoms.size()){plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);} //CO20230530 - vDOS is total+num_atoms
       else{
         message << "Skipping species-projected plots, there are varying num_each_type among POCC.ARUN's" << endl;
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
