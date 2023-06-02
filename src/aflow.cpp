@@ -402,6 +402,11 @@ int main(int _argc,char **_argv) {
       aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
       return 0; //CO20180419
     }
+     if(!Arun && (aurostd::args2flag(argv,cmds,"--kicad") || aurostd::args2attachedflag(argv,"--kicad="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::KICAD(aurostd::args2attachedutype<int>(argv,"--kicad=",0),TRUE);
+      return 0; //SC20230516
+    }
     if(!Arun && (aurostd::args2flag(argv,cmds,"--multiplexer") || aurostd::args2attachedflag(argv,"--multiplexer="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::MULTIPLEXER(aurostd::args2attachedutype<int>(argv,"--multiplexer=",0),TRUE);
@@ -1000,7 +1005,17 @@ namespace aflow {
 //#include "../AFLOW3_AURO/aflow_auro.cpp"
 
 // ***************************************************************************
+
+#include "../AFLOW3_AURO/aflow_auro.cpp"
+
+
 #ifndef _AFLOW_AURO_CPP_
+namespace aflowlib {
+  uint KICAD(int mode,bool VERBOSE) {
+    if(VERBOSE) cerr << XPID << "aflowlib::KICAD mode=" << mode << endl;
+    return 0;
+  }
+}
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE) {
     if(VERBOSE) cerr << XPID << "aflowlib::MOSFET mode=" << mode << endl;
@@ -1020,7 +1035,6 @@ namespace aflowlib {
   }
 }
 #endif
-
 
 // ***************************************************************************
 // *                                                                         *

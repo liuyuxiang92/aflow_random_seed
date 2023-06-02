@@ -882,6 +882,7 @@ namespace aflowlib {
 
 // will be moved near LI2RAW
 namespace aflowlib {
+  uint KICAD(int mode,bool VERBOSE);
   uint MOSFET(int mode,bool VERBOSE);
   uint MULTIPLEXER(int mode,bool VERBOSE);
   uint MAIL2SCAN(string library,bool VERBOSE);
