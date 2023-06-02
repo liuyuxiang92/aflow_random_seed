@@ -1005,10 +1005,6 @@ namespace aflow {
 //#include "../AFLOW3_AURO/aflow_auro.cpp"
 
 // ***************************************************************************
-
-#include "../AFLOW3_AURO/aflow_auro.cpp"
-
-
 #ifndef _AFLOW_AURO_CPP_
 namespace aflowlib {
   uint KICAD(int mode,bool VERBOSE) {
