@@ -4219,6 +4219,41 @@ namespace pocc {
     return unique_structure_bins.size();
   }
 
+  /// @brief thread function which calculates the UFF energy for a vector of POccSuperCell
+  /// @param thread_id dummy variable
+  /// @param vpsc vector of POccSuperCell
+  /// @param v_energy_analyzer vector of POccUFFEnergyAnalyzer
+  /// @param vv_types_config vector of v_types_config
+  /// @param npsc_queue number of POccSuperCell left to calculate
+  /// @param m_save save mutex
+  /// @param m_job job mutex
+  /// @note two mutexes are needed, m_job locks when determining the index of the POccSuperCell, m_save locks when writing to the vector of POccSuperCell
+  ///
+  /// @authors
+  /// @mod{SD+HE,20230604,created}
+  void POccCalculator::calculatePOccSuperCellUFF(int thread_id, vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job){
+    (void)thread_id;
+    size_t ipsc = 0;
+    std::map<uint, POccUFFEnergyAnalyzer> local_ea;
+    const size_t step_size = std::max((size_t)1, vpsc.size() / 100);
+    while(true){
+      {
+        std::lock_guard<std::mutex> lg_job(m_job);
+        if (npsc_queue <= 0){break;}
+        npsc_queue--;
+        ipsc = npsc_queue;
+        if(npsc_queue % step_size == 0){pflow::updateProgressBar(vpsc.size() - npsc_queue, vpsc.size(), *p_oss);} // use a step size to avoid updating the progress bar too often
+      }
+      if(local_ea.count(vpsc[ipsc].m_hnf_index) == 0){
+        local_ea[vpsc[ipsc].m_hnf_index] = v_energy_analyzer[vpsc[ipsc].m_hnf_index];
+      }
+      local_ea[vpsc[ipsc].m_hnf_index].setBonds(vv_types_config[ipsc]);
+      double uff_energy = aurostd::round(local_ea[vpsc[ipsc].m_hnf_index].getUFFEnergy(), 12);
+      std::lock_guard<std::mutex> lg_save(m_save);
+      vpsc[ipsc].m_energy_uff = uff_energy;
+    }
+  }
+
   void POccCalculator::calculate(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     stringstream message;
@@ -4299,37 +4334,56 @@ namespace pocc {
 
     ////energy_radius=12;
 
-    energy_analyzer.initialize(xstr_pocc,xstr_nopocc,m_species_redecoration,m_p_flags,m_aflags,*p_FileMESSAGE,*p_oss); //p_str,energy_radius);
+    //energy_analyzer.initialize(xstr_pocc,xstr_nopocc,m_species_redecoration,m_p_flags,m_aflags,*p_FileMESSAGE,*p_oss); //p_str,energy_radius);
     //energy_analyzer.m_species_redecoration=m_species_redecoration;  //clean me up, fix how we integrate these two objects
     //energy_analyzer.types2uffparams_map=getTypes2UFFParamsMap(m_species_redecoration); //clean me up, fix how we integrate these two objects
 
     unsigned long long int hnf_index=0;
     unsigned long long int site_config_index;
-    unsigned long long int current_iteration=0;
 
     //get algorithm settings
     string struct_gen_algo=DEFAULT_POCC_STRUCTURE_GENERATION_ALGO;
 
     if(struct_gen_algo=="UFF"){
       POccSuperCell psc;
+      vector<POccSuperCell> vpsc;
+      vector<POccUFFEnergyAnalyzer> v_energy_analyzer;
+      vector<vector<vector<int>>> vv_types_config;
+      energy_analyzer.initialize(xstr_pocc,xstr_nopocc,m_species_redecoration,m_p_flags,m_aflags,*p_FileMESSAGE,*p_oss); //p_str,energy_radius);
       resetHNFMatrices();
-      pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
       while(iterateHNFMatrix()){
-        energy_analyzer.getCluster(hnf_mat);
-        psc.m_hnf_index=hnf_index;
+        psc.m_hnf_index = hnf_index;
+        psc.m_degeneracy = 1;
         resetSiteConfigurations();
-        site_config_index=0;
+        site_config_index = 0;
+        POccUFFEnergyAnalyzer ea(energy_analyzer);
+        ea.getCluster(hnf_mat);
+        v_energy_analyzer.push_back(ea);
         while(getNextSiteConfiguration()){
           psc.m_site_config_index=site_config_index;
-          energy_analyzer.setBonds(v_types_config);
-          psc.m_energy_uff=energy_analyzer.getUFFEnergy();
-          psc.m_degeneracy=1; //degeneracy of 1
-          add2DerivativeStructuresList(psc);
+          vpsc.push_back(psc);
+          vv_types_config.push_back(v_types_config);
           site_config_index++;
-          pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
         }
         hnf_index++;
       }
+
+      std::mutex m_save, m_job;
+      xthread::xThread xt(KBIN::get_NCPUS(m_kflags),1);
+      size_t npsc_queue = vpsc.size();
+      std::function<void(int,
+          vector<POccSuperCell>&,
+          const vector<POccUFFEnergyAnalyzer>&,
+          const vector<vector<vector<int>>>&,
+          size_t&,
+          std::mutex&,
+          std::mutex&)> fn=std::bind(&POccCalculator::calculatePOccSuperCellUFF,this,
+        std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5,std::placeholders::_6,std::placeholders::_7);
+      pflow::updateProgressBar(0, vpsc.size(), *p_oss);
+      // the first number sets the number of threads that are created overall (in this case one thread per CPU)
+      xt.run(KBIN::get_NCPUS(m_kflags), fn, vpsc, v_energy_analyzer, vv_types_config, npsc_queue, m_save, m_job);
+      for(size_t i = 0; i < vpsc.size(); i++){add2DerivativeStructuresList(vpsc[i]);}
+
     }else{  //group theory approach
 
       uint i=0,j=0,k=0,site=0,occ=0,permut=0;
@@ -7465,7 +7519,7 @@ namespace pocc {
   //we will generate a list of vacancies
   //then we compare with previously determined vacancies
   //if they match, do not recalculate
-  void POccUFFEnergyAnalyzer::setBonds(vector<vector<int> >& v_types_config){
+  void POccUFFEnergyAnalyzer::setBonds(const vector<vector<int> >& v_types_config){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
 
     //cout << "m_types_config OLD ";

@@ -157,6 +157,7 @@
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
 #include "aflow.h"
+#include "aflow_pocc.h"
 
 // Global mutex that prevents two xThread instances from checking the number
 // of available CPUs at the same time.
@@ -735,6 +736,24 @@ namespace xthread {
     aurostd::xoption&,
     vector<apl::DOSCalculator>&,
     vector<xDOSCAR>&,
+    std::mutex&
+  );
+
+  //POccCalculator::calculatePOccSuperCellUFF
+  template void xThread::run<
+    std::function<void(int, vector<pocc::POccSuperCell>&, const vector<pocc::POccUFFEnergyAnalyzer>&, const vector<vector<vector<int>>>&, size_t&, std::mutex&, std::mutex&)>,
+    vector<pocc::POccSuperCell>,
+    vector<pocc::POccUFFEnergyAnalyzer>,
+    vector<vector<vector<int>>>,
+    size_t,
+    std::mutex,
+    std::mutex
+  >(int, std::function<void(int, vector<pocc::POccSuperCell>&, const vector<pocc::POccUFFEnergyAnalyzer>&, const vector<vector<vector<int>>>&, size_t&, std::mutex&, std::mutex&)>&,
+    vector<pocc::POccSuperCell>&,
+    vector<pocc::POccUFFEnergyAnalyzer>&,
+    vector<vector<vector<int>>>&,
+    size_t&,
+    std::mutex&,
     std::mutex&
   );
 
