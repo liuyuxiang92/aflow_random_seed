@@ -566,6 +566,7 @@ namespace pocc {
 
       //post-processing
       bool m_convolution;
+      bool m_count_unique_fast;
       vector<string> m_ARUN_directories;
       double m_Hmix;
       double m_efa;
@@ -698,6 +699,7 @@ namespace pocc {
       void calculateHNF();
       void getTotalPermutationsCount();
       void calculatePOccSuperCellUFF(int thread_id, vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job); //SD20230604
+      void countUniquePOccSuperCellUFF(int thread_id, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>& map_unique, const vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job); //SD20230609
       void calculate();
       string getARUNString(unsigned long long int i);
       xstructure getUniqueSuperCell(unsigned long long int i);

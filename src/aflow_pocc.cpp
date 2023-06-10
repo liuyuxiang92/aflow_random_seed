@@ -2467,6 +2467,7 @@ namespace pocc {
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();
     m_convolution=false;
+    m_count_unique_fast=false;
     m_ARUN_directories.clear();
     m_Hmix=AUROSTD_MAX_DOUBLE;
     m_efa=AUROSTD_MAX_DOUBLE;
@@ -2515,6 +2516,8 @@ namespace pocc {
     total_permutations_count=b.total_permutations_count;
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
+    m_convolution=b.m_convolution;
+    m_count_unique_fast=b.m_count_unique_fast;
     m_Hmix=b.m_Hmix;
     m_efa=b.m_efa;
     m_temperature_precision=b.m_temperature_precision;
@@ -3942,9 +3945,7 @@ namespace pocc {
   //}
 
   bool POccCalculator::areEquivalentStructuresByUFF(std::list<POccSuperCellSet>::iterator it, const POccSuperCell& psc) const {
-    bool energy_equal=aurostd::isequal((*it).getUFFEnergy(),psc.m_energy_uff,m_energy_uff_tolerance);
-    bool hnf_equal=((*it).getHNFIndex()==psc.m_hnf_index);
-    return energy_equal && hnf_equal;
+    return ((*it).getHNFIndex()==psc.m_hnf_index) && aurostd::isequal((*it).getUFFEnergy(),psc.m_energy_uff,m_energy_uff_tolerance);
   }
 
   //NEW
@@ -4254,6 +4255,36 @@ namespace pocc {
     }
   }
 
+  void POccCalculator::countUniquePOccSuperCellUFF(int thread_id, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>& map_unique, const vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job){
+    (void)thread_id;
+    const double uff_tol = DEFAULT_UFF_ENERGY_TOLERANCE;
+    size_t ipsc = 0;
+    std::map<uint, POccUFFEnergyAnalyzer> local_ea;
+    std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>> local_mu;
+    const size_t step_size = std::max((size_t)1, vpsc.size() / 100);
+    while(true){
+      { 
+        std::lock_guard<std::mutex> lg_job(m_job);
+        if (npsc_queue <= 0){break;}
+        npsc_queue--;
+        ipsc = npsc_queue;
+        if (npsc_queue % step_size == 0){pflow::updateProgressBar(vpsc.size() - npsc_queue, vpsc.size(), *p_oss);} // use a step size to avoid updating the progress bar too often
+      }
+      if (local_ea.count(vpsc[ipsc].m_hnf_index) == 0){
+        local_ea[vpsc[ipsc].m_hnf_index] = v_energy_analyzer[vpsc[ipsc].m_hnf_index];
+      }
+      local_ea[vpsc[ipsc].m_hnf_index].setBonds(vv_types_config[ipsc]);
+      unsigned long int uff_energy = std::ceil(local_ea[vpsc[ipsc].m_hnf_index].getUFFEnergy() / uff_tol);
+      local_mu[vpsc[ipsc].m_hnf_index][uff_energy]++;
+    }
+    std::lock_guard<std::mutex> lg_save(m_save);
+    for(std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>::iterator it_out = local_mu.begin(); it_out != local_mu.end(); it_out++){
+      for(std::unordered_map<unsigned long int, unsigned long int>::iterator it = it_out->second.begin(); it != it_out->second.end(); it++){
+        map_unique[it_out->first][it->first] += it->second;
+      }
+    }
+  }
+
   void POccCalculator::calculate(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     stringstream message;
@@ -4367,22 +4398,51 @@ namespace pocc {
         }
         hnf_index++;
       }
-
       std::mutex m_save, m_job;
       xthread::xThread xt(KBIN::get_NCPUS(m_kflags),1);
       size_t npsc_queue = vpsc.size();
-      std::function<void(int,
-          vector<POccSuperCell>&,
-          const vector<POccUFFEnergyAnalyzer>&,
-          const vector<vector<vector<int>>>&,
-          size_t&,
-          std::mutex&,
-          std::mutex&)> fn=std::bind(&POccCalculator::calculatePOccSuperCellUFF,this,
-        std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5,std::placeholders::_6,std::placeholders::_7);
-      pflow::updateProgressBar(0, vpsc.size(), *p_oss);
-      // the first number sets the number of threads that are created overall (in this case one thread per CPU)
-      xt.run(KBIN::get_NCPUS(m_kflags), fn, vpsc, v_energy_analyzer, vv_types_config, npsc_queue, m_save, m_job);
-      for(size_t i = 0; i < vpsc.size(); i++){add2DerivativeStructuresList(vpsc[i]);}
+      if(m_count_unique_fast){
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Count POCC unique FAST", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        const double uff_tol = DEFAULT_UFF_ENERGY_TOLERANCE;
+        std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>> map_unique;
+        std::function<void(int,
+            std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>&,
+            const vector<POccSuperCell>&,
+            const vector<POccUFFEnergyAnalyzer>&,
+            const vector<vector<vector<int>>>&,
+            size_t&,
+            std::mutex&,
+            std::mutex&)> fn=std::bind(&POccCalculator::countUniquePOccSuperCellUFF,this,
+          std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5,std::placeholders::_6,std::placeholders::_7,std::placeholders::_8);
+        pflow::updateProgressBar(0, vpsc.size(), *p_oss);
+        xt.run(KBIN::get_NCPUS(m_kflags), fn, map_unique, vpsc, v_energy_analyzer, vv_types_config, npsc_queue, m_save, m_job);
+        unsigned long long int count_tot = 0, count_bin = 0;
+        for(std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>::iterator it_out = map_unique.begin(); it_out != map_unique.end(); it_out++){
+          cout << "\tHFN index " << it_out->first << endl;
+          for(std::unordered_map<unsigned long int, unsigned long int>::iterator it = it_out->second.begin(); it != it_out->second.end(); it++){
+            count_bin++;
+            cout << "\t\tStructure bin " << count_bin << ": energy=" << (it->first) * uff_tol << ", " << "degeneracy=" << it->second << endl;
+            count_tot += it->second;
+          }
+        }
+        cout << "Total structures: " << count_tot << endl;
+        cout << "Total unique structures: " << count_bin << endl;
+        return;
+      }
+      else{
+        std::function<void(int,
+            vector<POccSuperCell>&,
+            const vector<POccUFFEnergyAnalyzer>&,
+            const vector<vector<vector<int>>>&,
+            size_t&,
+            std::mutex&,
+            std::mutex&)> fn=std::bind(&POccCalculator::calculatePOccSuperCellUFF,this,
+          std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5,std::placeholders::_6,std::placeholders::_7);
+        // the first number sets the number of threads that are created overall (in this case one thread per CPU)
+        pflow::updateProgressBar(0, vpsc.size(), *p_oss);
+        xt.run(KBIN::get_NCPUS(m_kflags), fn, vpsc, v_energy_analyzer, vv_types_config, npsc_queue, m_save, m_job);
+        for(size_t i = 0; i < vpsc.size(); i++){add2DerivativeStructuresList(vpsc[i]);}
+      }
 
     }else{  //group theory approach
 
