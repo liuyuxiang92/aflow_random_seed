@@ -724,8 +724,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("HNFCELL",aurostd::args2flag(argv,cmds,"--hnfcell|--hfncell|--pocc_show_unique_structures|--pocc_show_unique|--pocc_print_unique")); //CO20181226
   vpflow.flag("POCC_COUNT_TOTAL",aurostd::args2flag(argv,cmds,"--pocc_count_total_structures|--pocc_count_total")); //CO20181226
   vpflow.flag("POCC_COUNT_UNIQUE",aurostd::args2flag(argv,cmds,"--pocc_count_unique_structures|--pocc_count_unique")); //CO20181226
+  vpflow.flag("POCC_COUNT_UNIQUE_FAST",aurostd::args2flag(argv,cmds,"--pocc_count_unique_fast")); //SD20230609
   vpflow.flag("POCC_SKIP_WRITING_FILES",aurostd::args2flag(argv,cmds,"--pocc_skip_writing_files")); //CO20181226
-  if(vpflow.flag("HNF") || vpflow.flag("POCC_COUNT_TOTAL") || vpflow.flag("POCC_COUNT_UNIQUE")){vpflow.flag("HNFCELL",TRUE);} //funnel all of these through command_line function
+  if(vpflow.flag("HNF") || vpflow.flag("POCC_COUNT_TOTAL") || vpflow.flag("POCC_COUNT_UNIQUE") || vpflow.flag("POCC_COUNT_UNIQUE_FAST")){vpflow.flag("HNFCELL",TRUE);} //funnel all of these through command_line function
   if(vpflow.flag("HNFCELL")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401  //no point writing files if through command_line
   if(XHOST.vflag_control.flag("WWW")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401 //CO20200404 - new web flag
   vpflow.flag("MULTIENUMALL",aurostd::args2flag(argv,cmds,"--multienum|--enum"));
@@ -7853,13 +7854,14 @@ namespace pflow {
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
     pocc::POccCalculator pcalc(xstr,vpflow,oss); //CO20190319
+    pcalc.m_count_unique_fast=vpflow.flag("POCC_COUNT_UNIQUE_FAST");
     if(!pcalc.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"POccCalculator failed to initialized");}
     pcalc.calculateHNF();
     if(vpflow.flag("HNF")){return pcalc.m_initialized;}
     pcalc.getTotalPermutationsCount();
     if(vpflow.flag("POCC_COUNT_TOTAL")){return pcalc.m_initialized;}
     pcalc.calculate();
-    if(vpflow.flag("POCC_COUNT_UNIQUE")){return pcalc.m_initialized;}
+    if(vpflow.flag("POCC_COUNT_UNIQUE") || vpflow.flag("POCC_COUNT_UNIQUE_FAST")){return pcalc.m_initialized;}
     oss << AFLOWIN_SEPARATION_LINE << endl;
     oss << "Creating list of unique derivative supercells." << endl;  //CO20190116
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {

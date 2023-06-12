@@ -757,6 +757,27 @@ namespace xthread {
     std::mutex&
   );
 
+  //POccCalculator::countUniquePOccSuperCellUFF
+  template void xThread::run<
+    std::function<void(int, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>&, const vector<pocc::POccSuperCell>&, const vector<pocc::POccUFFEnergyAnalyzer>&, const vector<vector<vector<int>>>&, size_t&, std::mutex&, std::mutex&)>,
+    std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>,
+    vector<pocc::POccSuperCell>,
+    vector<pocc::POccUFFEnergyAnalyzer>,
+    vector<vector<vector<int>>>,
+    size_t,
+    std::mutex,
+    std::mutex
+  >(int, std::function<void(int, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>&, const vector<pocc::POccSuperCell>&, const vector<pocc::POccUFFEnergyAnalyzer>&, const vector<vector<vector<int>>>&, size_t&, std::mutex&, std::mutex&)>&,
+    std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>&,
+    vector<pocc::POccSuperCell>&,
+    vector<pocc::POccUFFEnergyAnalyzer>&,
+    vector<vector<vector<int>>>&,
+    size_t&,
+    std::mutex&,
+    std::mutex&
+  );
+
+
   //apl::TCONDCalculator::calculateAnharmonicRates
   template void xThread::run<std::function<void(int, const vector<vector<double> >&, vector<vector<double> >&)>,
     const vector<vector<double> >,
