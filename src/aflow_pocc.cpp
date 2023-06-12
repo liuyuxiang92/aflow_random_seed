@@ -4255,6 +4255,19 @@ namespace pocc {
     }
   }
 
+  /// @brief thread function which counts the number of unique POCC tiles using the UFF energy and an unordered map
+  /// @param thread_id dummy variable
+  /// @param map_unique unordered map of the UFF energies
+  /// @param vpsc vector of POccSuperCell
+  /// @param v_energy_analyzer vector of POccUFFEnergyAnalyzer
+  /// @param vv_types_config vector of v_types_config
+  /// @param npsc_queue number of POccSuperCell left to calculate
+  /// @param m_save save mutex
+  /// @param m_job job mutex
+  /// @note two mutexes are needed, m_job locks when determining the index of the POccSuperCell, m_save locks when writing to the vector of POccSuperCell
+  ///
+  /// @authors
+  /// @mod{SD+HE,20230609,created}
   void POccCalculator::countUniquePOccSuperCellUFF(int thread_id, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>& map_unique, const vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job){
     (void)thread_id;
     const double uff_tol = DEFAULT_UFF_ENERGY_TOLERANCE;
