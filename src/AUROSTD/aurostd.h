@@ -63,6 +63,7 @@
 #include <fts.h>         //HE20220222 - for EntryLoader (effective filesystem tree walk)
 #include <regex>         //HE20220222 - for EntryLoader (faster match of complex patterns like alloy matching)
 #include <limits.h>      //HE20230324 - for embedded files
+#include <random>        //HE20230620 - for replacement of random_shuffle with shuffle
 
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h

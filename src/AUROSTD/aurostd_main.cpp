@@ -649,7 +649,10 @@ namespace aurostd {
   // Function random_shuffle of a vector/deque
   // ***************************************************************************
   template<class utype> void random_shuffle(vector<utype>& vec) {
-    std::random_shuffle(vec.begin(),vec.end());
+    // switch std::random_shuffle to not deprecated std::shuffle //HE20230620
+    // https://en.cppreference.com/w/cpp/algorithm/random_shuffle
+    std::random_device rd;
+    std::shuffle(vec.begin(),vec.end(), rd);
   }
   // overload to force compiling
   void _aurostd_initialize_random_shuffle(vector<bool>& vec) {random_shuffle(vec);}
@@ -663,7 +666,10 @@ namespace aurostd {
   void _aurostd_initialize_random_shuffle(vector<long double>& vec) {random_shuffle(vec);}
 
   template<class utype> void random_shuffle(deque<utype>& vec) {
-    std::random_shuffle(vec.begin(),vec.end());
+    // switch std::random_shuffle to not deprecated std::shuffle //HE20230620
+    // https://en.cppreference.com/w/cpp/algorithm/random_shuffle
+    std::random_device rd;
+    std::shuffle(vec.begin(),vec.end(), rd);
   }
   // overload to force compiling
   void _aurostd_initialize_random_shuffle(deque<bool>& vec) {random_shuffle(vec);}
