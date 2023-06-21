@@ -21,7 +21,7 @@
 #define AUTHOR_RECENT_ARTICLES  300
 #define AUTHOR_RECENT_YEARS     30
 
-#define MAX_YEAR_PRESENTATIONS  2022
+#define MAX_YEAR_PRESENTATIONS  2023
 
 // ******************************************************************************************************************************************************
 // _OUTREACH CLASS
