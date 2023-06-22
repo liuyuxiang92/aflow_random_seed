@@ -7121,12 +7121,13 @@ namespace aurostd {
 
   template<class utype1,class utype2> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr) {
-      xvector<utype1> xarr = aurostd::vector2xvector(arr);
-      xvector<utype2> xbrr = aurostd::vector2xvector(brr);
-      aurostd::sort2(xarr.rows,xarr,xbrr);
-      arr = aurostd::xvector2vector(xarr);
-      brr = aurostd::xvector2vector(xbrr);
-    }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    aurostd::sort2(xarr.rows, xarr, xbrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+  }
+
 
   template<class utype1,class utype2> // function quicksort //CO20200915
     void sort(deque<utype1>& arr, deque<utype2>& brr) {

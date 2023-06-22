@@ -3,58 +3,25 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *                                                                         *
 // ***************************************************************************
-// This file contains the preprocessor macros to ensure a proper instantiation
-// of all aurostd functions.
-// Written by hagen.eckert@duke.edu
-
-/// EXAMPLE
-/// For a classe with the definition
-/// template<class utype> class xvector {}
-/// add after the implementation (in the same namespace)
-
-/// #define AST_TEMPLATE(utype) template class xvector<utype>;
-///  AST_GEN_1(AST_UTYPE_XVECTOR_NUM)
-/// #undef AST_TEMPLATE
-
-/// This will create the following instructions in the preprocessor (without newlines):
-///  template class xvector<int>;
-///  template class xvector<unsigned int>;
-///  template class xvector<long int>;
-///  template class xvector<long unsigned int>;
-///  template class xvector<long long int>;
-///  template class xvector<long long unsigned int>;
-///  template class xvector<float>;
-///  template class xvector<double>;
-///  template class xvector<long double>;
-
-/// if the function takes two independent types use AST_GEN_2
-/// #define AST_TEMPLATE(atype, btype) AST_GEN_2_test atype, btype;
-///   AST_GEN_2(AST_UTYPE_BASE_NUM)
-/// #undef AST_TEMPLATE
-
-/// for three independent types use AST_GEN_3
-/// #define AST_TEMPLATE(atype, btype, ctype) AST_GEN_3_test atype, btype, ctype;
-///   AST_GEN_3(AST_UTYPE_BASE_NUM)
-/// #undef AST_TEMPLATE
-
-/// Note: The maximal amount of generated lines should not be bigger than 1024
-/// (10 types for AST_GEN_3), while larger system work they are very slow
-
+/// @file
+/// @brief This file contains the preprocessor macros to ensure a proper instantiation of all aurostd functions.
+/// @authors
+/// @mod{HE,20230622,auto template system}
+/// @note the macro iterator logic is based on a blog post by Jonathan Heathcote
+/// @see
+/// @xlink{Blog about macro iterator,http://jhnet.co.uk/articles/cpp_magic#turning-recursion-into-an-iterator}
+/// source code examples next to the macros #AST_GEN_1 #AST_GEN_2 #AST_GEN_3
 
 #ifndef _AUROSTD_AUTOMATIC_TEMPLATE_H
 #define _AUROSTD_AUTOMATIC_TEMPLATE_H
 
-/// utype lists
+// utype lists
 #define AST_UTYPE_BASE_NUM int, uint, float, double
 #define AST_UTYPE_XVECTOR_NUM int, unsigned int, long int, long unsigned int, long long int, long long unsigned int, float, double, long double
 #define AST_UTYPE_FLOAT float, double, long double
 #define AST_UTYPE_INT int, long int, long long int
 #define AST_UTYPE_AINT int, unsigned int, long int, unsigned long int, long long int, unsigned long long int
 #define AST_UTYPE_UINT unsigned int, unsigned long int, unsigned long long int
-
-
-// This macro iterator logic is based on a blog post by Jonathan Heathcote
-// http://jhnet.co.uk/articles/cpp_magic#turning-recursion-into-an-iterator
 
 // Nested evaluations
 #define AST_FIRST(a, ...) a
@@ -107,103 +74,174 @@
 
 // logic for iterations up to 3 types
 // single utype
-#define AST_MAP(m, first, ...)           \
-  m(first)                           \
-  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP(m, first, ...)             \
+  m(first)                                 \
+  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(  \
+    AST_DEFER2(_AST_MAP)()(m, __VA_ARGS__) \
+  )(                                       \
+    /* Do nothing, just terminate */       \
   )
 #define _AST_MAP() AST_MAP
 
 // dual utype
-#define AST_MAP2_1(m, first, ...)           \
-  m(first, first)                           \
-  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP2_1)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP2_1(m, first, ...)             \
+  m(first, first)                             \
+  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(     \
+    AST_DEFER2(_AST_MAP2_1)()(m, __VA_ARGS__) \
+  )(                                          \
+    /* Do nothing, just terminate */          \
   )
 #define _AST_MAP2_1() AST_MAP2_1
 
-#define AST_MAP2_2(m, first,...)           \
-  AST_DEFER3(AST_MAP2_2_SUB(m, first, __VA_ARGS__))                    \
-  AST_IF_ELSE(AST_HAS_ARGS_2(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP2_2)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP2_2(m, first,...)                    \
+  AST_DEFER3(AST_MAP2_2_SUB(m, first, __VA_ARGS__)) \
+  AST_IF_ELSE(AST_HAS_ARGS_2(__VA_ARGS__))(         \
+    AST_DEFER2(_AST_MAP2_2)()(m, __VA_ARGS__)       \
+  )(                                                \
+    /* Do nothing, just terminate */                \
   )
 #define _AST_MAP2_2() AST_MAP2_2
 
 #define AST_MAP2_2_SUB(m, first, second, ...)           \
-  m(first, second)                                  \
-  m(second, first)      \
-  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP2_2_SUB)()(m,first, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+  m(first, second)                                      \
+  m(second, first)                                      \
+  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(               \
+    AST_DEFER2(_AST_MAP2_2_SUB)()(m,first, __VA_ARGS__) \
+  )(                                                    \
+    /* Do nothing, just terminate */                    \
   )
 #define _AST_MAP2_2_SUB() AST_MAP2_2_SUB
 
 // Three types
-
-#define AST_MAP3_1(m, first, ...)           \
-  m(first, first, first)                           \
-  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP3_1)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP3_1(m, first, ...)             \
+  m(first, first, first)                      \
+  AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(     \
+    AST_DEFER2(_AST_MAP3_1)()(m, __VA_ARGS__) \
+  )(                                          \
+    /* Do nothing, just terminate */          \
   )
 #define _AST_MAP3_1() AST_MAP3_1
 
-#define AST_MAP3_2(m, first, ...)           \
-  AST_DEFER4(AST_MAP3_2_SUB(m, first, __VA_ARGS__))                    \
-  AST_IF_ELSE(AST_HAS_ARGS_3(__VA_ARGS__))(    \
-    AST_DEFER3(_AST_MAP3_2)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP3_2(m, first, ...)                   \
+  AST_DEFER4(AST_MAP3_2_SUB(m, first, __VA_ARGS__)) \
+  AST_IF_ELSE(AST_HAS_ARGS_3(__VA_ARGS__))(         \
+    AST_DEFER3(_AST_MAP3_2)()(m, __VA_ARGS__)       \
+  )(                                                \
+    /* Do nothing, just terminate */                \
   )
 #define _AST_MAP3_2() AST_MAP3_2
 
 
-#define AST_MAP3_2_SUB(m, first, second, ...)           \
-  L2 (first,second)                                                      \
-  m(first, second, second)                           \
-  m(second, first, second)                           \
-  m(first, second, second) \
-  m(second, first, first)                            \
-  m(first, second, first)                              \
-   AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(              \
-    AST_DEFER3(AST_MAP3_3_SUB(m, first, second,__VA_ARGS__))                                                        \
-    AST_DEFER2(_AST_MAP3_2_SUB)()(m,first, __VA_ARGS__) \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP3_2_SUB(m, first, second, ...)                \
+  m(first, second, second)                                   \
+  m(second, first, second)                                   \
+  m(first, second, second)                                   \
+  m(second, first, first)                                    \
+  m(first, second, first)                                    \
+   AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(                   \
+    AST_DEFER3(AST_MAP3_3_SUB(m, first, second,__VA_ARGS__)) \
+    AST_DEFER2(_AST_MAP3_2_SUB)()(m,first, __VA_ARGS__)      \
+  )(                                                         \
+    /* Do nothing, just terminate */                         \
   )
 #define _AST_MAP3_2_SUB() AST_MAP3_2_SUB
 
 
-#define AST_MAP3_3_SUB(m, first, second, third, ...)           \
-    L3 (first,second,third)                                          \
-    m(first, second, third)                           \
-    m(first, third, second)                                     \
-    m(second, first, third)                                     \
-    m(second, third, first)                                     \
-    m(third, first, second)                                     \
-    m(third, second, first)                                     \
-    AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(    \
-    AST_DEFER2(_AST_MAP3_3_SUB)()(m, first, second, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
+#define AST_MAP3_3_SUB(m, first, second, third, ...)             \
+    m(first, second, third)                                      \
+    m(first, third, second)                                      \
+    m(second, first, third)                                      \
+    m(second, third, first)                                      \
+    m(third, first, second)                                      \
+    m(third, second, first)                                      \
+    AST_IF_ELSE(AST_HAS_ARGS(__VA_ARGS__))(                      \
+    AST_DEFER2(_AST_MAP3_3_SUB)()(m, first, second, __VA_ARGS__) \
+  )(                                                             \
+    /* Do nothing, just terminate */                             \
   )
 #define _AST_MAP3_3_SUB() AST_MAP3_3_SUB
 
 
-// macros for external use
+/// @brief autogenerate 1D code based on #AST_TEMPLATE
+/// @param type_selection use one of the `AST_UTYPE_*`
+/// @note always define the #AST_TEMPLATE before using this macro function
+/// @code{cpp}
+///  #define AST_TEMPLATE(utype) template class xvector<utype>;
+///    AST_GEN_1(AST_UTYPE_XVECTOR_NUM)
+///  #undef AST_TEMPLATE
+/// @endcode
+/// the preprocessor will generate (without newlines):
+/// @code{cpp}
+/// template class xvector<int>;
+/// template class xvector<unsigned int>;
+/// template class xvector<long int>;
+/// template class xvector<long unsigned int>;
+/// template class xvector<long long int>;
+/// template class xvector<long long unsigned int>;
+/// template class xvector<float>;
+/// template class xvector<double>;
+/// template class xvector<long double>;
+/// @endcode
 #define AST_GEN_1(type_selection) \
       AST_EVAL(AST_INVOKE(AST_MAP, AST_TEMPLATE, type_selection))
+
+/// @brief autogenerate 2D code based on #AST_TEMPLATE
+/// @param type_selection use one of the `AST_UTYPE_*`
+/// @note always define the #AST_TEMPLATE before using this macro function
+/// @code{cpp}
+///  #define AST_TEMPLATE(atype, btype) template xvector<atype> xvector2utype(const xvector<btype>& a);
+///    AST_GEN_2(AST_UTYPE_FLOAT)
+///  #undef AST_TEMPLATE
+/// @endcode
+/// the preprocessor will generate (without newlines):
+/// @code{cpp}
+/// template xvector<float> xvector2utype(const xvector<float>& a); 
+/// template xvector<double> xvector2utype(const xvector<double>& a);
+/// template xvector<long double> xvector2utype(const xvector<long double>& a);
+/// template xvector<float> xvector2utype(const xvector<double>& a);
+/// template xvector<double> xvector2utype(const xvector<float>& a);
+/// template xvector<float> xvector2utype(const xvector<long double>& a);
+/// template xvector<long double> xvector2utype(const xvector<float>& a);
+/// template xvector<double> xvector2utype(const xvector<long double>& a);
+/// template xvector<long double> xvector2utype(const xvector<double>& a);
+/// @endcode
 #define AST_GEN_2(type_selection) \
       AST_EVAL(AST_INVOKE(AST_MAP2_1, AST_TEMPLATE, type_selection)) \
       AST_EVAL(AST_INVOKE(AST_MAP2_2, AST_TEMPLATE, type_selection))
+
+/// @brief autogenerate 3D code based on #AST_TEMPLATE
+/// @param type_selection use one of the `AST_UTYPE_*`
+/// @note The maximal amount of generated lines should not be bigger than 1024
+/// (10 types for AST_GEN_3), while larger system work they are very slow
+///
+/// @note always define the #AST_TEMPLATE before using this macro function
+/// @code{cpp}
+///  #define AST_TEMPLATE(atype, btype, ctype) template void quicksort3(unsigned long n, xvector<atype>&, xvector<btype>&, xvector<ctype>&);
+///    AST_GEN_3(AST_UTYPE_FLOAT)
+///  #undef AST_TEMPLATE
+/// @endcode
+/// the preprocessor will generate (without newlines):
+/// @code
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<double>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<double>&, xvector<float>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<double>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<double>&, xvector<float>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<double>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<double>&, xvector<long double>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<long double>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<double>&, xvector<float>&, xvector<long double>&);
+/// template void quicksort3(unsigned long n, xvector<double>&, xvector<long double>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<long double>&, xvector<float>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<long double>&, xvector<double>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<long double>&, xvector<long double>&);
+/// template void quicksort3(unsigned long n, xvector<long double>&, xvector<float>&, xvector<long double>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<long double>&, xvector<long double>&);
+/// template void quicksort3(unsigned long n, xvector<long double>&, xvector<float>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<long double>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<float>&, xvector<float>&, xvector<float>&);
+/// template void quicksort3(unsigned long n, xvector<double>&, xvector<double>&, xvector<double>&);
+/// template void quicksort3(unsigned long n, xvector<long double>&, xvector<long double>&, xvector<long double>&);
+/// @endcode
 #define AST_GEN_3(type_selection) \
       AST_EVAL(AST_INVOKE(AST_MAP3_2, AST_TEMPLATE, type_selection)) \
       AST_EVAL(AST_INVOKE(AST_MAP3_1, AST_TEMPLATE, type_selection)) \
