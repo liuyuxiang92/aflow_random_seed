@@ -26,6 +26,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <pthread.h>
 #include <pwd.h>
