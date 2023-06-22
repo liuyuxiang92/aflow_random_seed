@@ -180,7 +180,7 @@ using std::vector;
 #define __xprototype
 #endif
 #endif
-
+#include "aurostd_automatic_template.h" //HE20230622
 #include "aurostd_xscalar.h"
 #include "aurostd_xcomplex.h"
 #include "aurostd_xvector.h"
