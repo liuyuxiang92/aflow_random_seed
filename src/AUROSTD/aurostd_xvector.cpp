@@ -3532,17 +3532,10 @@ namespace aurostd {
 } // namespace aurostd
 
 namespace aurostd { //force the compiler to instantiate the template at this point (avoids linker issues)
-  template class xvector<int>;
-  template class xvector<unsigned int>;
-  template class xvector<long int>;
-  template class xvector<long unsigned int>;
-  template class xvector<long long int>;
-  template class xvector<long long unsigned int>;
-  template class xvector<float>;
-  template class xvector<double>;
-  template class xvector<long double>;
+  #define AST_TEMPLATE(utype) template class xvector<utype>;
+  AST_GEN_1(AST_UTYPE_NUM)
+  #undef AST_TEMPLATE
 }
-
 
 namespace aurostd {
   //AS20210901 BEGIN

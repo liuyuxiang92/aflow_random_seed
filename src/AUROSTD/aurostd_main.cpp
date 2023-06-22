@@ -649,7 +649,10 @@ namespace aurostd {
   // Function random_shuffle of a vector/deque
   // ***************************************************************************
   template<class utype> void random_shuffle(vector<utype>& vec) {
-    std::random_shuffle(vec.begin(),vec.end());
+    // switch std::random_shuffle to not deprecated std::shuffle //HE20230620
+    // https://en.cppreference.com/w/cpp/algorithm/random_shuffle
+    std::random_device rd;
+    std::shuffle(vec.begin(),vec.end(), rd);
   }
   // overload to force compiling
   void _aurostd_initialize_random_shuffle(vector<bool>& vec) {random_shuffle(vec);}
@@ -663,7 +666,10 @@ namespace aurostd {
   void _aurostd_initialize_random_shuffle(vector<long double>& vec) {random_shuffle(vec);}
 
   template<class utype> void random_shuffle(deque<utype>& vec) {
-    std::random_shuffle(vec.begin(),vec.end());
+    // switch std::random_shuffle to not deprecated std::shuffle //HE20230620
+    // https://en.cppreference.com/w/cpp/algorithm/random_shuffle
+    std::random_device rd;
+    std::shuffle(vec.begin(),vec.end(), rd);
   }
   // overload to force compiling
   void _aurostd_initialize_random_shuffle(deque<bool>& vec) {random_shuffle(vec);}
@@ -684,12 +690,19 @@ namespace aurostd {
     for(uint i=0;i<vec1.size();i++) if(aurostd::abs(vec1[i]-vec2[i])>epsilon) return FALSE;
     return TRUE;
   }
+  #define AST_TEMPLATE(utype) template bool identical(vector<utype>, vector<utype>, utype);
+    AST_GEN_1(AST_UTYPE_NUM)
+  #undef AST_TEMPLATE
 
   template<class utype> bool identical(deque<utype> vec1,deque<utype> vec2,utype epsilon) {
     if(vec1.size()!=vec2.size()) return FALSE;
     for(uint i=0;i<vec1.size();i++) if(aurostd::abs(vec1[i]-vec2[i])>epsilon) return FALSE;
     return TRUE;
   }
+  #define AST_TEMPLATE(utype) template bool identical(deque<utype>, deque<utype>, utype);
+    AST_GEN_1(AST_UTYPE_NUM)
+  #undef AST_TEMPLATE
+
 
   bool identical(vector<int> vec1,vector<int> vec2,int epsilon) {
     if(vec1.size()!=vec2.size()) return FALSE;
@@ -7115,12 +7128,13 @@ namespace aurostd {
 
   template<class utype1,class utype2> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr) {
-      xvector<utype1> xarr = aurostd::vector2xvector(arr);
-      xvector<utype2> xbrr = aurostd::vector2xvector(brr);
-      aurostd::sort2(xarr.rows,xarr,xbrr);
-      arr = aurostd::xvector2vector(xarr);
-      brr = aurostd::xvector2vector(xbrr);
-    }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    aurostd::sort2(xarr.rows, xarr, xbrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+  }
+
 
   template<class utype1,class utype2> // function quicksort //CO20200915
     void sort(deque<utype1>& arr, deque<utype2>& brr) {
