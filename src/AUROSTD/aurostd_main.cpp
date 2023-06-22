@@ -690,12 +690,19 @@ namespace aurostd {
     for(uint i=0;i<vec1.size();i++) if(aurostd::abs(vec1[i]-vec2[i])>epsilon) return FALSE;
     return TRUE;
   }
+  #define AST_TEMPLATE(utype) template bool identical(vector<utype>, vector<utype>, utype);
+    AST_GEN_1(AST_UTYPE_NUM)
+  #undef AST_TEMPLATE
 
   template<class utype> bool identical(deque<utype> vec1,deque<utype> vec2,utype epsilon) {
     if(vec1.size()!=vec2.size()) return FALSE;
     for(uint i=0;i<vec1.size();i++) if(aurostd::abs(vec1[i]-vec2[i])>epsilon) return FALSE;
     return TRUE;
   }
+  #define AST_TEMPLATE(utype) template bool identical(deque<utype>, deque<utype>, utype);
+    AST_GEN_1(AST_UTYPE_NUM)
+  #undef AST_TEMPLATE
+
 
   bool identical(vector<int> vec1,vector<int> vec2,int epsilon) {
     if(vec1.size()!=vec2.size()) return FALSE;

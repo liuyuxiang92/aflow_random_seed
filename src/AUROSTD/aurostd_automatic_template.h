@@ -12,12 +12,12 @@
 /// @xlink{Blog about macro iterator,http://jhnet.co.uk/articles/cpp_magic#turning-recursion-into-an-iterator}
 /// source code examples next to the macros #AST_GEN_1 #AST_GEN_2 #AST_GEN_3
 
-#ifndef _AUROSTD_AUTOMATIC_TEMPLATE_H
-#define _AUROSTD_AUTOMATIC_TEMPLATE_H
+#ifndef _AUROSTD_AUTOMATIC_TEMPLATE_H_
+#define _AUROSTD_AUTOMATIC_TEMPLATE_H_
 
 // utype lists
 #define AST_UTYPE_BASE_NUM int, uint, float, double
-#define AST_UTYPE_XVECTOR_NUM int, unsigned int, long int, long unsigned int, long long int, long long unsigned int, float, double, long double
+#define AST_UTYPE_NUM int, unsigned int, long int, long unsigned int, long long int, long long unsigned int, float, double, long double
 #define AST_UTYPE_FLOAT float, double, long double
 #define AST_UTYPE_INT int, long int, long long int
 #define AST_UTYPE_AINT int, unsigned int, long int, unsigned long int, long long int, unsigned long long int
@@ -167,7 +167,7 @@
 /// @note always define the #AST_TEMPLATE before using this macro function
 /// @code{cpp}
 ///  #define AST_TEMPLATE(utype) template class xvector<utype>;
-///    AST_GEN_1(AST_UTYPE_XVECTOR_NUM)
+///    AST_GEN_1(AST_UTYPE_NUM)
 ///  #undef AST_TEMPLATE
 /// @endcode
 /// the preprocessor will generate (without newlines):
@@ -247,4 +247,4 @@
       AST_EVAL(AST_INVOKE(AST_MAP3_1, AST_TEMPLATE, type_selection)) \
 
 
-#endif //_AUROSTD_AUTOMATIC_TEMPLATE_H
+#endif //_AUROSTD_AUTOMATIC_TEMPLATE_H_

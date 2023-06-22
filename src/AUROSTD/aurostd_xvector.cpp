@@ -3533,7 +3533,7 @@ namespace aurostd {
 
 namespace aurostd { //force the compiler to instantiate the template at this point (avoids linker issues)
   #define AST_TEMPLATE(utype) template class xvector<utype>;
-  AST_GEN_1(AST_UTYPE_XVECTOR_NUM)
+  AST_GEN_1(AST_UTYPE_NUM)
   #undef AST_TEMPLATE
 }
 
