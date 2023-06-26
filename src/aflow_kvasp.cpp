@@ -1746,7 +1746,7 @@ namespace KBIN {
     // string::size_type sub_size1,sub_size2;
     string subS,subS1,subS2;
     ostringstream aus;
-    string::iterator pos;
+    //[CO20230626 - clang warning not used]string::iterator pos;
     bool Krun=TRUE;
 
     ifstream FileAFLOWIN;

@@ -183,7 +183,7 @@ namespace KBIN{
     if(LDEBUG) cerr << "DEBUG: KBIN::AIMS_Directory (BEGIN)" << endl;
     string subS,subS1,subS2;
     ostringstream aus;
-    string::iterator pos;
+    //[CO20230626 - clang warning not used]string::iterator pos;
     bool Krun=TRUE;
 
     ifstream FileAFLOWIN;

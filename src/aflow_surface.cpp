@@ -340,7 +340,7 @@ namespace surface {
         }
       }
       //  cout << grid_close_atoms_cpos.size() << " " << grid_far_atoms_cpos.size() << endl;
-      int matches=0;
+      //[CO20230626 - clang warning not used]int matches=0;
       afound=0.0;
       for(uint iat_close=0;iat_close<grid_close_atoms_cpos.size();iat_close++) {
         rrr1=*grid_close_atoms_cpos.at(iat_close);
@@ -371,7 +371,7 @@ namespace surface {
                 if(PlaneDistance(rrr,a,b,c,d)<eps) {
                   if(!isrhombus) afound+=surface::PointInTriangleContribution(rrr,v1,v2,v3);   // 1st triangle
                   if(isrhombus)  afound+=surface::PointInRhombusContribution(rrr,v1,v2,v3,v4); // rhombus
-                  matches++;
+                  //[CO20230626 - clang warning not used]matches++;
                 }
               }
             }

@@ -7724,7 +7724,7 @@ namespace pocc {
     uint atom1,atom2,type1,type2;
     UFFParamAtom uffai, uffaj;
     UFFParamBond uffb;
-    uint count=0;
+    //[CO20230626 - clang warning not used]uint count=0;
 
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " bonding mode = " << (MODE==BOND_MODE ? "bonding" : "non-bonding") << endl;}
 
@@ -7765,7 +7765,7 @@ namespace pocc {
       //cerr << endl;
       //  continue;
       //}
-      count++;
+      //[CO20230626 - clang warning not used]count++;
       //skip anything with a vacancy - END
       //cerr << "atom1=" << atom1 << endl;
       //cerr << "atom2=" << atom2 << endl;

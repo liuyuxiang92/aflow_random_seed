@@ -10194,7 +10194,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
   xvector<double> b1(3),b2(3),b3(3),db1(3),db2(3),db3(3);
   double nb1,nb2,nb3;
   k1=1;k2=1;k3=1;
-  int kk1,kk2,kk3,kk;
+  int kk1,kk2,kk3; //[CO20230626 - clang warning not used],kk;
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
@@ -10206,10 +10206,10 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
     dkdelta=0.999;
     dk=aurostd::min(nb1,nb2,nb3);
     kk1=0;kk2=0;kk3=0;
-    kk=0;
+    //[CO20230626 - clang warning not used]kk=0;
     int iverbose=0;
     while(!found) {
-      kk++;
+      //[CO20230626 - clang warning not used]kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
         aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
@@ -10249,7 +10249,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
   xvector<double> b1(3),b2(3),b3(3),db1(3),db2(3),db3(3);
   double nb1,nb2,nb3;
   k1=1;k2=1;k3=1;
-  int kk1,kk2,kk3,kk;
+  int kk1,kk2,kk3; //[CO20230626 - clang warning not used],kk;
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
@@ -10261,10 +10261,10 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
     dkdelta=0.999;
     dk=aurostd::min(nb1,nb2,nb3);
     kk1=0;kk2=0;kk3=0;
-    kk=0;
+    //[CO20230626 - clang warning not used]kk=0;
     int iverbose=0;
     while(!found) {
-      kk++;
+      //[CO20230626 - clang warning not used]kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
         aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
@@ -10322,7 +10322,7 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
   xvector<double> b1(3),b2(3),b3(3),db1(3),db2(3),db3(3);
   double nb1,nb2,nb3;
   k1=1;k2=1;k3=1;
-  int kk1,kk2,kk3,kk;
+  int kk1,kk2,kk3; //[CO20230626 - clang warning not used],kk;
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
@@ -10334,10 +10334,10 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
     dkdelta=0.9999;
     dk=aurostd::min(nb1,nb2,nb3);
     kk1=0;kk2=0;kk3=0;
-    kk=0;
+    //[CO20230626 - clang warning not used]kk=0;
     int iverbose=0;
     while(!found) {
-      kk++;
+      //[CO20230626 - clang warning not used]kk++;
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
       kk3=(int) floor((double) nb3/dk);db3=b3/((double) kk3);
@@ -14433,7 +14433,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
               candidate_lattice_vector.push_back(cdisp);
         }
   if(LDEBUG) cout << "DEBUG" << candidate_lattice_vector.size() << endl;
-  int cnt=0;
+  //[CO20230626 - clang warning not used]int cnt=0;
   olattice=sstr.lattice;                      // the lattice is always a good lattice
   // now generate triplets
   for(uint iu=0;iu<candidate_lattice_vector.size();iu++) {
@@ -14451,7 +14451,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
                 plattice=NiggliUnitCellForm(plattice);           // Niggli Second
                 if(isdifferent(plattice,olattice,0.0001)) {
                   olattice=plattice;
-                  cnt++;
+                  //[CO20230626 - clang warning not used]cnt++;
                 }
               }
             }
@@ -14553,7 +14553,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
     }
   }
   //  cerr << candidate_lattice_vector.size() << endl;
-  int cnt=0;
+  //[CO20230626 - clang warning not used]int cnt=0;
   // now generate triplets
   for(uint iu=0;iu<candidate_lattice_vector.size();iu++) {
     for(uint i=1;i<=3;i++) plattice(1,i)=candidate_lattice_vector.at(iu)(i);
@@ -14568,7 +14568,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
             if(isdifferent(plattice,olattice,0.0001)) {
               olattice=plattice;
               //      cerr << det(olattice) << " " << cnt<< endl;
-              cnt++;
+              //[CO20230626 - clang warning not used]cnt++;
             }
           }
         }
@@ -14882,7 +14882,7 @@ xstructure GetPrimitive3(const xstructure& a) {
   }
 
   cerr << candidate_lattice_vector.size() << endl;
-  int cnt=0;
+  //[CO20230626 - clang warning not used]int cnt=0;
   // now generate triplets
   for(uint iu=0;iu<candidate_lattice_vector.size();iu++) {
     for(uint i=1;i<=3;i++) plattice(1,i)=candidate_lattice_vector.at(iu)(i);
@@ -14897,7 +14897,7 @@ xstructure GetPrimitive3(const xstructure& a) {
             if(isdifferent(plattice,olattice,0.0001)) {
               olattice=plattice;
               //      cerr << det(olattice) << " " << cnt<< endl;
-              cnt++;
+              //[CO20230626 - clang warning not used]cnt++;
             }
           }
         }

@@ -4446,7 +4446,7 @@ namespace SYM {
     // same sets of lengths and angles as the original lattice unit cell vectors.
     //[CO20190520 - testing setUf and setUc]_sym_op test; //delete me
     //[CO20190520 - testing setUf and setUc]bool isequal; //delete me
-    uint ii=0,jj=0,kk=0;
+    uint ii=0,kk=0; //[CO20230626 - clang warning not used]jj=0,
     for(uint i=0;i<grid_clattice.size();i++){
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
       for(ii=1;ii<=3;ii++) temp_flattice(1,ii)=(*grid_flattice[i])(ii);
@@ -4460,7 +4460,7 @@ namespace SYM {
             temp_clatticevol=abs(det(temp_clattice));
             if(abs(temp_clatticevol-latticevol)<=_eps_vol_ && temp_clatticevol > 0.0) {  // check volume !!! FAST !
               temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-              jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
+              //[CO20230626 - clang warning not used]jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
               // compare the temp_clattice... and lattice... to see if they are the same lattice
               // that is do the lattice vectors have the same lengths and the same angles
               if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_)                // check lattices
@@ -4886,7 +4886,7 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
       }
     }
   }
-  uint ii=0,jj=0;
+  uint ii=0; //[CO20230626 - clang warning not used],jj=0;
   for(uint i=0;i<grid_clattice.size();i++) {
     for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
     for(ii=1;ii<=3;ii++) temp_flattice(1,ii)=(*grid_flattice[i])(ii);
@@ -4900,7 +4900,7 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
           temp_clatticevol=abs(det(temp_clattice));
           if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {
             temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-            jj++;
+            //[CO20230626 - clang warning not used]jj++;
             if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)
               if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)
                 if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)
@@ -7592,7 +7592,7 @@ namespace SYM {
       *grid_flattice_ptr=Adt(i);
       grid_flattice.push_back(grid_flattice_ptr);  // TRICK so I get the identity first
     }
-    uint ii,jj,kk;
+    uint ii,kk; //[CO20230626 - clang warning not used],jj
     for(int i=-dims[1];i<=dims[1];i++) {
       for(int j=-dims[2];j<=dims[2];j++) {
         for(int k=-dims[3];k<=dims[3];k++) {
@@ -7615,7 +7615,7 @@ namespace SYM {
     }
     // for each set of three lattice points within the sphere see which one has the
     // same sets of lengths and angles as the original lattice unit cell vectors.
-    ii=0;jj=0;kk=0;
+    ii=0;kk=0; //[CO20230626 - clang warning not used];jj=0
     for(uint i=0;i<grid_clattice.size();i++) {
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
       for(ii=1;ii<=3;ii++) temp_flattice(1,ii)=(*grid_flattice[i])(ii);
@@ -7629,7 +7629,7 @@ namespace SYM {
             temp_clatticevol=abs(det(temp_clattice));
             if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {  // check volume !!! FAST !
               temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-              jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
+              //[CO20230626 - clang warning not used]jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
               // compare the temp_clattice... and lattice... to see if they are the same lattice
               // that is do the lattice vectors have the same lengths and the same angles
               if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)                // check lattices

@@ -87,7 +87,7 @@ namespace ALIEN {
     // bool KBIN_MPI_LOCAL;KBIN_MPI_LOCAL=MPI;
     string subS,subS1,subS2;
     ostringstream aus;
-    string::iterator pos;
+    //[CO20230626 - clang warning not used]string::iterator pos;
     bool Krun=TRUE;
     _alienflags alienflags;
     _xalien xalien;

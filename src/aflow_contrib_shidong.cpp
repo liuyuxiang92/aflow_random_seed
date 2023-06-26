@@ -44,7 +44,7 @@ bool ACEGetStructureType(const string& structure_type_in) {
 // ***************************************************************************
 vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) {
   vector<cestructure> str_out_list;
-  uint LineCounter = 1;
+  //[CO20230626 - clang warning not used]uint LineCounter = 1;
   string line_content;
   string alloy_name, structure_name;
   double stoich_b, fit_quantity;
@@ -106,7 +106,7 @@ vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) 
       }
 
     }
-    LineCounter++;
+    //[CO20230626 - clang warning not used]LineCounter++;
     //cout << LineCounter << " " << structure_name << endl;
   }
 

@@ -315,7 +315,7 @@ _kflags KBIN_MATLAB_Get_Matlabflags_from_AflowIN(string &AflowIn) {
 bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) { // AFLOW_FUNCTION_IMPLEMENTATION
   string subS,subS1,subS2;
   ostringstream aus;
-  string::iterator pos;
+  //[CO20230626 - clang warning not used]string::iterator pos;
   bool Krun=TRUE;
 
   ifstream FileAFLOWIN;

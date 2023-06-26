@@ -7252,7 +7252,7 @@ bool XtalFinderCalculator::buildSimilarLattices(
 
   // ---------------------------------------------------------------------------
   // compute lenths of possible lattices before-hand (faster than on-the-fly)
-  int store=0;
+  //[CO20230626 - clang warning not used]int store=0;
   vector<double> translations_mod;
   for(uint i=0;i<n_translations;i++){
     translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
@@ -7328,7 +7328,7 @@ bool XtalFinderCalculator::buildSimilarLattices(
                             //DX20201130 clattices.insert(clattices.begin()+placement_index, tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
                             latt_devs.insert(latt_devs.begin()+placement_index, tmp_latt_dev);
                           }
-                          store++;
+                          //[CO20230626 - clang warning not used]store++;
                         }
                       }
                     }

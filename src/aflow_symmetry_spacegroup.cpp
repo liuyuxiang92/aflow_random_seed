@@ -3112,11 +3112,11 @@ namespace SYM {
       ident_trans = 0;
       // ===== There must be an identity operator otherwise a tolerance problem ===== //
       while (ident_trans == 0) {
-        int symcount = 0;
+        //[CO20230626 - clang warning not used]int symcount = 0;
 
         // ===== Loop over symmetry elements ===== //
         for (uint i = 0; i < SYMINDEX.size(); i++) {
-          symcount++;
+          //[CO20230626 - clang warning not used]symcount++;
           xmatrix<double> Rf = ITC_sym_info.sym_mats[SYMINDEX[i]];  //Uf  //CO
           string sym_symbol = ITC_sym_info.symbol[SYMINDEX[i]];
           //cerr << i << " testing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;

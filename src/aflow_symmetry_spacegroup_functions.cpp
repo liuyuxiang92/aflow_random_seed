@@ -1481,14 +1481,14 @@ namespace SYM {
   vector<int> get_multiplicities(string sg) {
     vector<int> wyckoff_multiplicities;
     int line = 0;
-    int mult_factor = 0;
+    //[CO20230626 - clang warning not used]int mult_factor = 0;
     for (uint i = 0; i < sg.length(); i++) {
       if(sg[i] == 0x0a)
         line++;
       if(line == 2)
         break;
-      if(sg[i] == '(')
-        mult_factor++;
+      if(sg[i] == '('){}
+        //[CO20230626 - clang warning not used]mult_factor++;
     }
     line = 0;
     ostringstream temp;
@@ -5139,8 +5139,8 @@ namespace SYM {
     vector<xvector<double> > tmp_trip;
     vector<vector<xvector<double> > > point_sets;
     char tmpchar;
-    int count = 0;
-    int rotation_ops = 0;
+    //[CO20230626 - clang warning not used]int count = 0;
+    //[CO20230626 - clang warning not used]int rotation_ops = 0;
     for (int i = 0; i < triplets_size; i++) {
       tmp_trip.clear();
       tmp_trip.push_back(expanded_lattice[cmb[0]]);
@@ -5148,7 +5148,7 @@ namespace SYM {
       tmp_trip.push_back(expanded_lattice[cmb[2]]);
       tmpchar = discern_rot_sym(get_mod_angle_tensor(tmp_trip), tol); //DX20190215 - added tol
       if(tmpchar != 'z') {
-        count++;
+        //[CO20230626 - clang warning not used]count++;
         Screw candidate_rotation;
         //Get axis direction
         xvector<double> axis_direction = aurostd::vector_product(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]); //DX20190905 - SYM::CrossPro() -> aurostd::vector_product()
@@ -5241,7 +5241,7 @@ namespace SYM {
             //cerr << tmpchar << endl;
             //cerr << candidate_rotation << endl;
             //cerr << "********************" << endl;
-            rotation_ops++;
+            //[CO20230626 - clang warning not used]rotation_ops++;
           }
         }
       }

@@ -1289,7 +1289,7 @@ namespace KBIN {
     //[SD20220224 - OBSOLETE]FileSUBDIR.clear();FileSUBDIR.close();
     // string::size_type sub_size1,sub_size2;
     string AflowIn,AflowInMode,subS,subS1,subS2;
-    string::iterator pos;
+    //[CO20230626 - clang warning not used]string::iterator pos;
     bool Krun=TRUE;
     //  int i;
 

@@ -302,7 +302,7 @@ namespace pflow {
     float Nbasis,Nbasismin,Nbasismax;
     float Dmin,Dmax,Dcalc;
     string sline,sword,ssub,sdata,Pearson,ChemFormula,title,sICSDid,SG,stmp;
-    string::iterator siter;
+    //[CO20230626 - clang warning not used]string::iterator siter;
     vector<bool> foundbasis,iwritelist;
     vector<string> sbuf,Zname,Znameref,ChemUnique,ChemNameRef,WyckLabel,IDref;
     vector<int> Zcount;
@@ -1061,12 +1061,12 @@ namespace pflow {
 
     bool ifound,iread,iwrite,AtomLineFound=false,icontinue=true;
     int j,k,
-        ICSDid=0,SGnumber=0,Ncompounds=0,Nspec=0,CellChoice=1;
+        ICSDid=0,SGnumber=0,Nspec=0,CellChoice=1; //[CO20230626 - clang warning not used]Ncompounds=0,
     float ftmp,Dcalc=0.0;
     string cstmp,stmp;
     string sline,sword,ssub,
            title,sdir,sICSDid,CompoundName,StructuredName,scommand,Pearson,SG;
-    string::iterator siter;
+    //[CO20230626 - clang warning not used]string::iterator siter;
     size_t ssize_t;
     vector<int> Zcount;
     vector<float> Zconc,unitcell(6),xpos,ypos,zpos,pocc;
@@ -1076,13 +1076,13 @@ namespace pflow {
 
     fout.open("proto.label");
 
-    Ncompounds=0;iwrite=false;
+    iwrite=false; //[CO20230626 - clang warning not used]Ncompounds=0;
     while(!input.eof()) {
       getline(input,sline);sline=sline+'\n';
 
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="*data") {
-        Ncompounds++;title="";
+        title=""; //[CO20230626 - clang warning not used]Ncompounds++;
       }
 
       if(sline.length()>8) sword=sline.substr(0,9);
@@ -1391,7 +1391,7 @@ namespace pflow {
     string cstmp;
     string sline,sword,ssub,
            title,sdir,sICSDid,CompoundName,scommand;
-    string::iterator siter;
+    //[CO20230626 - clang warning not used]string::iterator siter;
     vector<int> Zcount;
     vector<float> Zconc,unitcell(6),xpos,ypos,zpos,pocc;
     vector<string> Zname,WyckLabel;
