@@ -313,13 +313,13 @@ namespace aflowlib {
 
       case Source::SQLITE: {
         std::string where = "aurl='\"" + AURL + "\"'";
-        where = std::regex_replace(where, m_re_aurl2file, "$1_" + m_sqlite_collection + "/");
+        where = std::regex_replace(where, aurostd::regex_aurl2file, "$1_" + m_sqlite_collection + "/");
         loadSqliteWhere(where);
         break;
       }
 
       case Source::AFLUX: {
-        AURL = std::regex_replace(AURL, m_re_aurl2file, "$1_" + m_aflux_collection + "/");
+        AURL = std::regex_replace(AURL, aurostd::regex_aurl2file, "$1_" + m_aflux_collection + "/");
         std::map <std::string, std::string> matchbook{{"*",    ""},
                                                       {"aurl", "'" + AURL + "'"}};
         loadAFLUXMatchbook(matchbook);
@@ -380,7 +380,7 @@ namespace aflowlib {
           }
           else {
             AURL_combined = "'" + AURL_combined + "'";
-            AURL_combined = std::regex_replace(AURL_combined, m_re_aurl2file, "$1_" + m_aflux_collection + "/");
+            AURL_combined = std::regex_replace(AURL_combined, aurostd::regex_aurl2file, "$1_" + m_aflux_collection + "/");
             loadAFLUXMatchbook({{"*",    ""},
                                 {"aurl", AURL_combined}});
             AURL_combined = clean_AURL[i];
@@ -388,7 +388,7 @@ namespace aflowlib {
         }
 
         AURL_combined = "'" + AURL_combined + "'";
-        AURL_combined = std::regex_replace(AURL_combined, m_re_aurl2file, "$1_" + m_aflux_collection + "/");
+        AURL_combined = std::regex_replace(AURL_combined, aurostd::regex_aurl2file, "$1_" + m_aflux_collection + "/");
         loadAFLUXMatchbook({{"*",    ""},
                             {"aurl", AURL_combined}});
         break;
@@ -396,7 +396,7 @@ namespace aflowlib {
 
       case Source::SQLITE: {
         std::string where = aurostd::joinWDelimiter(clean_AURL, "\"','\"");
-        where = std::regex_replace(where, m_re_aurl2file, "$1_" + m_sqlite_collection + "/");
+        where = std::regex_replace(where, aurostd::regex_aurl2file, "$1_" + m_sqlite_collection + "/");
         where = "aurl IN ('\"" + where + "\"')";
         loadSqliteWhere(where);
         break;
@@ -406,7 +406,7 @@ namespace aflowlib {
       case Source::RESTAPI_RAW: {
         std::vector <std::string> queries;
         for (std::vector<std::string>::const_iterator AURL_single = clean_AURL.begin(); AURL_single != clean_AURL.end(); AURL_single++) {
-          std::string rest_query = std::regex_replace(AURL_single->substr(28), m_re_aurl2file, "$1_" + m_sqlite_collection + "/") + "/";
+          std::string rest_query = std::regex_replace(AURL_single->substr(28), aurostd::regex_aurl2file, "$1_" + m_sqlite_collection + "/") + "/";
           queries.push_back(rest_query);
         }
         loadRestAPIQueries(queries);
@@ -418,7 +418,7 @@ namespace aflowlib {
         std::vector <std::string> files;
         for (std::vector<std::string>::const_iterator AURL_single = clean_AURL.begin(); AURL_single != clean_AURL.end(); AURL_single++) {
           std::string file_path = m_filesystem_path + AURL_single->substr(28) + "/" + m_filesystem_outfile;
-          file_path = std::regex_replace(file_path, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
+          file_path = std::regex_replace(file_path, aurostd::regex_aurl2file, "$1/" + m_filesystem_collection + "/");
           files.push_back(file_path);
         }
         loadFiles(files);
@@ -717,7 +717,7 @@ namespace aflowlib {
       entry->el_source = source;
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
-        (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
+        (*m_entries_layered_map)[entry->nspecies][entry->species].push_back(entry);
         m_auid_list.emplace_back(entry->auid);
         if (m_xstructure_original) addXstructure(*entry, true);
         if (m_xstructure_relaxed) addXstructure(*entry);
@@ -742,7 +742,7 @@ namespace aflowlib {
       entry->el_source = source;
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
-        (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
+        (*m_entries_layered_map)[entry->nspecies][entry->species].push_back(entry);
         m_auid_list.emplace_back(entry->auid);
         if (m_xstructure_original) addXstructure(*entry, true);
         if (m_xstructure_relaxed) addXstructure(*entry);
@@ -1004,7 +1004,7 @@ namespace aflowlib {
       base_folder = entry.el_source.substr(0, entry.el_source.size()-m_filesystem_outfile.size());
     } else {
       base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
-      base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
+      base_folder = std::regex_replace(base_folder, aurostd::regex_aurl2file, "$1/" + m_filesystem_collection + "/");
     }
     std::string poscar;
     if (entry.catalog =="LIB0" && !m_filesystem_available && entry.aurl.substr(entry.aurl.size() - 2)=="/0"){
@@ -1050,7 +1050,7 @@ namespace aflowlib {
       base_folder = entry.el_source.substr(0, entry.el_source.size()-m_filesystem_outfile.size());
     } else {
       base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
-      base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
+      base_folder = std::regex_replace(base_folder, aurostd::regex_aurl2file, "$1/" + m_filesystem_collection + "/");
     }
     std::string base_url = m_restapi_server + m_restapi_path + entry.aurl.substr(28) + "/";
     std::string aflowin_content;
@@ -1535,11 +1535,11 @@ namespace aflowlib {
       name.erase(std::min(name.find("_ICSD_"), name.size()));
     } else if (lib_type == 'L') { //LIBX
       name.erase(std::min(name.find(':'), name.size()));
-      name = std::regex_replace(name, m_re_ppclean,"");
+      name = std::regex_replace(name, aurostd::regex_ppclean,"");
     } else {
       return "";
     }
-    std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
+    std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), aurostd::regex_elements),
                                             std::sregex_token_iterator());
     std::sort(element_match.begin(), element_match.end());
     return aurostd::joinWDelimiter(element_match, "");

@@ -1083,7 +1083,7 @@ uint xstructure::GetPrimitiveCell(void) {
     //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
     //DX20210129 [OBSOLETE]     tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
     //DX20210129 [OBSOLETE]   }
-    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom);
+    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom,false);  //CO20230319 - add by type
     //DX20210129 [OBSOLETE] }
   }
   //DX20210129 [OBSOLETE] (*this).num_each_type = numtypes;
@@ -1727,7 +1727,7 @@ namespace SYM {
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] xstr_out.species.clear();
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] // Add new atomic basis
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c],false); //CO20230319 - add by type
         //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] }
 
         //DX20210315 [OBSOLETE]//DX20190410 START
@@ -2091,6 +2091,11 @@ namespace SYM {
     }
     candidate_lattice_vectors.push_back(CL);
     candidate_lattice_chars.push_back('h');
+    //DX20221110 - TRY OBVERSE SETTING - START
+    CL = xvec2xmat(-conv_lattice_vec_b, -conv_lattice_vec_a, conv_lattice_vec_c);
+    candidate_lattice_vectors.push_back(CL);
+    candidate_lattice_chars.push_back('h');
+    //DX20221110 - TRY OBVERSE SETTING - STOP
 
     return true;
   }
@@ -2257,10 +2262,14 @@ namespace SYM {
       if(mirror_lattice_vectors.size() > 1) {
         if(aurostd::modulus(mirror_lattice_vectors[1]) < aurostd::modulus(mirror_lattice_vectors[0])) {
           possible_h_lats.push_back(mirror_lattice_vectors[1]);
+          possible_h_lats.push_back(-mirror_lattice_vectors[1]); //DX20221129
           possible_h_lats.push_back(mirror_lattice_vectors[0]);
+          possible_h_lats.push_back(-mirror_lattice_vectors[0]); //DX20221129
         } else {
           possible_h_lats.push_back(mirror_lattice_vectors[0]);
+          possible_h_lats.push_back(-mirror_lattice_vectors[0]); //DX20221129
           possible_h_lats.push_back(mirror_lattice_vectors[1]);
+          possible_h_lats.push_back(-mirror_lattice_vectors[1]); //DX20221129
         }
         if(LDEBUG) {
           cerr << __AFLOW_FUNC__ << " Two choices for unique axis. " << endl;
@@ -2270,6 +2279,7 @@ namespace SYM {
       } 
       else {
         possible_h_lats.push_back(mirror_lattice_vectors[0]);
+        possible_h_lats.push_back(-mirror_lattice_vectors[0]); //DX20221129
         if(LDEBUG) {
           cerr << __AFLOW_FUNC__ << " One choice for unique axis. " << endl;
           cerr << __AFLOW_FUNC__ << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
@@ -2277,6 +2287,7 @@ namespace SYM {
       }
     } else if(twofold_lattice_vectors.size() > 0) {
       possible_h_lats.push_back(twofold_lattice_vectors[0]);
+      possible_h_lats.push_back(-twofold_lattice_vectors[0]); //DX20221129
       if(LDEBUG) {
         cerr << __AFLOW_FUNC__ << " One choice for unique axis. " << endl;
         cerr << __AFLOW_FUNC__ << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
@@ -3446,6 +3457,12 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     return 0;
   }
 
+  // If iomode is WYCKCAR, convert to IOVASP temporarily, otherwise, printing of ITC lattice parameters/coordinates
+  // gets messed up (this is just a printing problem when debugging)
+  // DX20221128
+  int iomode_tmp = (*this).iomode;
+  if((*this).iomode==IOVASP_WYCKCAR) { iomode_tmp = (*this).iomode; (*this).iomode=IOVASP_POSCAR; }
+
   // ===== Initialize symmetry elements and set tolerance ===== //
   SymmetryInformationITC ITC_sym_info; //DX20190215
   ITC_sym_info.initsymmats(); //DX20190215
@@ -3494,7 +3511,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   xstr.MinkowskiBasisReduction();
 
   // ===== Declare variables ===== //
-  ostringstream woss;  //stringstream for wyccar
+  ostringstream woss, woss_min;  //stringstream for wyccar //DX+KC20221115 - need to store minimum wyccar stringstream for aflow --wyckoff --print=json
   int spacegroup = 0, spacegroup_global = 0; //DX20220920
   bool foundspacegroup = false, foundspacegroup_global = false; //DX20220827 - added foundspacegroup_global
   deque<_atom> atomicbasis;
@@ -3544,6 +3561,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   string spacegroupstring = "";
                   
   int min_wyckoff_sum = 1e9, minimum_scheme_sum = 1e9, global_min_wyckoff_sum = 1e9; //DX20220827 - track minimum Wyckoff sum
+  vector<int> min_Wyckoff_numbers, global_min_Wyckoff_numbers; //DX20221103
   vector<int> wyckoffmult, wyckoffmult_min;                   // Wyckoff multiplicity //DX20220827 - added min variant
   vector<string> general_wyckoff_position, general_wyckoff_position_min;   // General wyckoff positions //DX20220827 - added min variant
   vector<string> wyckoffsymbols, wyckoffsymbols_min;             // Wyckoff symbol //DX20220827 - added min variant
@@ -3615,6 +3633,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols = wyckoffSymbols_min;
           wyckoffVariables = wyckoffVariables_min;
           tmpvvvstring = tmpvvvstring_min;
+          woss.str(""); woss << woss_min.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift = OriginShift_Wyckoff_min;
           break;
@@ -3747,6 +3766,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
 
       // ===== Use the point group and the lattice type/lattice centering to narrow down the space group ===== //
       sg_search = SYM::PointGroup_SpaceGroup(pointgroup, CCell.bravais_label_ITC);
+      //std::reverse(sg_search.begin(), sg_search.end()); //DX20221230 - reverse to give preference to higher space groups
       // If we are looking at the rhombohedral setting, we need to use bravais label 'R' instead of 'P' //DX20180807 
       //DX20190130 - add anrl cell choice : if(cell_choice == 1 && CCell.lattice_label_ITC == 'r') //DX20180807
       if((cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && CCell.lattice_label_ITC == 'r') //DX20190131 - add anrl setting
@@ -3855,6 +3875,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       }
       // ===== Check other space groups (2-230), and find origin ===== //
       for (uint j = 0; j < ITC_sym_info.sgindex.size(); j++) {
+      //for (int j = ITC_sym_info.sgindex.size()-1; j>=0; j--) //DX20221230 - reverse order to give preference to higher space groups
         if(aurostd::WithinList(sg_search, ITC_sym_info.sgindex[j])) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
           //DEBUGGER:
           if(LDEBUG) {
@@ -3973,11 +3994,13 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
             if(LDEBUG) {
               cerr << __AFLOW_FUNC__ << " Generator reduction matches for space group: " << ITC_sym_info.sgindex[j] << endl;
             }
-            //cerr << "GENERATOR REDUCTION MATCH: SG" <<  ITC_sym_info.sgindex[j] << endl;
-            //for(uint ix=0;ix<CG.size();ix++){
-            //   cerr << "CG: " << endl;
-            //   print(CG[ix]);
-            //}
+            if(LDEBUG) {
+              cerr << __AFLOW_FUNC__ << "GENERATOR REDUCTION MATCH: SG" <<  ITC_sym_info.sgindex[j] << endl;
+              for(uint ix=0;ix<CG.size();ix++){
+                cerr << __AFLOW_FUNC__ << " CG: " << endl;
+                print(CG[ix]);
+              }
+            }
             vector<xvector<double> > oneshiftset;
             vector<xmatrix<double> > onerotset;
             for (uint ix = 0; ix < CG.size(); ix++) {
@@ -3987,10 +4010,14 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                 onerotset.push_back(Ident - ITC_sym_info.sym_mats[insym[CG[ix][k]]]);
                 oneshiftset.push_back(ITCshiftset[k] - translations[CG[ix][k]]);
               }
-              //print(oneshiftset);
-              //xb();
-              //print(onerotset);
-              //xb();
+              if(LDEBUG) {
+                cerr << __AFLOW_FUNC__ << "Set of possible shifts: " << endl;
+                print(oneshiftset);
+                xb();
+                cerr << __AFLOW_FUNC__ << "Set of possible rotations: " << endl;
+                print(onerotset);
+                xb();
+              }
 
               // ===== It becomes a linear algebra problem to solve for a consistent origin shift ===== //
               vector<double> RHS;
@@ -4094,6 +4121,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                 bool final_shift = false;
                 uint origin_shift_index = 0;
                 vector<int> sum_wyckoff_letters;
+                vector<vector<int> > all_enumerated_wyckoff_letters; //DX20221103
 
                 while (orig_origin_shift == true || final_shift == false) {
                   // ========== Pick origin shift to test for Wyckoff Positions ========== //
@@ -4148,10 +4176,15 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                     int min_wyckoff_config = 0;
                     //DX20220828 - int min_wyckoff_sum = sum_wyckoff_letters[0];
                     min_wyckoff_sum = sum_wyckoff_letters[0]; //DX20220828
+                    min_Wyckoff_numbers = all_enumerated_wyckoff_letters[0]; //DX20220828
                     for (uint s = 0; s < sum_wyckoff_letters.size(); s++) {
-                      if(min_wyckoff_sum > sum_wyckoff_letters[s] && shift_valid[s]) {
+                      if(LDEBUG) { cerr << __AFLOW_FUNC__ << "shift_valid[s]=" << shift_valid[s] << " sum_wyckoff_letters[s]=" << aurostd::joinWDelimiter(all_enumerated_wyckoff_letters[s], ",") << endl; }
+                      if((min_wyckoff_sum > sum_wyckoff_letters[s] && shift_valid[s]) || 
+                        (min_wyckoff_sum==sum_wyckoff_letters[s] && all_enumerated_wyckoff_letters[s]<min_Wyckoff_numbers)) //DX20221110 - added tie-breaker
+                      {
                         min_wyckoff_config = s;
                         min_wyckoff_sum = sum_wyckoff_letters[s];
+                        min_Wyckoff_numbers = all_enumerated_wyckoff_letters[s];
                       }
                     }
                     xvector<double> shift_for_min_wyckoff_config;
@@ -4169,33 +4202,49 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                       wyckoffmult, wyckoffsymbols, wyckoffVariables, wyckoffPositionsVector, 
                       wyckoffSymbols, woss, obverse_force_transformed);
                   shift_valid.push_back(found_all_wyckoff);
+                  if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Shift is valid ? : " << found_all_wyckoff << endl; }
                   if(found_all_wyckoff == false && orig_origin_shift == true) {
                     foundspacegroup=false;
                     break;
                   } else if(found_all_wyckoff == false && orig_origin_shift == false) {
                     sum_wyckoff_letters.push_back(AUROSTD_MAX_INT); //DX20220827 - changed from 100 to AUROSTD_MAX_DOUBLE
+                    vector<int> vec_int_tmp;
+                    all_enumerated_wyckoff_letters.push_back(vec_int_tmp); //DX20221103 
                     continue;
                   }
                   // ===== Determine multiplicity, letters, and site symmetry in WYCCAR ===== //
                   // This allows us to investigate if there are other Wyckoff positions corresponding to the
                   // ones in the POSCAR which will find the "lowest" Wyckoff letter enumeration scheme
-                  // ===== Extract Wyckoff info ===== 
+                  // ===== Extract Wyckoff info =====
+                  vector<GroupedWyckoffPosition> grouped_Wyckoff_positions_structure;
+                  vector<wyckoffsite_ITC> sorted_Wyckoff_sites = wyckoffVariables;
+                  std::sort(sorted_Wyckoff_sites.begin(), sorted_Wyckoff_sites.end(), sortWyckoffByLetter); //DX20221201 - need to sort for tie-breaker
+                  std::sort(sorted_Wyckoff_sites.begin(), sorted_Wyckoff_sites.end(), sortWyckoffByType); //DX20221201 - need to sort for tie-breaker
+                  compare::groupWyckoffPositions(sorted_Wyckoff_sites, grouped_Wyckoff_positions_structure);
+                  if(LDEBUG) {
+                    string Wyckoff_string_structure = anrl::groupedWyckoffPosition2ANRLString(grouped_Wyckoff_positions_structure, true);
+                    cerr << __AFLOW_FUNC__ << "Wyckoff_string_structure=" << Wyckoff_string_structure << endl;
+                  }
                   vector<int> wyckoff_mult;
                   vector<string> wyckoff_letter;
                   vector<string> wyckoff_site_sym;
-                  for (uint w = 0; w < wyckoffSymbols.size(); w++) {
-                    //cerr << "wyckoffSymbols: " << wyckoffSymbols[w] << endl;
-                    vector<string> tokens;
-                    aurostd::string2tokens(wyckoffSymbols[w], tokens, " ");
-                    if(tokens.size()==3){
-                      wyckoff_mult.push_back(aurostd::string2utype<int>(tokens[0]));
-                      wyckoff_letter.push_back(tokens[1]);
-                      wyckoff_site_sym.push_back(tokens[2]);
+
+                  // ---------------------------------------------------------------------------
+                  // Store the wyckoff information into vectors
+                  // DX20221201 - updated the loop below to use the sorted/grouped Wyckoff positions
+                  // (sorting is required to find the minimum enumerated Wyckoff set)
+                  for (uint w = 0; w < grouped_Wyckoff_positions_structure.size(); w++) {
+                    for (uint x = 0; x < grouped_Wyckoff_positions_structure[w].multiplicities.size(); x++) {
+                      wyckoff_mult.push_back(grouped_Wyckoff_positions_structure[w].multiplicities[x]);
+                      wyckoff_letter.push_back(grouped_Wyckoff_positions_structure[w].letters[x]);
+                      wyckoff_site_sym.push_back(grouped_Wyckoff_positions_structure[w].site_symmetries[x]);
                     }
                   }
 
                   // ===== Calculate the sum of the enumerated wyckoff letters ===== //
-                  sum_wyckoff_letters.push_back(aurostd::sum(SYM::enumerate_wyckoff_letters(wyckoff_letter)));
+                  vector<int> enumerated_wyckoff_letters = SYM::enumerate_wyckoff_letters(wyckoff_letter); //DX20221103
+                  sum_wyckoff_letters.push_back(aurostd::sum(enumerated_wyckoff_letters));
+                  all_enumerated_wyckoff_letters.push_back(enumerated_wyckoff_letters); //DX20221103
 
                   // ===== If we have performed the original origin shift, now check the other possibilites ===== //
                   if(orig_origin_shift == true) {
@@ -4229,16 +4278,19 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                     }
 
                     // ===== If we do not have the minimum enumerated Wyckoff letter set, check possible origin shifts ===== //
-                    if(LDEBUG){ cerr << "SYM::SpaceGroup_ITC: minimum_scheme_sum=" << minimum_scheme_sum << " vs current=" << sum_enumerated_found_letters << endl; }
-                    if(sum_enumerated_found_letters > minimum_scheme_sum) {
+                    if(LDEBUG){ cerr << __AFLOW_FUNC__ << "SYM::SpaceGroup_ITC: minimum_scheme_sum=" << minimum_scheme_sum << " vs current=" << sum_enumerated_found_letters << endl; }
+                    if(sum_enumerated_found_letters >= minimum_scheme_sum) { //DX20221127 - added = condition, keep this condition in case we want to skip it later
                       if(LDEBUG) {
                         cerr << __AFLOW_FUNC__ << " Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
                       }
                       possible_shifts = SYM::get_possible_origin_shifts(spacegroupstring, min_multiplicity, min_site_sym);
+                      min_wyckoff_sum = sum_enumerated_found_letters; //DX20230112
+                      min_Wyckoff_numbers = found_enumerated_Wyckoff_numbers; //DX20230110
                     }
                     else {
                       final_shift = true;
                       min_wyckoff_sum = sum_enumerated_found_letters; //DX20220828
+                      min_Wyckoff_numbers = found_enumerated_Wyckoff_numbers; //DX20230110
                     }
                   }
                 }
@@ -4258,13 +4310,24 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       }
       //cerr << "SPACEGROUP:: " <<spacegroup << endl;
       if(foundspacegroup == true) {
-        if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: spacegroup=" << spacegroup << " iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << " (spacegroup_global=" << spacegroup_global << ")" <<  endl; }
+        if(LDEBUG) {
+          cerr << "SYM::SpaceGroup_ITC: spacegroup=" << spacegroup << " iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << " (spacegroup_global=" << spacegroup_global << ")" <<  endl;
+          cerr << "SYM::SpaceGroup_ITC: min_Wyckoff_numbers: " << min_Wyckoff_numbers.size() << " " << aurostd::joinWDelimiter(min_Wyckoff_numbers,",") << endl;
+          cerr << "SYM::SpaceGroup_ITC: global_min_Wyckoff_numbers: size=" << global_min_Wyckoff_numbers.size() << " enumerations=" << aurostd::joinWDelimiter(global_min_Wyckoff_numbers,",") << endl;
+        }
         foundspacegroup_global = true;
-        spacegroup_global = spacegroup;
+        //spacegroup_global = spacegroup;
+        if(spacegroup_global == 0) { spacegroup_global = spacegroup; } //DX20221229
         foundspacegroup = false;
-        if(min_wyckoff_sum<global_min_wyckoff_sum) {
+        //if(min_wyckoff_sum<global_min_wyckoff_sum || 
+        if(spacegroup >= spacegroup_global &&
+            (min_wyckoff_sum<global_min_wyckoff_sum || 
+           (min_wyckoff_sum==global_min_wyckoff_sum && global_min_Wyckoff_numbers.size()>0 && min_Wyckoff_numbers<global_min_Wyckoff_numbers))
+        ) { //DX20221103 - added tie-breaker
           // update minimum Wyckoff sum
+          spacegroup_global = spacegroup; //DX20221229
           global_min_wyckoff_sum = min_wyckoff_sum;
+          global_min_Wyckoff_numbers = min_Wyckoff_numbers; //DX20221103
           // update CCell
           CCell_Wyckoff_min = CCell;
           // update Wyckoff info
@@ -4274,10 +4337,11 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols_min = wyckoffSymbols;
           wyckoffVariables_min = wyckoffVariables;
           tmpvvvstring_min = tmpvvvstring;
+          woss_min.str(""); woss_min << woss.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift_Wyckoff_min = OriginShift;
         }
-        if(iterate == (int)candidate_lattice_vectors_prev.size()-1 || global_min_wyckoff_sum == minimum_scheme_sum) {
+        if(iterate == (int)candidate_lattice_vectors_prev.size()-1) {//DX20221201 [do not stop searching once minimum Wyckoff sequence is found - need to keep searching to get most alphabetical from left to right] 
           tested_all_lattices = true;
           foundspacegroup = true;
           spacegroup = spacegroup_global;
@@ -4289,6 +4353,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
           wyckoffSymbols = wyckoffSymbols_min;
           wyckoffVariables = wyckoffVariables_min;
           tmpvvvstring = tmpvvvstring_min;
+          woss.str(""); woss << woss_min.str(); //DX+KC20221103 - added woss_min for aflow --wyckoff --print=json
           // update shifts
           OriginShift = OriginShift_Wyckoff_min;
         }
@@ -4407,6 +4472,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   (*this).origin_ITC = OriginShift; //DX20170830 - SGDATA
   (*this).general_position_ITC = general_wyckoff_position; //DX20170830 - SGDATA
   //cerr << "TOLERANCE USED: " << (*this).sym_eps << endl; //DX20190215 - _SYM_TOL to (*this).sym_eps
+  
+  // convert iomode to original format
+  (*this).iomode = iomode_tmp;
+  
   return (uint)spacegroup;
 }
 

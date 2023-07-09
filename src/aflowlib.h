@@ -297,10 +297,12 @@ namespace aflowlib {
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
       bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
       bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
-      string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
-      string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
-      vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
-      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
+      string getPathAURL(ostream& oss=cout, bool load_from_common=false) const;                   // converts entry.aurl to url/path (common)
+      string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false) const; // converts entry.aurl to url/path (common)
+      string getPathDirectory(const string& filesystem_collection="LIB");                         //SD20221207
+      vector<string> getSpecies() const;                                                          //CO20221110 - extracts species from restapi
+      vector<string> getSpeciesAURL(ostream& oss) const;                                          //CO20210201 - extracts species from aurl
+      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss) const;                    //CO20210201 - extracts species from aurl
       //ML stoich features
       void getStoichFeatures(vector<string>& vheaders,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
       void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
@@ -822,16 +824,6 @@ namespace aflowlib {
       /// @note creating a copy of this smart pointer is the most efficient way to use
       ///       the loaded entries after the EntryLoader class goes out of scope
       std::shared_ptr<std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
-
-      // REGEX expressions for quick finding/replacements in strings
-      /// REGEX to find all chemical elements in a string
-      const std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
-      /// REGEX to find all pseudo potentials that contain uppercase letters from a string (could be mistaken for a chemical element)
-      const std::regex m_re_ppclean{"("+ std::regex_replace(CAPITAL_LETTERS_PP_LIST, std::regex(","), "|") + ")"};
-      /// @brief REGEX to help change a AURL into a file path
-      /// @note the content of the group `((?:(?:LIB\d{1,})|(?:ICSD)))` can be used in the replacement  with `$1`;
-      ///       the second group `(?:(?:RAW)|(?:LIB)|(?:WEB))` is there to select the full substring to be replaced
-      const std::regex m_re_aurl2file{"((?:(?:LIB\\d{1,})|(?:ICSD)))_(?:(?:RAW)|(?:LIB)|(?:WEB))\\/"};
 
       // Generic entry loaders
       void loadAUID(std::string AUID);

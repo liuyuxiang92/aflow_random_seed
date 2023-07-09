@@ -29,7 +29,6 @@ using aurostd::isequal;
 //DX+CO START
 #include "aflow_symmetry_spacegroup.h"
 //DX+CO END
-#include "aflow_sym_python.cpp" //DX20201228
 
 #define  _NO_SCALE_LATTICE_PGROUP_
 
@@ -2674,17 +2673,17 @@ namespace SYM {
       xcomplex<double> tmp3(0.0,-_axis(3)/2.0);
       complex_matrix(2,2) = theta*tmp3;
       xmatrix<xcomplex<double> > exp_matrix = aurostd::exp(complex_matrix);
-      if(!(abs(_SU2_matrix(1,1).re-exp_matrix(1,1).re)<1e-3 && abs(_SU2_matrix(1,1).im-exp_matrix(1,1).im)<1e-3 &&
-            abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
-            abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
-            abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
-        //DX20200217 - warning to error
-        stringstream message;
-        message << "Lie algebra does not connect back to Lie group, i.e., exp(theta*su(2)) != SU(2):" << endl;
-        message << "SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
-        message << "exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
-        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
-      }
+      //[CO20230319 - not sure what this is?]if(!(abs(_SU2_matrix(1,1).re-exp_matrix(1,1).re)<1e-3 && abs(_SU2_matrix(1,1).im-exp_matrix(1,1).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
+      //[CO20230319 - not sure what this is?]      abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
+      //[CO20230319 - not sure what this is?]  //DX20200217 - warning to error
+      //[CO20230319 - not sure what this is?]  stringstream message;
+      //[CO20230319 - not sure what this is?]  message << "Lie algebra does not connect back to Lie group, i.e., exp(theta*su(2)) != SU(2):" << endl;
+      //[CO20230319 - not sure what this is?]  message << "SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
+      //[CO20230319 - not sure what this is?]  message << "exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
+      //[CO20230319 - not sure what this is?]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      //[CO20230319 - not sure what this is?]}
     }
     return true;
   }
@@ -4973,7 +4972,7 @@ namespace SYM {
     //DX+CO END
     aa.title="KLATTICE";
     _atom atom;
-    aa.AddAtom(atom); // just something in the origin;
+    aa.AddAtom(atom,false); // just something in the origin;  //CO20230319 - add by type
     //  cerr << aa << endl;
     //DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
     Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); //DX20170808 - New klattice routine
@@ -5010,7 +5009,7 @@ namespace SYM {
     //DX+CO END
     aa.title="KCRYSTAL";
     _atom atom;
-    aa.AddAtom(atom); // just something in the origin;
+    aa.AddAtom(atom,false); // just something in the origin;  //CO20230319 - add by species
     //  cerr << aa << endl;
     //DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL //HE20220912
@@ -9021,10 +9020,8 @@ namespace SYM {
     aurostd::DirectoryMake(python_dir);
 
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
-    stringstream output;
 
-    output << AFLOW_SYM_PYTHON_PY;
-    aurostd::stringstream2file(output, python_dir+"/"+"aflow_sym_python.py");
+    aurostd::EmbData::save_to_file("aflow_sym_python.py", python_dir+"/"+"aflow_sym_python.py");
   }
 }
 

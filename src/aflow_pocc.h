@@ -446,7 +446,7 @@ namespace pocc {
       void setSpeciesRedecoration(const vector<string>& species_redecoration);
       void setExplorationRadius();
       void getCluster(xmatrix<double>& _hnf_mat);
-      void setBonds(vector<vector<int> >& v_types_config);
+      void setBonds(const vector<vector<int> >& v_types_config);
       double getUFFEnergy();
       bool isVacancy(vector<uint>& v_vacancies,uint atom);
       double bondEnergyBond(const UFFParamBond& uffb);
@@ -566,6 +566,7 @@ namespace pocc {
 
       //post-processing
       bool m_convolution;
+      bool m_count_unique_fast;
       vector<string> m_ARUN_directories;
       double m_Hmix;
       double m_efa;
@@ -697,6 +698,8 @@ namespace pocc {
       unsigned long long int runRobustStructureComparison(std::list<POccSuperCellSet>::iterator it);
       void calculateHNF();
       void getTotalPermutationsCount();
+      void calculatePOccSuperCellUFF(int thread_id, vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job); //SD20230604
+      void countUniquePOccSuperCellUFF(int thread_id, std::map<unsigned long long int, std::unordered_map<unsigned long int, unsigned long int>>& map_unique, const vector<POccSuperCell>& vpsc, const vector<POccUFFEnergyAnalyzer>& v_energy_analyzer, const vector<vector<vector<int>>>& vv_types_config, size_t& npsc_queue, std::mutex& m_save, std::mutex& m_job); //SD20230609
       void calculate();
       string getARUNString(unsigned long long int i);
       xstructure getUniqueSuperCell(unsigned long long int i);

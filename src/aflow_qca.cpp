@@ -704,7 +704,10 @@ namespace qca {
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
     aurostd::RemoveFile(rundirpath + "/maps.log");
-    chdir(rundirpath.c_str());
+    if(chdir(rundirpath.c_str())!=0){ //CO20230507 - compiler warning on gitrunner
+      message << "chdir failed";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
     string tmpfile = aurostd::TmpStrCreate(), logstring = "";
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
     message << "Running ATAT cluster expansion";
@@ -721,7 +724,10 @@ namespace qca {
       aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
-    chdir(cdirpath.c_str());
+    if(chdir(cdirpath.c_str())!=0){ //CO20230507 - compiler warning on gitrunner
+      message << "chdir failed";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
   }
 
   /// @brief reads the coefficient of variation
@@ -852,7 +858,7 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void QuasiChemApproxCalculator::calculateDegeneracyCluster() {
-    degeneracy_cluster = xvector<long int>(ncluster);
+    degeneracy_cluster = xvector<unsigned long long int>(ncluster);
     string filepath = "";
     if (!rundirpath.empty()) {
       vector<string> tokens;
@@ -860,7 +866,7 @@ namespace qca {
       filepath = "/" + QCA_FILE_PREFIX + "degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.txt";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;} // well defined path due to how we define rundirpath
       if (aurostd::file2vectorstring(filepath, tokens)) {
-        degeneracy_cluster = aurostd::vector2xvector(aurostd::vectorstring2vectorutype<long int>(tokens));
+        degeneracy_cluster = aurostd::vector2xvector(aurostd::vectorstring2vectorutype<unsigned long long int>(tokens));
         return;
       }
     }
@@ -930,13 +936,14 @@ namespace qca {
         }
       }
       std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
+      //CO20230319 - DX, I believe this code is obsolete now that I patch AddAtom() with add_species, keep for safety
       itype = 0;
       atoms[0].type = itype;
       for (size_t j = 1; j < atoms.size(); j++) {
         if (atoms[j].name != atoms[j - 1].name) {itype++;}
         atoms[j].type = itype;
       }
-      str_pocc.AddAtom(atoms);
+      str_pocc.AddAtom(atoms,true); //CO20230319 - add by species
       // Enumerate unique superlattices
       pocc::POccCalculator pcalc(str_pocc);
       pcalc.calculateHNF();
@@ -997,20 +1004,20 @@ namespace qca {
         conc_macro = _conc_macro;
       }
       else if (nelem == 3) { // barycentric coordinates
-        xmatrix<double> _conc_macro((conc_npts * conc_npts - conc_npts) / 2, nelem); // always even
+        xmatrix<double> _conc_macro((conc_npts * conc_npts - conc_npts) / 2.0, nelem); // always even
         xvector<double> x = aurostd::linspace(CONC_SHIFT, 1.0 - CONC_SHIFT, conc_npts);
         xvector<double> p1(2), p2(2), p3(2), p4(2);
         p1(1) = 0.0; p1(2) = 0.0;
         p2(1) = 1.0; p2(2) = 0.0;
         p3(1) = 1.0; p3(2) = 1.0;
-        int ii = 1;
+        int ii = 0;
         for (int i = x.lrows; i <= x.rows; i++) {
-          for (int j = x.lrows + 1; j <= x.rows; j++) {
+          for (int j = x.lrows + i; j <= x.rows; j++) {
+            ii++;
             p4(1) = x(j); p4(2) = x(i);
             _conc_macro(ii, 1) = (p1(1) - p3(1)) * (p4(2) - p1(2)) - (p1(1) - p4(1)) * (p3(2) - p1(2));
             _conc_macro(ii, 2) = (p1(1) - p4(1)) * (p2(2) - p1(2)) - (p1(1) - p2(1)) * (p4(2) - p1(2));
             _conc_macro(ii, 3) = (p4(1) - p3(1)) * (p2(2) - p4(2)) - (p4(1) - p2(1)) * (p3(2) - p4(2));
-            ii++;
           }
         }
         conc_macro = _conc_macro;
@@ -1450,21 +1457,21 @@ namespace qca {
       }
     }
     else if (print == "json") {
-      aurostd::JSONwriter json;
-      json.addString("Alloy name", alloyname);
-      json.addVector("Elements", elements);
-      json.addString("Parent lattice", plattice);
-      json.addNumber("Concentration curve", conc_curve);
-      json.addMatrix("Macroscopic concentration", conc_macro);
-      json.addVector("Temperature range (K)", temp);
-      json.addNumber("Max atoms per cell", max_num_atoms);
-      json.addNumber("Cluster CV score (eV)", cv_cluster);
-      json.addVector("Cluster degeneracy", aurostd::xvector2utype<long int, double>(degeneracy_cluster));
-      json.addMatrix("Cluster concentration", conc_cluster);
-      json.addVector("Cluster excess energy (eV)", excess_energy_cluster);
-      json.addNumber("EC transition temperature (K)", param_ec.second);
-      json.addVector("Binodal curve (K)", binodal_curve);
-      aurostd::string2file(json.toString(), filepath);
+      aurostd::JSON::object jo(aurostd::JSON::object_types::DICTIONARY);
+      jo["Alloy name"] = alloyname;
+      jo["Elements"] = elements;
+      jo["Parent lattice"] = plattice;
+      jo["Concentration curve"] = conc_curve;
+      jo["Macroscopic concentration"] = conc_macro;
+      jo["Temperature range (K)"] = temp;
+      jo["Max atoms per cell"] = max_num_atoms;
+      jo["Cluster CV score (eV)"] = cv_cluster;
+      jo["Cluster degeneracy"] = degeneracy_cluster;
+      jo["Cluster concentration"] = conc_cluster;
+      jo["Cluster excess energy (eV)"] = excess_energy_cluster;
+      jo["EC transition temperature (K)"] = param_ec.second;
+      jo["Binodal curve (K)"] = binodal_curve;
+      jo.saveFile(filepath);
       return;
     }
     cout << output.str() << endl;
@@ -1480,12 +1487,12 @@ namespace qca {
       string message = "The JSON file does not exist, filepath=" + filepath; 
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
-    string jsonfile = aurostd::file2string(filepath);
-    alloyname = aurostd::extractJsonValueAflow(jsonfile, "Alloy name");
-    conc_curve = aurostd::string2utype<bool>(aurostd::extractJsonValueAflow(jsonfile, "Concentration curve"));
-    conc_macro = aurostd::vectorvector2xmatrix<double>(aurostd::extractJsonMatrixAflow(jsonfile, "Macroscopic concentration"));
-    temp = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Temperature range (K)"));
-    binodal_curve = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Binodal curve (K)"));
+    aurostd::JSON::object jo = aurostd::JSON::loadFile(filepath);
+    alloyname = (string)jo["Alloy name"];
+    conc_curve = jo["Concentration curve"];
+    conc_macro = jo["Macroscopic concentration"];
+    temp = jo["Temperature range (K)"];
+    binodal_curve = jo["Binodal curve (K)"];
   }
 
   /// @brief plots the QCA data

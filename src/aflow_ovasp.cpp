@@ -2020,7 +2020,7 @@ bool xOUTCAR::GetXStructure() {
   xstr.FixLattices();
   //xstr.atoms=atoms;
   for(uint i=0;i<atoms.size();i++){
-    xstr.AddAtom(atoms[i]);
+    xstr.AddAtom(atoms[i],false); //CO20230319 - add by type
     xstr.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); //default!
   }
   xstr.MakeBasis();
@@ -4105,7 +4105,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 //[CO20200404 - OBSOLETE]  return TRUE;
 //[CO20200404 - OBSOLETE]}
 
-bool xOUTCAR::GetIonicStepsData(){  //CO20211106
+/// @brief gets the ionic step data
+/// @authors
+/// @mod{CO,20211106,created function}
+/// @mod{SD,20221208,patched for VASP5 and VASP6}
+bool xOUTCAR::GetIonicStepsData(){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   vxstr_ionic.clear();
   venergy_ionic.clear();
@@ -4165,7 +4169,12 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   vector<_atom> vatoms; //must keep like this until we settle types...
   for(iline=0;iline<vcontent_size;iline++){
     if(reading_ionic==false){
-      if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
+      if(aurostd::substring2bool(vcontent[iline],"aborting") &&
+           aurostd::substring2bool(vcontent[iline],"loop") &&
+           aurostd::substring2bool(vcontent[iline],"because") &&
+           aurostd::substring2bool(vcontent[iline],"EDIFF") &&
+           aurostd::substring2bool(vcontent[iline],"is") &&
+           aurostd::substring2bool(vcontent[iline],"reached")){
         reading_ionic=true;
         reading_stresses=false;reading_lattice=false;reading_atoms=false;convert_kBar2eV=false;
         //clear everything, set stresses to 3 as an indicator that it's not set
@@ -4276,7 +4285,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
               vatoms[iatom].name=species_pp[itype];
               vatoms[iatom].name_is_given=(!vatoms[iatom].name.empty());
               vatoms[iatom].fpos=xstr.c2f*vatoms[iatom].cpos;
-              xstr.AddAtom(vatoms[iatom]);
+              xstr.AddAtom(vatoms[iatom],false);  //CO20230319 - add by type
               xstr.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
               iatom++;
             }
@@ -4293,133 +4302,44 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   return true;
 }
 
-void xOUTCAR::populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path){ //CO20220124
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-
-  if(LDEBUG){cerr << __AFLOW_FUNC__ << " outcar_path=" << outcar_path << endl;}
-  data.clear();
-  data.vspecies.clear(); for(uint i=0;i<species.size();i++) { data.vspecies.push_back(species.at(i)); } // for aflowlib_libraries.cpp
-  data.nspecies=data.vspecies.size();
-  data.vspecies_pp_AUID.clear(); for(uint i=0;i<species_pp_AUID.size();i++) { data.vspecies_pp_AUID.push_back(species_pp_AUID.at(i)); } // for aflowlib_libraries.cpp
-  data.dft_type=pp_type;
-  data.METAGGA=METAGGA;
-
-  data.catalog="LIB"+aurostd::utype2string(data.vspecies.size()); //default
-  if(!outcar_path.empty()){
-    aflowlib::setAURL(data,aurostd::dirname(outcar_path));  //outcar_path is a path to a file, not a directory like directory_LIB
-  }
-
-  if(LDEBUG){
-    cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(data.vspecies,",") << endl;
-    cerr << __AFLOW_FUNC__ << " vspecies_pp_AUID=" << aurostd::joinWDelimiter(data.vspecies_pp_AUID,",") << endl;
-    cerr << __AFLOW_FUNC__ << " dft_type=" << data.dft_type << endl;
-    cerr << __AFLOW_FUNC__ << " METAGGA=" << data.METAGGA << endl;
-    cerr << __AFLOW_FUNC__ << " aurl=" << data.aurl << endl;
-    cerr << __AFLOW_FUNC__ << " catalog=" << data.catalog << endl;
-  }
-}
-
-void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path){  //CO20211106
-  vector<string> velements;
-  return WriteMTPCFG(output_ss,outcar_path,velements);
-}
-void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& _velements){  //CO20211106
-
-  if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
-  if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
-
-  aflowlib::_aflowlib_entry data;
-  populateAFLOWLIBEntry(data,outcar_path);
-  vector<string> velements=_velements;
-  if(velements.empty()){velements=data.vspecies;}
-  bool FORMATION_CALC=false;
-
-  output_ss.setf(std::ios::fixed,std::ios::floatfield);
-  uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
-  output_ss.precision(_precision_);
-
-  string tab=" ";
-  uint istr,iatom,itype=0;
-  uint i=0,j=0;
-  int icoord=0;
-  bool found_itype=false;
-
-  for(istr=0;istr<vxstr_ionic.size();istr++){
-    const xstructure& a=vxstr_ionic[istr];
-    output_ss << "BEGIN_CFG" << endl;
-    output_ss << tab << "Size" << endl;
-    output_ss << tab << tab << a.atoms.size() << endl;
-    output_ss << tab << "Supercell" << endl;
-    for(i=1;i<=3;i++) {
-      for(j=1;j<=3;j++) {
-        output_ss << tab << tab << " ";
-        if(abs(a.lattice(i,j))<10.0) output_ss << " ";
-        if(!std::signbit(a.lattice(i,j))) output_ss << " ";
-        output_ss << a.lattice(i,j) << "";
-      }
-      output_ss << endl;
+/// @brief write ionic step data to JSON
+/// @param jo JSON object
+/// @param entry aflowlib entry
+/// @authors
+/// @mod{CO,20211106,created function}
+/// @mod{SD+HE,20221208,rewritten using JSON objects}
+void xOUTCAR::AddStepsIAPCFG(aurostd::JSON::object& jo, aflowlib::_aflowlib_entry& entry) {
+  if (vxstr_ionic.size() != venergy_ionic.size()) {throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "vxstr_ionic.size()!=venergy_ionic", _FILE_CORRUPT_);}
+  if (vxstr_ionic.size() != vstresses_ionic.size()) {throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "vxstr_ionic.size()!=vstresses_ionic", _FILE_CORRUPT_);}
+  //bool FORMATION_CALC = false;
+  vector<string> type;
+  vector<xvector<double>> fpos, force;
+  for(size_t istr = 0; istr < vxstr_ionic.size(); istr++) {
+    aurostd::JSON::object step(aurostd::JSON::object_types::DICTIONARY);
+    step["auid"] = entry.auid;
+    step["energy"] = venergy_ionic[istr];
+    step["lattice"] = vxstr_ionic[istr].lattice;
+    step["stress"] = vstresses_ionic[istr];
+    type.clear();
+    fpos.clear();
+    force.clear();
+    for(size_t iatom = 0; iatom < vxstr_ionic[istr].atoms.size(); iatom++) {
+      type.push_back(vxstr_ionic[istr].atoms[iatom].cleanname);
+      fpos.push_back(vxstr_ionic[istr].atoms[iatom].fpos);
+      force.push_back(vxstr_ionic[istr].atoms[iatom].force);
     }
-    output_ss << tab << "AtomData: id type direct_x direct_y direct_z  fx fy fz" << endl;
-    for(iatom=0;iatom<a.atoms.size();iatom++){
-      output_ss << tab << tab;
-      if(iatom<10) output_ss << "  ";
-      else if(iatom<100) output_ss << " ";
-      output_ss << iatom << " ";
-      if(0){
-        //this assumes all of the OUTCARs have the species in the right order
-        //if we're looking at the CrMn alloy, some systems in LIB2 have Mn only
-        //itype==1, base it on input velements (if available)
-        if(abs(a.atoms[iatom].type)<10) output_ss << "  ";
-        else if(abs(a.atoms[iatom].type)<100) output_ss << " ";
-        output_ss << a.atoms[iatom].type << " ";
-      }else{
-        found_itype=false;
-        for(itype=0;itype<velements.size()&&!found_itype;itype++){
-          if(a.atoms[iatom].cleanname==velements[itype]){
-            if(itype<10) output_ss << "  ";
-            else if(itype<100) output_ss << " ";
-            output_ss << itype << " ";
-            found_itype=true;
-          }
-        }
-        if(!found_itype){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"itype not found",_FILE_CORRUPT_);}
-      }
-      for(icoord=a.atoms[iatom].fpos.lrows;icoord<=a.atoms[iatom].fpos.urows;icoord++){
-        if(!std::signbit(a.atoms[iatom].fpos[icoord])) output_ss << " ";
-        output_ss << a.atoms[iatom].fpos[icoord] << (icoord<a.atoms[iatom].fpos.urows?" ":"");
-      }
-      output_ss << " ";
-      for(icoord=a.atoms[iatom].force.lrows;icoord<=a.atoms[iatom].force.urows;icoord++){
-        if(abs(a.atoms[iatom].force[icoord])<10) output_ss << "  ";
-        else if(abs(a.atoms[iatom].force[icoord])<100) output_ss << " ";
-        if(!std::signbit(a.atoms[iatom].force[icoord])) output_ss << " ";
-        output_ss << a.atoms[iatom].force[icoord] << (icoord<a.atoms[iatom].force.urows?" ":"");
-      }
-      output_ss << endl;
-    }
-    output_ss << tab << "Energy" << endl;
-    output_ss << tab << tab << venergy_ionic[istr] << endl;
-    output_ss << tab << "PlusStress: xx yy zz xy yz xz" << endl; //order as vasp
-    output_ss << tab << tab;
-    for(icoord=vstresses_ionic[istr].lrows;icoord<=vstresses_ionic[istr].urows;icoord++){
-      if(abs(vstresses_ionic[istr][icoord])<10) output_ss << "  ";
-      else if(abs(vstresses_ionic[istr][icoord])<100) output_ss << " ";
-      if(!std::signbit(vstresses_ionic[istr][icoord])) output_ss << " ";
-      output_ss << vstresses_ionic[istr][icoord] << (icoord<vstresses_ionic[istr].urows?" ":"");
-    }
-    output_ss << endl;
-    data.enthalpy_cell=data.enthalpy_atom=venergy_ionic[istr];
-    data.enthalpy_atom/=a.atoms.size();
-    FORMATION_CALC=aflowlib::LIB2RAW_Calculate_FormationEnthalpy(data,a,__AFLOW_FUNC__);
-    if(FORMATION_CALC){
-      output_ss << tab << "Feature enthalpy_formation_atom " << data.enthalpy_formation_atom << endl;
-    }
-    output_ss << tab << "Feature EFS_by vasp" << endl;
-    output_ss << tab << "Feature from aflow.org:" << outcar_path << ":ionic_step=" << istr+1 << endl;
-    output_ss << tab << "Feature elements ";
-    for(itype=0;itype<a.species.size();itype++){output_ss << KBIN::VASP_PseudoPotential_CleanName(a.species[itype]);}
-    output_ss << endl;
-    output_ss << "END_CFG" << endl;
+    aurostd::JSON::object atoms(aurostd::JSON::object_types::DICTIONARY);
+    atoms["type"] = type;
+    atoms["position"] = fpos;
+    atoms["force"] = force;
+    step["atoms"] = atoms;
+  //  entry.enthalpy_cell = entry.enthalpy_atom = venergy_ionic[istr];
+  //  entry.enthalpy_atom /= vxstr_ionic[istr].atoms.size();
+  //  FORMATION_CALC = aflowlib::LIB2RAW_Calculate_FormationEnthalpy(entry, vxstr_ionic[istr], __AFLOW_FUNC__);
+  //  if (FORMATION_CALC) {
+  //    step["enthalpy_formation_atom"] = entry.enthalpy_formation_atom;
+  //  }
+    jo["data"].push_back(step);
   }
 
 }

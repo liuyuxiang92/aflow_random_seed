@@ -26,6 +26,9 @@
 #ifndef _AUROSTD_XOPTION_CPP_
 #include "aurostd_xoption.cpp"
 #endif
+#ifndef _AUROSTD_DATA_CPP_
+#include "aurostd_data.cpp"
+#endif
 #ifndef _AUROSTD_XCOMPLEX_CPP_
 #include "aurostd_xcomplex.cpp"
 #endif

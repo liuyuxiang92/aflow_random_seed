@@ -995,7 +995,7 @@ namespace aflowlib {
         std::deque<_atom> atoms;
         atoms=str.atoms;
         while(str.atoms.size()>0) str.RemoveAtom(0);
-        for(uint i=0;i<atoms.size();i++) str.AddAtom(atoms.at(i));
+        for(uint i=0;i<atoms.size();i++) str.AddAtom(atoms.at(i),true); //CO20230319 - add by species
         if(LDEBUG) { //CO20181128
           cerr << "BEFORE SpeciesPutAlphabetic() " << endl;
           for(uint iat=0;iat<str.atoms.size();iat++) {
@@ -1304,14 +1304,14 @@ namespace aflowlib {
       if(nspecies>1)
         for(iat=0;iat<str_tmp.atoms.size();iat++)
           if(str_tmp.atoms.at(iat).type==1)
-            str.AddAtom(str_tmp.atoms.at(iat));
+            str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
       for(iat=0;iat<str_tmp.atoms.size();iat++)
         if(str_tmp.atoms.at(iat).type==0)
-          str.AddAtom(str_tmp.atoms.at(iat));
+          str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
       if(nspecies>2)
         for(iat=0;iat<str_tmp.atoms.size();iat++)
           if(str_tmp.atoms.at(iat).type==2)
-            str.AddAtom(str_tmp.atoms.at(iat));
+            str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
 
       //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up] if(nspecies==1) {
       //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(0));
@@ -1455,7 +1455,7 @@ namespace aflowlib {
             for(uint iat=0;iat<str_tmp.atoms.size();iat++)
               if(str_tmp.atoms.at(iat).name==vatomX.at(isp)) {
                 if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [SWAP(,)] plugging=" <<  str_tmp.atoms.at(iat).name << endl; }
-                str.AddAtom(str_tmp.atoms.at(iat));
+                str.AddAtom(str_tmp.atoms.at(iat),true);  //CO20230319 - add by species
               }
         }
         // aurostd::swap(str.num_each_type.at(ispecies.at(0)),str.num_each_type.at(ispecies.at(1)));  // taken care by AddAtom
@@ -2880,7 +2880,7 @@ namespace aflowlib {
         std::deque<_atom> atoms;
         atoms=str.atoms;
         while(str.atoms.size()>0) str.RemoveAtom(0);
-        for(uint i=0;i<atoms.size();i++) str.AddAtom(atoms.at(i));
+        for(uint i=0;i<atoms.size();i++) str.AddAtom(atoms.at(i),true); //CO20230319 - add by species
         // make alphabetic
         str.SpeciesPutAlphabetic();
         // fix title
@@ -3158,12 +3158,12 @@ namespace aflowlib {
 
       if(nspecies>1)
         for(iat=0;iat<str_tmp.atoms.size();iat++)
-          if(str_tmp.atoms.at(iat).type==1) str.AddAtom(str_tmp.atoms.at(iat));
+          if(str_tmp.atoms.at(iat).type==1) str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
       for(iat=0;iat<str_tmp.atoms.size();iat++)
-        if(str_tmp.atoms.at(iat).type==0) str.AddAtom(str_tmp.atoms.at(iat));
+        if(str_tmp.atoms.at(iat).type==0) str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
       if(nspecies>2)
         for(iat=0;iat<str_tmp.atoms.size();iat++)
-          if(str_tmp.atoms.at(iat).type==2) str.AddAtom(str_tmp.atoms.at(iat));
+          if(str_tmp.atoms.at(iat).type==2) str.AddAtom(str_tmp.atoms.at(iat),false); //CO20230319 - add by type
 
       if(nspecies==1) {
         str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(0));
@@ -3305,7 +3305,7 @@ namespace aflowlib {
             for(uint iat=0;iat<str_tmp.atoms.size();iat++)
               if(str_tmp.atoms.at(iat).name==PARAMS->vatomX.at(isp)) {
                 if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [SWAP(,)] plugging=" <<  str_tmp.atoms.at(iat).name << endl;
-                str.AddAtom(str_tmp.atoms.at(iat));
+                str.AddAtom(str_tmp.atoms.at(iat),true);  //CO20230319 - add by species
               }
         }
         // aurostd::swap(str.num_each_type.at(ispecies.at(0)),str.num_each_type.at(ispecies.at(1)));  // taken care by AddAtom

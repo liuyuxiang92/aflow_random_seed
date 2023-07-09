@@ -12,7 +12,6 @@
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
-#include "aflow_xtalfinder_python.cpp" //DX20201228
 
 //[OBSOLETE - ME20220128] #undef AFLOW_MULTITHREADS_ENABLE
 
@@ -1810,7 +1809,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
   // ---------------------------------------------------------------------------
   // used to find the total number of structures
   vector<string> start_string;
-  aurostd::substring2strings(input_stream.str(),start_string,START);
+  aurostd::substring2strings(input_stream.str(),start_string,string(START),string(STOP)); //CO20230502
 
   message << "Loading " << start_string.size() << " structures in file ... ";
   pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -2456,10 +2455,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
       species.push_back(names[all_indices[i][j]]);
     }
     xstr_tmp.SetSpecies(species);
-    //DX TEST xstr_tmp.species_pp = species; //for vasp5 20190731
-    xstr_tmp.species = species; //DX20190813
-    xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
-    xstr_tmp.SpeciesPutAlphabetic(); // updates num each type
+    std::stable_sort(xstr_tmp.atoms.begin(),xstr_tmp.atoms.end(),sortAtomsNames); //DX20230227 - with updated SetSpecies using ReplaceAtoms, need to resort atoms based on names
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 
@@ -6786,7 +6782,7 @@ namespace compare {
     }
     std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
     for(uint i=0;i<new_basis.size();i++){
-      proto_new.AddAtom(new_basis[i]);
+      proto_new.AddAtom(new_basis[i],true); //CO20230319 - add by species
     }
     proto = proto_new;
 
@@ -7803,10 +7799,8 @@ namespace compare {
     aurostd::DirectoryMake(python_dir);
 
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
-    stringstream output;
 
-    output << AFLOW_XTALFINDER_PYTHON_PY;
-    aurostd::stringstream2file(output, python_dir+"/"+"aflow_xtalfinder_python.py");
+    aurostd::EmbData::save_to_file("aflow_xtalfinder_python.py", python_dir+"/"+"aflow_xtalfinder_python.py");
   }
 }
 

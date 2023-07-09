@@ -31,3 +31,5 @@ jobs:
       run: make -j -C src
     - name: run unit_test
       run: ./src/aflow --unit_test aurostd,database,structure
+    - name: recreate makefile
+      run: cd src && ./aflow --makefile && make -j

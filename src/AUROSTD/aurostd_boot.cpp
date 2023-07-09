@@ -615,6 +615,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     deque<uint> dui; jwui.addVector("",dui);//AS20201217
     vector<vector<uint> > vvui; jwui.addMatrix("",vvui);//AS20201217
     deque<deque<uint> > ddui; jwui.addMatrix("",ddui);//AS20201217
+    vector<aflowlib::_aflowlib_entry> ventries;aurostd::reorder(ventries,vui,1);  //CO20221111
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -722,7 +723,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
     o+=initialize_scalar((unsigned long long int)(1));
-    // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
+    o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
     unsigned long long int ulligcd=1;_GCD(ulligcd,ulligcd,ulligcd,ulligcd,ulligcd);_GCD(ulligcd,ulligcd,ulligcd);  //CO20191201

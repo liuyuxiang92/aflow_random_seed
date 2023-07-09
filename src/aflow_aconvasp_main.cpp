@@ -331,7 +331,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::OUTPUT","--print=|--p=|--output=|--o=",""); //determine how to get output, could pull from XHOST, but --output was used previously (backwards compatibility)
     if(vpflow.flag("CHULL::OUTPUT")){
       vector<string> out_forms;
-      string out_form;
+      string out_form="";
       aurostd::string2tokens(vpflow.getattachedscheme("CHULL::OUTPUT"),out_forms,",");
       if(out_forms.size()>1){vpflow.flag("CHULL::MULTI_OUTPUT",TRUE);} //CO20180409
       for(uint i=0;i<out_forms.size();i++){
@@ -397,6 +397,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       if(vpflow.flag("CHULL::PNG_IMAGE")){
         vpflow.args2addattachedscheme(argv,cmds,"CHULL::PNG_RESOLUTION","--png_resolution=|--pngresolution=|--pngr=",""); //calculate distance to hull for point
       }
+    }
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS","--distance_for_equivalence_analysis=|--dist4equi=|--d4e=","0.0"); //calculate distance to hull for point
+    if(vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")){
+      vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS_ND_ONLY",aurostd::args2attachedflag(argv,cmds,"--d4e_ND|--d4e_nd"));
     }
   }
 
@@ -636,6 +640,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("HKL_SEARCH_COMPLETE",aurostd::args2flag(argv,cmds,"--hkl_search_complete"));
   vpflow.args2addattachedscheme(argv,cmds,"HKL_SEARCH_COMPLETE","--hkl_search_complete=","");
 
+  vpflow.flag("IAP::INIT",aurostd::args2flag(argv,cmds,"--iap|--IAP"));  // initiate IAP writer
+
   vpflow.flag("ICSD",aurostd::args2flag(argv,cmds,"--icsd"));
   vpflow.flag("ICSD_ALLLESSTHAN",aurostd::args2flag(argv,cmds,"--icsd_alllessthan"));
   vpflow.flag("ICSD_ALLMORETHAN",aurostd::args2flag(argv,cmds,"--icsd_allmorethan"));
@@ -718,8 +724,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("HNFCELL",aurostd::args2flag(argv,cmds,"--hnfcell|--hfncell|--pocc_show_unique_structures|--pocc_show_unique|--pocc_print_unique")); //CO20181226
   vpflow.flag("POCC_COUNT_TOTAL",aurostd::args2flag(argv,cmds,"--pocc_count_total_structures|--pocc_count_total")); //CO20181226
   vpflow.flag("POCC_COUNT_UNIQUE",aurostd::args2flag(argv,cmds,"--pocc_count_unique_structures|--pocc_count_unique")); //CO20181226
+  vpflow.flag("POCC_COUNT_UNIQUE_FAST",aurostd::args2flag(argv,cmds,"--pocc_count_unique_fast")); //SD20230609
   vpflow.flag("POCC_SKIP_WRITING_FILES",aurostd::args2flag(argv,cmds,"--pocc_skip_writing_files")); //CO20181226
-  if(vpflow.flag("HNF") || vpflow.flag("POCC_COUNT_TOTAL") || vpflow.flag("POCC_COUNT_UNIQUE")){vpflow.flag("HNFCELL",TRUE);} //funnel all of these through command_line function
+  if(vpflow.flag("HNF") || vpflow.flag("POCC_COUNT_TOTAL") || vpflow.flag("POCC_COUNT_UNIQUE") || vpflow.flag("POCC_COUNT_UNIQUE_FAST")){vpflow.flag("HNFCELL",TRUE);} //funnel all of these through command_line function
   if(vpflow.flag("HNFCELL")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401  //no point writing files if through command_line
   if(XHOST.vflag_control.flag("WWW")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401 //CO20200404 - new web flag
   vpflow.flag("MULTIENUMALL",aurostd::args2flag(argv,cmds,"--multienum|--enum"));
@@ -778,8 +785,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("MISCIBILITY",aurostd::args2flag(argv,cmds,"--MIX|--mix|--MISCIBILITY|--miscibility|--MISCIBILE|--miscibile"));
   vpflow.flag("MOM",aurostd::args2flag(argv,cmds,"--mom"));
   vpflow.flag("MSI",aurostd::args2flag(argv,cmds,"--msi"));
-
-  vpflow.flag("MTP::INIT",aurostd::args2flag(argv,cmds,"--mtp|--MTP"));  // initiate MTP writer
 
   vpflow.flag("MULTI=BZIP2",aurostd::args2flag(argv,cmds,"--multi=bzip2"));
   vpflow.flag("MULTI=BUNZIP2",aurostd::args2flag(argv,cmds,"--multi=bunzip2"));
@@ -1902,17 +1907,8 @@ namespace pflow {
       //[CO20190208 - OBSOLETE]if(vpflow.flag("HNFCELL")) {pflow::HNFCELL(vpflow,cin,cout); _PROGRAMRUN=true;} //CO20181226
       if(vpflow.flag("HNFCELL")) {pflow::POCC_COMMAND_LINE(vpflow,cin,cout); _PROGRAMRUN=true;} //CO20181226
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFCELL")) {pocc::HNFCELL(cin); _PROGRAMRUN=true;}
-      // K
-      if(vpflow.flag("KBAND")) {pflow::KBAND(argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPOINTS")) {pflow::KPOINTS(vpflow.getattachedscheme("KPOINTS"),cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("FLAG::XVASP_KPOINTS_DELTA")) {pflow::KPOINTS_DELTA(vpflow,cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("KILL")) {sflow::KILL(vpflow.getattachedscheme("KILL")); _PROGRAMRUN=true;} 
-      // J
-      if(vpflow.flag("JUSTAFTER")) {sflow::JUST(vpflow.getattachedscheme("JUSTAFTER"),cin,"JUSTAFTER"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JUSTBEFORE")) {sflow::JUST(vpflow.getattachedscheme("JUSTBEFORE"),cin,"JUSTBEFORE"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JUSTBETWEEN")) {sflow::JUST(vpflow.getattachedscheme("JUSTBETWEEN"),cin,"JUSTBETWEEN"); _PROGRAMRUN=true;}
-      if(vpflow.flag("JMOL")) {pflow::JMOL(vpflow.getattachedscheme("JMOL"),cin); _PROGRAMRUN=true;}
       // I
+      if(vpflow.flag("IAP::INIT")) {aflowMachL::WriteFileIAPCFG(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD") || vpflow.flag("ICSD_CHEM") || vpflow.flag("ICSD_PROTO") || vpflow.flag("ICSD_ID") || vpflow.flag("ICSD_LESSTHAN") || vpflow.flag("ICSD_MORETHAN") ||
           vpflow.flag("ICSD_DENSLESSTHAN") || vpflow.flag("ICSD_DENSMORETHAN") || vpflow.flag("ICSD_SG") || vpflow.flag("ICSD_SGLESSTHAN") ||
           vpflow.flag("ICSD_SGMORETHAN") || vpflow.flag("ICSD_TRICLINIC") || vpflow.flag("ICSD_MONOCLINIC") || vpflow.flag("ICSD_ORTHORHOMBIC") ||
@@ -1940,6 +1936,16 @@ namespace pflow {
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(vpflow.getattachedscheme("INFLATE_VOLUME"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
+      // J
+      if(vpflow.flag("JUSTAFTER")) {sflow::JUST(vpflow.getattachedscheme("JUSTAFTER"),cin,"JUSTAFTER"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JUSTBEFORE")) {sflow::JUST(vpflow.getattachedscheme("JUSTBEFORE"),cin,"JUSTBEFORE"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JUSTBETWEEN")) {sflow::JUST(vpflow.getattachedscheme("JUSTBETWEEN"),cin,"JUSTBETWEEN"); _PROGRAMRUN=true;}
+      if(vpflow.flag("JMOL")) {pflow::JMOL(vpflow.getattachedscheme("JMOL"),cin); _PROGRAMRUN=true;}
+      // K
+      if(vpflow.flag("KBAND")) {pflow::KBAND(argv); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPOINTS")) {pflow::KPOINTS(vpflow.getattachedscheme("KPOINTS"),cin,cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("FLAG::XVASP_KPOINTS_DELTA")) {pflow::KPOINTS_DELTA(vpflow,cin,cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("KILL")) {sflow::KILL(vpflow.getattachedscheme("KILL")); _PROGRAMRUN=true;} 
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
       //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
@@ -1953,7 +1959,6 @@ namespace pflow {
       if(vpflow.flag("LTCELL")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LTCELLFV")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELLFV"),cin); _PROGRAMRUN=true;}
       // M
-      if(vpflow.flag("MTP::INIT")) {aflowMachL::PrintMTPCFGAlloy(vpflow); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("MILLER")) {cout << pflow::MILLER(vpflow.getattachedscheme("MILLER"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BZIP2")) {AFLOW_PTHREADS::MULTI_compress("bzip2",argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BUNZIP2")) {AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);_PROGRAMRUN=true;}
@@ -5520,8 +5525,8 @@ namespace pflow {
               _atom atom=b.atoms.at(iat);
               atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
               atom.cpos=F2C(a.lattice,atom.fpos);
-              if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) a.AddAtom(atom);
-              //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   a.AddAtom(atom);	    //a.AddAtom(atom);
+              if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) a.AddAtom(atom,false);  //CO20230319 - add by type
+              //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   a.AddAtom(atom,false);	    //a.AddAtom(atom,false);  //CO20230319 - add by type
             }
           }
         }
@@ -7849,13 +7854,14 @@ namespace pflow {
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
     pocc::POccCalculator pcalc(xstr,vpflow,oss); //CO20190319
+    pcalc.m_count_unique_fast=vpflow.flag("POCC_COUNT_UNIQUE_FAST");
     if(!pcalc.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"POccCalculator failed to initialized");}
     pcalc.calculateHNF();
     if(vpflow.flag("HNF")){return pcalc.m_initialized;}
     pcalc.getTotalPermutationsCount();
     if(vpflow.flag("POCC_COUNT_TOTAL")){return pcalc.m_initialized;}
     pcalc.calculate();
-    if(vpflow.flag("POCC_COUNT_UNIQUE")){return pcalc.m_initialized;}
+    if(vpflow.flag("POCC_COUNT_UNIQUE") || vpflow.flag("POCC_COUNT_UNIQUE_FAST")){return pcalc.m_initialized;}
     oss << AFLOWIN_SEPARATION_LINE << endl;
     oss << "Creating list of unique derivative supercells." << endl;  //CO20190116
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {
@@ -8179,7 +8185,7 @@ namespace pflow {
                 atom=a.atoms.at(iat);
                 atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
                 if(aurostd::isequal(atom.fpos[1],1.0,0.02) || aurostd::isequal(atom.fpos[2],1.0,0.02)|| aurostd::isequal(atom.fpos[3],1.0,0.02))
-                  b.AddAtom(F2C(b,atom));
+                  b.AddAtom(F2C(b,atom),false); //CO20230319 - add by type
               }
         }
         a=b;
@@ -9871,24 +9877,26 @@ namespace pflow {
     stringstream message;
 
     //get path if not provided
-    if (path.empty()) {
-      path = entry.getPathAURL(FileMESSAGE,oss,true); is_url_path=false;
-      if(!(!path.empty()&&aurostd::IsDirectory(path))){path = "";}  //reset
+    if(path.empty()){
+      path=entry.getPathAURL(FileMESSAGE,oss,true); is_url_path=false;
+      if(!(!path.empty()&&aurostd::IsDirectory(path))){path="";}  //reset
     }
     if(path.empty()){path = entry.getPathAURL(FileMESSAGE,oss,false);is_url_path=true;}
-    if (path.empty()) {
+    if(path.empty()){
       message << "Path cannot be loaded from entry, skipping loadXstructure()";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
 
     vector<string> vspecies=entry.vspecies;
-    if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+    //[CO20221110 - fails for unaries in LIB2]if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+    if(vspecies.empty()){vspecies=entry.getSpecies();}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
 
     xstructure xstrAux;
     stringstream ss;
     vector<string> files;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
 
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
@@ -9954,7 +9962,7 @@ namespace pflow {
           }
         }
       }
-      if (!xstrAux.atoms.size()) {
+      if(!xstrAux.atoms.size()) {
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
@@ -9974,7 +9982,7 @@ namespace pflow {
         if(aurostd::EWithinList(files,poscar_files_relax_mid[i],efile)) {
           if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for " << path+"/"+efile << endl;}
           ss.str("");
-          if ( (is_url_path ? 
+          if( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ 
@@ -9994,7 +10002,7 @@ namespace pflow {
           }
         }
       }
-      if (!xstrAux.atoms.size()) {
+      if(!xstrAux.atoms.size()) {
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
@@ -10015,7 +10023,7 @@ namespace pflow {
       if(aurostd::EWithinList(files,poscar_files_relax_final[i],efile)) {
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for " << path+"/"+efile << endl;}
         ss.str("");
-        if ( (is_url_path ? 
+        if( (is_url_path ? 
               aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
               aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
           try{ 
@@ -10035,7 +10043,7 @@ namespace pflow {
         }
       }
     }
-    if (!xstrAux.atoms.size()) {
+    if(!xstrAux.atoms.size()) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
@@ -10127,7 +10135,7 @@ namespace pflow {
         atom.name = species[type_idx];
         atom.cleanname = species[type_idx];
         atom.name_is_given = true;
-        new_structure.AddAtom(atom);
+        new_structure.AddAtom(atom,false);  //CO20230319 - add by type
         num_atoms++;
       }
     }
@@ -10399,7 +10407,6 @@ namespace pflow {
     }
     if(message_parts.size()==0){return;}
 
-
     string tag_code="00000";
     string tag_message="MESSAGE";
     if (type == _LOGGER_ERROR_) {
@@ -10441,7 +10448,7 @@ namespace pflow {
         stream << "  ";
         stream << tag_message;
         stream << " ";
-        stream << __AFLOW_FUNC__;
+        stream << function_name;  //CO20230319
         stream << " ";
         stream << message_parts[i]; //CO20181226 //message;
         stream << Message(filename,aflags,message_metadata);
@@ -10966,7 +10973,7 @@ namespace pflow {
             _atom atom=a.atoms.at(iat);
             atom.cpos=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3)+a.atoms.at(iat).cpos;
             atom.fpos=C2F(b.lattice,atom.cpos);               // put in fractional of new basis
-            if(modulus(atom.cpos)<=radius)  b.AddAtom(atom);
+            if(modulus(atom.cpos)<=radius)  b.AddAtom(atom,false);  //CO20230319 - add by species
           }
         }
       }
@@ -11747,6 +11754,12 @@ namespace pflow {
   };
   vector<POCCSiteSpecification> poccString2POCCSiteSpecification(const xstructure& xstr,const vector<string> pocc_sites){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG){ //CO20230319
+      cerr << __AFLOW_FUNC__ << " xstr=" << endl << xstr << endl;
+      cerr << __AFLOW_FUNC__ << " pocc_sites=";
+      for(uint i=0;i<pocc_sites.size();i++){cerr << pocc_sites[i] << (i<pocc_sites.size()-1?",":"");}
+      cerr << endl;
+    }
     stringstream message;
     vector<POCCSiteSpecification> vpss;
     if(pocc_sites.empty()){return vpss;}
@@ -12091,7 +12104,7 @@ namespace pflow {
     }
     xstr.RemoveAtom(atoms2remove);
     std::stable_sort(atoms2add.begin(),atoms2add.end(),sortAtomsTypes); //safe because we do AddAtom() below
-    for(uint i=0;i<atoms2add.size();i++){xstr.AddAtom(atoms2add[i]);}
+    for(uint i=0;i<atoms2add.size();i++){xstr.AddAtom(atoms2add[i],false);} //CO20230319 - add by type
     //volumes
     //AddAtom() takes care of setting default volumes/masses
     if(vvolumes.size()==xstr.species_volume.size()){
@@ -13454,20 +13467,15 @@ namespace pflow {
         if (!aurostd::FileExist(moddir)) aurostd::DirectoryMake(moddir);
         // Only include cpps here to avoid multiple definition errors
         if (mod == "aflow_cce") {
-#include "aflow_cce_python.cpp"
-          aurostd::string2file(AFLOW_CCE_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_cce_python.py", moddir + "/__init__.py");
         } else if (mod == "aflow_chull") {
-#include "aflow_chull_python.cpp"
-          aurostd::string2file(AFLOW_CHULL_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_chull_python.py", moddir + "/__init__.py");
         } else if (mod == "aflow_chull_plotter") {
-#include "aflow_chull_jupyter_plotter.cpp"
-          aurostd::string2file(AFLOW_CHULL_JUPYTER_PLOTTER_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_chull_jupyter_plotter.py", moddir + "/__init__.py");
         } else if (mod == "aflow_sym") {
-#include "aflow_sym_python.cpp"
-          aurostd::string2file(AFLOW_SYM_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_sym_python.py", moddir + "/__init__.py");
         } else if ((mod == "aflow_xtal_finder") || (mod == "aflow_xtalfinder")) {
-#include "aflow_xtalfinder_python.cpp"
-          aurostd::string2file(AFLOW_XTALFINDER_PYTHON_PY, moddir + "/__init__.py");
+          aurostd::EmbData::save_to_file("aflow_xtalfinder_python.py", moddir + "/__init__.py");
         }
       }
       message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";
