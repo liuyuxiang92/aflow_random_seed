@@ -773,6 +773,12 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
     throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
+  // ---------------------------------------------------------------------------
+  // convert the input structure based on the comparison_options
+  // if a conversion is requested, this should be done before the symmetry;
+  // otherwise the symmetry analysis could be very slow
+  convertStructures(comparison_options, num_proc);
+
   vector<StructurePrototype> prototypes_final;
 
   // ---------------------------------------------------------------------------
@@ -1031,6 +1037,12 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     message << "Input structure was not loaded. Nothing to compare.";
     throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
+
+  // ---------------------------------------------------------------------------
+  // convert the input structure based on the comparison_options
+  // if a conversion is requested, this should be done before the symmetry;
+  // otherwise the symmetry analysis could be very slow
+  convertStructures(comparison_options, num_proc);
 
   // ---------------------------------------------------------------------------
   // start building AFLUX query
