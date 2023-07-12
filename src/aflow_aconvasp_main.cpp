@@ -1736,7 +1736,7 @@ namespace pflow {
         if(vpflow.flag("QE")){xstr.xstructure2qe();}
         if(vpflow.flag("VASP")||vpflow.flag("VASP5")){
           xstr.xstructure2vasp();
-          if(vpflow.flag("VASP5")){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}
+          if(vpflow.flag("VASP5")){xstr.is_vasp4_poscar_format=false;xstr.is_vasp5_poscar_format=true;}
         }
         if(vpflow.flag("ITC")){xstr.xstructure2itc();}
         //perform structure/lattice normalization
