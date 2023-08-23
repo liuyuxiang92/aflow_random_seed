@@ -4256,6 +4256,37 @@ namespace KBIN {
       }
     }
     // ***************************************************************************
+    
+    // ***************************************************************************
+    // KPAR KPAR KPAR KPAR KPAR KPAR
+    else if(command=="KPAR") {
+      keyword=command;
+
+      if(Krun){
+        incar_input=keyword+"="+aurostd::utype2string(ivalue);
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
+          if(incar_input==incar_input_old){Krun=false;}
+        }
+        //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
+      }
+
+      if(Krun){
+        //REMOVE LINES
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation_ivalue,VERBOSE);  //CO20200624
+      }
+      //[CO20230822 - no kflags passed in, do later...]//[CO20230822 - no kflags passed in, do later...]]//CO20230822 - first check that we have a vasp version higher than 5.3.2  //https://www.vasp.at/wiki/index.php/KPAR
+      //[CO20230822 - no kflags passed in, do later...]string vasp_path_full=kflags.KBIN_BIN;
+      //[CO20230822 - no kflags passed in, do later...]double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
+      //[CO20230822 - no kflags passed in, do later...]if(vaspVersion<5.32){Krun=false;}
+      if(Krun){
+        //ADD LINES
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_ivalue << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] end" << endl;
+      }
+    }
+    // ***************************************************************************
 
     // ***************************************************************************
     // LASPH LASPH LASPH LASPH LASPH LASPH
@@ -6576,6 +6607,69 @@ namespace KBIN {
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
+    else if(fix=="BMIX_GAMMA") { //CO+DB20230822 - https://www.vasp.at/vasp-workshop/optelectron.pdf //before 'BMIX='
+      //first get BMIX for current run
+      //then get GAMMA
+      //if GAMMA>1, decrease BMIX, else increase BMIX
+      //BMIX_new = 1/GAMMA * BMIX
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load INCAR into xvasp, modify, then write out new INCAR
+      Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+      double BMIX=AUROSTD_MAX_DOUBLE;
+      double GAMMA=AUROSTD_MAX_DOUBLE;
+      if(Krun){ //get BMIX
+        param_double=AUROSTD_MAX_DOUBLE;
+        //try OUTCAR first
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::FileExist(xvasp.Directory+"/OUTCAR")&&aurostd::FileNotEmpty(xvasp.Directory+"/OUTCAR")){
+          xOUTCAR OUTCAR(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
+          param_double=OUTCAR.BMIX;
+        }
+        //try INCAR next
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::kvpair2bool(xvasp.INCAR,"BMIX","=")){
+          param_double=aurostd::kvpair2utype<double>(xvasp.INCAR,"BMIX","=");
+        }
+        if(param_double==AUROSTD_MAX_DOUBLE || aurostd::lessEqualZero(param_double) ){Krun=false;}
+      }
+      if(Krun){ //get GAMMA
+        BMIX=param_double;
+        param_double=AUROSTD_MAX_DOUBLE;
+        //must grab from OUTCAR
+        string value="";
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::FileExist(xvasp.Directory+"/OUTCAR")&&aurostd::FileNotEmpty(xvasp.Directory+"/OUTCAR")){
+          xOUTCAR OUTCAR(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
+          const vector<string>& vcontent=OUTCAR.vcontent;
+          for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW - FROM THE BACK, get last instance
+            if(aurostd::substring2bool(vcontent[iline],"average")){
+              if(aurostd::substring2bool(vcontent[iline],"eigenvalue")){
+                if(aurostd::substring2bool(vcontent[iline],"GAMMA")){
+                  if(aurostd::substring2bool(vcontent[iline],"=")){
+                    value=aurostd::substring2string(vcontent[iline],"=",1,true,false);  //instance=1,RemoveWS=true,RemoveComments=false
+                    if(aurostd::isfloat(value)){param_double=aurostd::string2utype<double>(value);}
+                  }
+                }
+              }
+            }
+          }
+        }
+        if(param_double==AUROSTD_MAX_DOUBLE || aurostd::lessEqualZero(param_double) ){Krun=false;}
+      }
+      if(Krun){ //test BMIX and GAMMA
+        GAMMA=param_double;
+        if(BMIX==AUROSTD_MAX_DOUBLE || aurostd::lessEqualZero(BMIX) ){Krun=false;}
+        if(GAMMA==AUROSTD_MAX_DOUBLE || aurostd::lessEqualZero(GAMMA) ){Krun=false;}
+      }
+      if(Krun){ //set param_double to new BMIX: BMIX_new = 1/GAMMA * BMIX
+        param_double=1.0/GAMMA*BMIX;
+        if(param_double==AUROSTD_MAX_DOUBLE || aurostd::lessEqualZero(param_double) ){Krun=false;}
+      }
+      //overwrite BMIX
+      Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("BMIX",xvasp,vflags,"",0,param_double,FALSE));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
+      //END - load INCAR into xvasp, modify, then write out new INCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"=" << param_double << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
     else if(fix.find("BMIX=")!=string::npos) {
       loc=fix.find('=');
       if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"BMIX mode not found",_INPUT_ILLEGAL_);}
@@ -6607,7 +6701,7 @@ namespace KBIN {
           param_double=aurostd::kvpair2utype<double>(xvasp.INCAR,"EDIFF","=");
         }
         if(param_double==AUROSTD_MAX_DOUBLE){param_double=1e-4;}  //default for vasp
-        param_double*=10; //increase by an order of magnitdue
+        param_double*=10; //increase by an order of magnitude
       }
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,param_double,FALSE));
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
@@ -6658,6 +6752,26 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR",xvasp,vflags,"",param_int,0.0,FALSE));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
+      //END - load INCAR into xvasp, modify, then write out new INCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
+    else if(fix.find("KPAR=")!=string::npos) {  //CO+DB20230822
+      loc=fix.find('=');
+      if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"KPAR mode not found",_INPUT_ILLEGAL_);}
+      param_int=aurostd::string2utype<int>(fix.substr(loc+1)); //get everything after the '='
+      
+      //CO20230822 - first check that we have a vasp version higher than 5.3.2  //https://www.vasp.at/wiki/index.php/KPAR
+      string vasp_path_full=kflags.KBIN_BIN;
+      double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
+      if(vaspVersion<5.32){Krun=false;}
+
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load INCAR into xvasp, modify, then write out new INCAR
+      Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+      Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("KPAR",xvasp,vflags,"",param_int,0.0,FALSE));
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
       }
@@ -7280,7 +7394,13 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=2){Krun=false;}
+      if(submode==2){  //CO+DB20230822 - try setting KPAR=2; do not worry about NPAR/NCORE, NPAR takes preference according to VASP (https://www.vasp.at/wiki/index.php/NPAR)
+        fix="KPAR=2";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {  //CO20210315 - does a simple shift work for IBZKPT? come back
@@ -7419,6 +7539,7 @@ namespace KBIN {
     }
     else if(mode=="NELM") { //CSLOSHING solutions should be tried first
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      //see here for rational for electronic convergence issues: https://www.vasp.at/vasp-workshop/optelectron.pdf
       if(submode==0){ //AMIX/BMIX fixes, helps here: ICSD/LIB/CUB/Pd1Tm1_ICSD_649071
         bool Krun1=true;fix="AMIX=0.1";
         bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
@@ -7455,19 +7576,57 @@ namespace KBIN {
         }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //desperate attempt, increase NELM  //CO20211017 - do BEFORE you increase KPOINTS (KPOINTS=GAMMA_ODD), as the longer run will be more expensive with more KPOINTS
+      if(submode==2){ //more BMIX/AMIN fixes from CO+DB - 3.0 can be too high
+        bool Krun1=true;fix="BMIX=1"; //1.0
+        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix1){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="AMIN=0.01";
+        xfixed.flag(fix,false); //CO20230822 - redo AMIN=0.01 with new BMIX=1
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix1){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+          if(!ignorefix2){fix="AMIN=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==3){ //more BMIX/AMIN fixes from CO+DB - fix according to GAMMA
+        bool Krun1=true;fix="BMIX_GAMMA"; //adjust with GAMMA value
+        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix1){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="AMIN=0.01";
+        xfixed.flag(fix,false); //CO20230822 - redo AMIN=0.01 with new BMIX=1
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix1){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+          if(!ignorefix2){fix="AMIN=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==4){ //desperate attempt, increase NELM  //CO20211017 - do BEFORE you increase KPOINTS (KPOINTS=GAMMA_ODD), as the longer run will be more expensive with more KPOINTS
         fix="NELM";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
+      if(submode==5){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
         fix="KPOINTS=GAMMA_ODD";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==4){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
+      if(submode==6){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
         bool Krun1=true;fix="NELM";
         bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
@@ -7482,7 +7641,7 @@ namespace KBIN {
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=5){Krun=false;}
+      if(submode>=7){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
