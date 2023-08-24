@@ -1093,6 +1093,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::SPIN_REMOVE_RELAX_1")) vlist+="--spin_remove_relax_1 ";  //CO20180214
     vpflow.flag("PROTO_AFLOW::SPIN_REMOVE_RELAX_2",aurostd::args2flag(argv,cmds,"--spin_remove_relax_2|--SPIN_REMOVE_RELAX_2")); //CO20180214
     if(vpflow.flag("PROTO_AFLOW::SPIN_REMOVE_RELAX_2")) vlist+="--spin_remove_relax_2 ";  //CO20180214
+    vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::MAGMOM","--magmom=|--MAGMOM=","");  //CO20230823
+    if(vpflow.flag("PROTO_AFLOW::MAGMOM")) vlist+="--magmom="+vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM")+" ";             // recursion is GNU's pleasure (SC2014)  //CO20230823
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::POTIM","--potim=|--POTIM=","");
     if(vpflow.flag("PROTO_AFLOW::POTIM")) vlist+="--potim="+vpflow.getattachedscheme("PROTO_AFLOW::POTIM")+" ";             // recursion is GNU's pleasure (SC2014)
@@ -12852,6 +12854,12 @@ namespace pflow {
     PARAMS.vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2",vpflow.flag("PROTO_AFLOW::SPIN_REMOVE_RELAX_2"));
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2") << endl;
 
+    // check magmom //CO20230823
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK MAGMOM" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM",vpflow.flag("PROTO_AFLOW::MAGMOM"));
+    if(vpflow.flag("PROTO_AFLOW::MAGMOM")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::MAGMOM",vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::MAGMOM\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM") << endl;
+    
     // check ldau
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK LDAU" << endl; 
     PARAMS.vparams.flag("AFLOWIN_FLAG::AUTOLDAU",vpflow.flag("PROTO_AFLOW::LDAU"));

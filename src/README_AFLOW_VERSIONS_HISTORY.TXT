@@ -13,6 +13,7 @@
         -- patching AddAtom() types vs. names bug (CO)
         -- rearranged QHA code to enable calculation of thermodynamic properties if isEOS and isQHA (CO)
         -- added machine settings for machine005 (CO)
+        -- added --magmom= to --aflow_proto (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
