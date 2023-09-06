@@ -448,7 +448,8 @@ namespace aurostd {
   bool ProcessRunning(const string& process,const string& pgid,bool user_specific=true); //SD20220329
   void ProcessKill(const string& process,bool user_specific=true,uint signal=9); //CO20210315 //SD20220627 - 9 = SIGKILL, 15 = SIGTERM
   void ProcessKill(const string& process,const string& pgid,bool user_specific=true,uint signal=9); //SD20220329 - 9 = SIGKILL, 15 = SIGTERM
-  void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315
+  bool ProcessRenice(const string& process,int nvalue,bool user_specific=true,const string& pgid=""); //CO20210315
+  bool ReniceAvailable(void); //CO20221029
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);

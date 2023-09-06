@@ -3230,7 +3230,7 @@ namespace KBIN {
     //CO20210315 - might consider "renice 20 -p VASP_PIDs" to give greps below priority
 
     bool renice=false;
-    if(vasp_still_running && fsize_vaspout>=10000000){aurostd::ProcessRenice(vasp_bin,15);renice=true;} //renice vasp if vasp.out>=10Mb so grep can work faster
+    if(vasp_still_running && aurostd::ReniceAvailable() && fsize_vaspout>=10000000){renice=aurostd::ProcessRenice(vasp_bin,15);} //renice vasp if vasp.out>=10Mb so grep can work faster //CO20221028 - renice up/down is not always possible, now we check first
 
     uint i=0;
     vector<string> vtokens;
