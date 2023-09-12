@@ -828,7 +828,7 @@ namespace KBIN {
         }
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         if((vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option) || DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM) {
-          KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,FALSE);
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,0.0,FALSE);
           xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
         }
       }
@@ -3987,8 +3987,8 @@ namespace KBIN {
     // ***************************************************************************
 
     // ***************************************************************************
-    // AUTO_MAGMOM AUTO_MAGMOM AUTO_MAGMOM AUTO_MAGMOM AUTO_MAGMOM AUTO_MAGMOM
-    else if(command=="AUTO_MAGMOM") {
+    // MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM
+    else if(command=="MAGMOM") {
       keyword="MAGMOM";
 
       if(Krun){
@@ -6759,7 +6759,7 @@ namespace KBIN {
         //
         xvasp.str.Standard_Conventional_UnitCellForm(); //CO20210315 - previously missing before
         if(remove_magmom){KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation,vflags.KBIN_VASP_INCAR_VERBOSE);} //CO20200624
-        if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,FALSE);}
+        if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,0.0,FALSE);}
         if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
           if(remove_magmom || write_magmom){aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}  //write out incar
         }

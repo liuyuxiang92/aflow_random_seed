@@ -1316,7 +1316,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::ENMAX_MULTYPLY\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTYPLY") << endl;
 
   //CO20230823 - fix spin if magmom provided
-  if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){xvasp.aopts.flag("FLAG::AVASP_SPIN",true);}
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
+    xvasp.aopts.flag("FLAG::AVASP_SPIN",true);
+    xvasp.aopts.flag("FLAG::AVASP_AUTO_MAGMOM",false)
+  }
 
   //  cerr << aurostd::vectorstring2string(xvasp.str.species) << "/" << xvasp.AVASP_label << endl;
   // checks if everything is different
@@ -2015,7 +2018,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   string magmom_str="";
   string magmom_dir="";
   if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
-    magmom_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM");  //going in the INCAR
+    magmom_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM");  //going in the aflow.in setting
     magmom_dir=string(magmom_str); //going in the directory name
     //spaces will be tricky with non-collinear, consider using double spaces and __, check LNONCOLLINEAR first
     aurostd::StringSubst(magmom_str,"_"," ");
@@ -2462,6 +2465,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   } else {
     aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM in .aflow.rc)" << endl;
   }
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM="+magmom_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+  }
 
   // RELAX_TYPE + RELAX WRITING
   //CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
@@ -2871,11 +2877,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       }
       //CO20181226 STOP
     }
-    //CO20230823 START - MAGMOM
-    if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
-      aflowin << aurostd::PaddedPOST("MAGMOM="+magmom_str,_AFLOWINPAD_) << " # initial magnetic moment guess, provided as input from command-line" << endl;
-    }
-    //CO20230823 STOP - MAGMOM
+    //[CO20230911 - moving to its own vasp force option]//CO20230823 START - MAGMOM
+    //[CO20230911 - moving to its own vasp force option]if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
+    //[CO20230911 - moving to its own vasp force option]  aflowin << aurostd::PaddedPOST("MAGMOM="+magmom_str,_AFLOWINPAD_) << " # initial magnetic moment guess, provided as input from command-line" << endl;
+    //[CO20230911 - moving to its own vasp force option]}
+    //[CO20230911 - moving to its own vasp force option]//CO20230823 STOP - MAGMOM
     aflowin << aurostd::PaddedPOST("#PSTRESS=000       # Pressure in kBar (1kB=0.1GPa) ",_AFLOWINPAD_) << " # for hand modification" << endl;
     aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_AFLOWINPAD_) << " # for hand modification" << endl;
     aflowin << aurostd::PaddedPOST("#POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"      # default ",_AFLOWINPAD_) << " # for hand modification" << endl;
