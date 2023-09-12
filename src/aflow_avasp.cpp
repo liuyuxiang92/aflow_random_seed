@@ -1589,10 +1589,19 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " [5a.1]" << endl;
       string label_AFLOWLIB_LIB0,label_AFLOWLIB_LIB1,label_AFLOWLIB_LIB2,label_AFLOWLIB_LIB3,label_AFLOWLIB_LIB4,label_AFLOWLIB_LIB5,label_AFLOWLIB_LIB6,label_AFLOWLIB_LIB7,label_AFLOWLIB_LIB8,label_AFLOWLIB_LIB9;
       directory=xvasp.AVASP_dirbase+"/"; string pp_add_on="";
+      //CO20230911 - figure out directory and system with POTCAR information
+      //is_identical_pottype tells us if AFLOW wants to use all the same pottypes (PAW_PBE, PAW_LDA, etc.)
+      //sometimes they change depending on the chemistry
+      //the strategy is to build the FULL pottypedatestr (Ge:PAW_PBE:Sn:PAW_PBE, etc.)
+      //if is_identical_pottype, rewrite the string at the end
       string pottypedatestr="",_pottypedatestr="";
-      bool specify_pottype_once=true;
+      bool is_identical_pottype=true;
       for(uint i=0;i<xvasp.str.species_pp.size();i++) {
         pp_add_on+=xvasp.str.species_pp.at(i);
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " xvasp.POTCAR_TYPE_DATE_PRINT_flag=" << xvasp.POTCAR_TYPE_DATE_PRINT_flag << endl;
+          cerr << __AFLOW_FUNC__ << " xvasp.POTCAR_TYPE_PRINT_flag=" << xvasp.POTCAR_TYPE_PRINT_flag << endl;
+        }
         if(xvasp.POTCAR_TYPE_DATE_PRINT_flag || xvasp.POTCAR_TYPE_PRINT_flag) { // add potential type and date (or just type) //CO20181226
           if(LDEBUG){
             cerr << "DEBUG - " << __AFLOW_FUNC__ << " [5a.2]" << endl;
@@ -1632,7 +1641,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
                 if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
-
               }
               if(pottype.empty()) {
                 cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << "  wrong pottype:" << sgrep << endl; 
@@ -1645,7 +1653,12 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
               _pottypedatestr=pottype;
               if(xvasp.POTCAR_TYPE_DATE_PRINT_flag){_pottypedatestr+=":"+date;}
               if(pottypedatestr.empty()){pottypedatestr=_pottypedatestr;}
-              if(pottypedatestr!=_pottypedatestr){specify_pottype_once=false;} //there's a mismatch, need to specify all
+              if(pottypedatestr!=_pottypedatestr){is_identical_pottype=false;} //there's a mismatch, need to specify all
+              if(LDEBUG){
+                cerr << __AFLOW_FUNC__ << " is_identical_pottype=" << is_identical_pottype << endl;
+                cerr << __AFLOW_FUNC__ << " pottypedatestr=" << pottypedatestr << endl;
+                cerr << __AFLOW_FUNC__ << " _pottypedatestr=" << _pottypedatestr << endl;
+              }
               //[CO20181226]directory+=":"+pottype+":"+date;
               pp_add_on+=":"+_pottypedatestr;
               if(i<xvasp.str.species_pp.size()-1) pp_add_on+=":";
@@ -1655,11 +1668,27 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         }
       }
       if(XHOST.GENERATE_AFLOWIN_ONLY){pottypedatestr="PAW_PBE";}  //CO20190116 - set some sort of default for workshop stuff
-      if((xvasp.POTCAR_TYPE_DATE_PRINT_flag || xvasp.POTCAR_TYPE_PRINT_flag) && specify_pottype_once){pp_add_on=aurostd::joinWDelimiter(xvasp.str.species_pp,"")+":"+pottypedatestr;}  //overwrite  //CO20191020 - xvasp.POTCAR_TYPE_PRINT_flag
+      if((xvasp.POTCAR_TYPE_DATE_PRINT_flag || xvasp.POTCAR_TYPE_PRINT_flag) && is_identical_pottype && !pottypedatestr.empty()){  //overwrite  //CO20191020 - xvasp.POTCAR_TYPE_PRINT_flag //ME20200228 - removed colon for empty pottypedatestr
+        pp_add_on=aurostd::joinWDelimiter(xvasp.str.species_pp,"")+":"+pottypedatestr;
+      }
       if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " [5a.3]" << endl;
       directory+=pp_add_on+"/"+xvasp.AVASP_label;
-      //  cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;    
-      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+((specify_pottype_once && !pottypedatestr.empty())?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;  //ME20200228 - removed colon for empty pottypedatestr
+      //  cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;
+      //CO20230911 - do not use --generate_aflowin_only for database runs
+      //there was a bug that is now fixed that directory != system name if --generate_aflowin_only
+      //this forces :PAW_PBE to be added to SYSTEM, even if that is not necessarily the pp used (might change because of chemistry)
+      //furthermore, the LIB2/LIB3 directories do not :PAW_PBE or anything, we will likely change this in the future
+      //SOLUTION for existing issues with SYSTEM, leave alone... there is a lot to fix inside vasp files
+      //for now, treat as what the intended pp was
+      //a mismatch here across the database is not a big deal, does not warrant changing ALL the database files
+      //will break postprocess files (like bader) that depend on system name
+      //in the future, simply change LIB2/LIB/XXYY to LIB2/XXYY:PAW_PBE
+      //may need to check which species actually got GGA, do an aflux query
+      //[CO20230911 - leverage pp_add_on to avoid mismatch with directory]system=aurostd::vectorstring2string(xvasp.str.species_pp);
+      //[CO20230911 - leverage pp_add_on to avoid mismatch with directory]if(is_identical_pottype && !pottypedatestr.empty()){ //ME20200228 - removed colon for empty pottypedatestr
+      //[CO20230911 - leverage pp_add_on to avoid mismatch with directory]  system+=":"+pottypedatestr;
+      //[CO20230911 - leverage pp_add_on to avoid mismatch with directory]}
+      system=pp_add_on+"."+xvasp.AVASP_label;
       // label_text0 - MIX
       label_MIX=xvasp.AVASP_libbase+"/"+aurostd::vectorstring2string(xvasp.str.species_pp)+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " [5a.4]" << endl;
