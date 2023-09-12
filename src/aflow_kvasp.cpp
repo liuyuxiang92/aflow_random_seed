@@ -33,6 +33,7 @@ pthread_mutex_t mutex_KVASP=PTHREAD_MUTEX_INITIALIZER;
 #define DUKE_MATERIALS_VASP5_CORES_DIELECTRIC 16
 #define AFLOWLIB_VASP5_CORES_DIELECTRIC 16
 #define DUKE_BETA_VASP5_CORES_DIELECTRIC 16
+#define S4E_VASP5_CORES_DIELECTRIC 16 //CO20230825
 
 
 // ******************************************************************************************************************************************************
@@ -146,6 +147,17 @@ namespace KBIN {
       kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
     }
     //CO20201220 X STOP
+    //CO20230825 START - S4E_WORKSTATION
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::S4E_WORKSTATION") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]S4E_WORKSTATION") ||  
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]JHU_WORKSTATION"))  //check S4E_WORKSTATION //SD20221006
+      aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::S4E_WORKSTATION")) {
+      aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
+      kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+    }
+    //CO20230825 STOP - S4E_WORKSTATION
     //CO20220818 JHU_ROCKFISH START
     // jhu_rockfish
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||
@@ -1142,23 +1154,28 @@ namespace KBIN {
     // SPIN AND PRIORITIES // ON | OFF
     vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;   // DEFAULT
     vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2;   // DEFAULT
+    vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN=DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN;                 // DEFAULT //CO20230826
     vflags.KBIN_VASP_FORCE_OPTION_SPIN.options2entry(AflowIn,_STROPT_+"SPIN=",DEFAULT_VASP_FORCE_OPTION_SPIN);
     if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry) { //ME+RF20200225; fixes bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default
       if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option){
-        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "SPIN is OFF. REMOVE_RELAX_1/2 will be switched off.", aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"RECYCLE_SPIN")){  //CO20230826
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "SPIN is OFF. REMOVE_RELAX_1/2 + RECYCLE_SPIN will be switched off.", aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);  //CO20230826
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+          vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN=FALSE; //CO20230826
         }
       } else {
         vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
         vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+        vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN=FALSE; //CO20230826
         if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=TRUE;}
         if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=TRUE;}
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"RECYCLE_SPIN")){vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN=TRUE;}   //CO20230826
       }
     }
     if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE; // nothing to remove
     if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE; // nothing to remove
+    if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN=FALSE;        // nothing to remove  //CO20230826
 
     // BADER AND PRIORITIES // ON | OFF
     vflags.KBIN_VASP_FORCE_OPTION_BADER.options2entry(AflowIn,_STROPT_+"BADER=",DEFAULT_VASP_FORCE_OPTION_BADER);
@@ -1178,6 +1195,7 @@ namespace KBIN {
 
     // AUTO_MAGMOM AND PRIORITIES  // ON | OFF
     vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.options2entry(AflowIn,string(_STROPT_+"AUTO_MAGMOM="+"|"+_STROPT_+"MAGMOM=AUTO"),DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);  //adding MAGMOM=AUTO
+    vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.options2entry(AflowIn,_STROPT_+"MAGMOM=",0);  //CO20230826
     // LSCOUPLING AND PRIORITIES  // ON | OFF
     vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.options2entry(AflowIn,_STROPT_+"LSCOUPLING=",DEFAULT_VASP_FORCE_OPTION_LSCOUPLING);
     if(vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option) {
@@ -2275,7 +2293,7 @@ namespace KBIN {
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION<]");return Krun;}
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]Krun=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true); //CO20201111
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION<]");return Krun;} //CO20201111
-                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE);         // check if it is the case of turning off spin //CO20210315 - always write_incar here
+                        KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE);         // check if it is the case of turning off spin //CO20210315 - always write_incar here
                         KBIN::XVASP_KPOINTS_IBZKPT_UPDATE(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE);           // check if it is the case of updating IBZKPT  //CO20210315 - always write_incar here
                         //ME20190301 BEGIN
                         // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
@@ -2304,7 +2322,7 @@ namespace KBIN {
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]Krun=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true); //CO20201111
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION=]");return Krun;} //CO20201111
-                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,false,FileMESSAGE);  //ME20190610 - or else SPIN_REMOVE_RELAX_2 won't work  //CO20210315 - never write_incar here (last step for sure)
+                        KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,false,FileMESSAGE);  //ME20190610 - or else SPIN_REMOVE_RELAX_2 won't work  //CO20210315 - never write_incar here (last step for sure)
                       }
                       KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, (xvasp.NRELAXING<xvasp.NRELAX), FileMESSAGE);  //ME20191028 //CO20210315 - only write_incar if it's not the last relaxation (last step)
                     }
@@ -2393,11 +2411,11 @@ namespace KBIN {
                       aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << Message(__AFLOW_FILE__,aflags) << endl;
                       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                       //[CO20210315 - made robust enough to work in all cases]if(xvasp.NRELAXING<xvasp.NRELAX) 
-                      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least)
+                      KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least)
                     }
                     if(xvasp.NRELAX>0) KBIN::VASP_Recycle(xvasp,"relax"+aurostd::utype2string(xvasp.NRELAX));  // bring back the stuff
                     //[CO20210315 - not sure why only if NRELAX==2, we could have NRELAX==1 and this still might apply]if(xvasp.NRELAX==2) 
-                    KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAX,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least) //CO20210315 - no longer necessary per above (we check after every relaxation, but it doesn't hurt
+                    KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,xvasp.NRELAX,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least) //CO20210315 - no longer necessary per above (we check after every relaxation, but it doesn't hurt
                   }
                   if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) { //CO20210315 - looks like a typo to me //RELAX_STATIC
                     aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(__AFLOW_FILE__,aflags) << endl;
@@ -2763,7 +2781,8 @@ namespace KBIN {
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_CRAY")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //SD20221006 X_X
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_OLDCRAY")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //SD20221006 X_X
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X_SMB")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //SD20221006 X_X
-                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //CO20220818 ROCKFISH
+                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::S4E_WORKSTATION")) kflags.KBIN_MPI_NCPUS=S4E_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //CO20230825
+                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) kflags.KBIN_MPI_NCPUS=S4E_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //CO20220818 ROCKFISH
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
@@ -4310,6 +4329,21 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             //CO20201220 X STOP
+            //CO20230825 START - S4E_WORKSTATION
+            if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::S4E_WORKSTATION")) {
+              if(!aurostd::FileExist(MPI_BINARY_DIR_S4E_WORKSTATION+kflags.KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_S4E_WORKSTATION+kflags.KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
+              // verbosization
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_S4E_WORKSTATION << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_S4E_WORKSTATION << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              // run
+              aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
+              aus_exec << MPI_OPTIONS_S4E_WORKSTATION << endl;
+              aus_exec << MPI_COMMAND_S4E_WORKSTATION << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_S4E_WORKSTATION << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << endl;
+              //        aurostd::PrintMessageStream(FileMESSAGE,aus_exec,XHOST.QUIET);
+              aurostd::execute(aus_exec);
+            }
+            //CO20230825 STOP - S4E_WORKSTATION
             //CO20220818 JHU_ROCKFISH START
             // HOST JHU_ROCKFISH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {

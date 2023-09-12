@@ -964,10 +964,12 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_SPIN;          // SPIN 
     bool KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;
     bool KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2;
+    bool KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN;     //CO20230826
     // xoption KBIN_VASP_FORCE_OPTION_TRISTATE;      //  SYM 
     xoption KBIN_VASP_FORCE_OPTION_BADER;         // BADER=ON | OFF | NONE
     xoption KBIN_VASP_FORCE_OPTION_ELF;           // ELF=ON | OFF | NONE
     xoption KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM;   // AUTO_MAGMOM
+    xoption KBIN_VASP_FORCE_OPTION_MAGMOM;        // MAGMOM //CO20230826
     xoption KBIN_VASP_FORCE_OPTION_SYM;           // SYM
     xoption KBIN_VASP_FORCE_OPTION_WAVECAR;       // WAVECAR
     xoption KBIN_VASP_FORCE_OPTION_CHGCAR;        // CHGCAR
@@ -3320,7 +3322,7 @@ namespace KBIN {
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
   bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int,bool write_incar, ofstream&);  //ME20191028 //CO20210315 - write_incar
-  void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
+  void XVASP_INCAR_SPIN_FIX_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
   void XVASP_INCAR_LDAU_OFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_LDAU_ON(_xvasp& xvasp,_vflags& vflags,uint type);
