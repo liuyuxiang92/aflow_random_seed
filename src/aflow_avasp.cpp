@@ -2018,22 +2018,22 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   //CO20230823 START - check MAGMOM
-  string magmom_str="";
-  string magmom_dir="";
+  string magmom_vasp_str="";
+  string magmom_aflow_str="";
   if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
-    magmom_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM");  //going in the aflow.in setting
-    magmom_dir=string(magmom_str); //going in the directory name
+    magmom_vasp_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM");  //going in the aflow.in setting
+    magmom_aflow_str=string(magmom_vasp_str); //going in the directory name
     //spaces will be tricky with non-collinear, consider using double spaces and __, check LNONCOLLINEAR first
-    aurostd::StringSubst(magmom_str,","," ");
-    aurostd::StringSubst(magmom_str,"_"," ");
-    aurostd::StringSubst(magmom_str,"x","*");
+    aurostd::StringSubst(magmom_vasp_str,","," ");
+    aurostd::StringSubst(magmom_vasp_str,"_"," ");
+    aurostd::StringSubst(magmom_vasp_str,"x","*");
     //
-    aurostd::StringSubst(magmom_dir," ","_");
-    aurostd::StringSubst(magmom_dir,",","_");
-    aurostd::StringSubst(magmom_dir,"*","x");
+    aurostd::StringSubst(magmom_aflow_str," ","_");
+    aurostd::StringSubst(magmom_aflow_str,",","_");
+    aurostd::StringSubst(magmom_aflow_str,"*","x");
     //
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m]" << endl;}
-    string magmom_add_on=":MAGMOM="+magmom_dir;
+    string magmom_add_on=":MAGMOM="+magmom_aflow_str;
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m2] magmom_add_on="  << magmom_add_on << endl;}
     system+=magmom_add_on;directory+=magmom_add_on;xvasp.AVASP_label+=magmom_add_on;
   }
@@ -2474,8 +2474,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //CO20230826 START - MAGMOM
   //CO20230826 - think later about consolidating AUTO_MAGMOM and MAGMOM=AUTO
   if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
-    //use magmom_dir as it is a single clean string
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM="+magmom_dir,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+    //use magmom_aflow_str as it is a single clean string
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM="+magmom_aflow_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+  }
   //CO20230826 STOP - MAGMOM
 
   // RELAX_TYPE + RELAX WRITING
@@ -2888,7 +2889,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
     //[CO20230911 - moving to its own vasp force option]//CO20230823 START - MAGMOM
     //[CO20230911 - moving to its own vasp force option]if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
-    //[CO20230911 - moving to its own vasp force option]  aflowin << aurostd::PaddedPOST("MAGMOM="+magmom_str,_AFLOWINPAD_) << " # initial magnetic moment guess, provided as input from command-line" << endl;
+    //[CO20230911 - moving to its own vasp force option]  aflowin << aurostd::PaddedPOST("MAGMOM="+magmom_vasp_str,_AFLOWINPAD_) << " # initial magnetic moment guess, provided as input from command-line" << endl;
     //[CO20230911 - moving to its own vasp force option]}
     //[CO20230911 - moving to its own vasp force option]//CO20230823 STOP - MAGMOM
     aflowin << aurostd::PaddedPOST("#PSTRESS=000       # Pressure in kBar (1kB=0.1GPa) ",_AFLOWINPAD_) << " # for hand modification" << endl;
