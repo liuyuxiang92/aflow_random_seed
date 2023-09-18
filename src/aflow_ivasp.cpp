@@ -4918,6 +4918,7 @@ namespace KBIN {
         KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SPIN=",function); //CO20210315
         KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM=",function); //CO20230826
         KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM*=",function); //CO20230826
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM_MULT=",function); //CO20230826
         KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SPIN=OFF",function);  //CO20210315
         //[CO20210315 - OBSOLETE]stringstream aus_exec;
         //[CO20210315 - OBSOLETE]aus_exec << "cd " << xvasp.Directory << endl;
@@ -4971,6 +4972,7 @@ namespace KBIN {
             // fix aflow.in
             KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM=",function); //CO20210315
             KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM*=",function); //CO20210315
+            KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM_MULT=",function); //CO20230826
             KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM="+svalue,function);  //CO20210315
           }
         }

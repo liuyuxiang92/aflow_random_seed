@@ -2042,6 +2042,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m]" << endl;}
     string magmom_add_on=":MAGMOM="+magmom_aflow_str;
     if(!aurostd::isequal(aurostd::string2utype<double>(magmom_mult_str),AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER)){
+      //CO20230918 - leave as "1" instead of "1.0", same as POCC
       magmom_add_on+=":MAGMOMx="+magmom_mult_str;
     }
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m2] magmom_add_on="  << magmom_add_on << endl;}
@@ -2487,7 +2488,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     //use magmom_aflow_str as it is a single clean string
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM="+magmom_aflow_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
     if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT")){
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM*="+magmom_mult_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+      //CO20230918 - leave as "1" instead of "1.0", same as POCC
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM*="+magmom_mult_str,_AFLOWINPAD_) << " // magnetic moments multiplier, provided as input from command-line" << endl;
     }
   }
   //CO20230826 STOP - MAGMOM
