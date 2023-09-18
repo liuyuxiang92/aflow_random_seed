@@ -970,6 +970,7 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_ELF;           // ELF=ON | OFF | NONE
     xoption KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM;   // AUTO_MAGMOM
     xoption KBIN_VASP_FORCE_OPTION_MAGMOM;        // MAGMOM //CO20230826
+    xoption KBIN_VASP_FORCE_OPTION_MAGMOM_MULT;   // MAGMOM //CO20230826
     xoption KBIN_VASP_FORCE_OPTION_SYM;           // SYM
     xoption KBIN_VASP_FORCE_OPTION_WAVECAR;       // WAVECAR
     xoption KBIN_VASP_FORCE_OPTION_CHGCAR;        // CHGCAR
@@ -1907,8 +1908,10 @@ class xstructure {
     bool qm_forces_write;                                         // QM FORCES calculation
     std::vector<xvector<double> > qm_positions;                   // QM POSITIONS calculation
     bool qm_positions_write;                                      // QM POSITIONS calculation
-    double qm_E_cell,qm_dE_cell,qm_H_cell,qm_PV_cell,qm_P,qm_mag_cell;                     // QM energetics PER CELL
-    double qm_E_atom,qm_dE_atom,qm_H_atom,qm_PV_atom,qm_mag_atom;                     // QM energetics ATOMIC
+    double qm_E_cell,qm_dE_cell,qm_H_cell,qm_V_cell,qm_PV_cell,qm_P,qm_mag_cell;      // QM energetics PER CELL //CO20230917 - volume
+    double qm_E_atom,qm_dE_atom,qm_H_atom,qm_V_atom,qm_PV_atom,qm_mag_atom;           // QM energetics ATOMIC //CO20230917 - volume
+    vector<double> qm_vmag;                                       //CO20230915 - QM MAGNETIC MOMENTS OF EACH ATOM - vmag from OUTCAR
+    bool qm_vmag_write;                                           //CO20230915 - QM MAGNETIC MOMENTS OF EACH ATOM - vmag from OUTCAR
     // ----------------------------------------------------------------------------------------
     // KPOINTS                                                    // --------------------------------------
     int kpoints_mode;                                             // mode of kpoints
@@ -3320,7 +3323,10 @@ namespace KBIN {
   int XVASP_INCAR_GetNBANDS(const _xvasp& xvasp,const _aflags& aflags,bool ispin=true); //CO20210315 - spin==true is safer
   string INCAR_IALGO2ALGO(int ialgo); //CO20210315
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
+  bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp,vector<double>& vmag);  //CO20210315
+  bool XVASP_INCAR_Read_MAGMOM(const string& magmoms_str,vector<double>& vmags);  //CO20210315
   bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
+  bool CONSOLIDATE_MAGMOM(const vector<double>& vmag,vector<double>& vmag_uniq,vector<uint>& vmult);  //CO20230913
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int,bool write_incar, ofstream&);  //ME20191028 //CO20210315 - write_incar
   void XVASP_INCAR_SPIN_FIX_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar

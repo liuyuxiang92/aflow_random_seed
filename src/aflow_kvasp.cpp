@@ -1194,8 +1194,21 @@ namespace KBIN {
     // if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) vflags.KBIN_VASP_FORCE_OPTION_ELF.option=TRUE; // DEFAULT 
 
     // AUTO_MAGMOM AND PRIORITIES  // ON | OFF
-    vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.options2entry(AflowIn,string(_STROPT_+"AUTO_MAGMOM="+"|"+_STROPT_+"MAGMOM=AUTO"),DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);  //adding MAGMOM=AUTO
+    vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.options2entry(AflowIn,string(_STROPT_+"AUTO_MAGMOM="),DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);
     vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.options2entry(AflowIn,_STROPT_+"MAGMOM=",0);  //CO20230826
+    vflags.KBIN_VASP_FORCE_OPTION_MAGMOM_MULT.options2entry(AflowIn,_STROPT_+"MAGMOM*="+"|"+_STROPT_+"MAGMOM_MULT=",0,aurostd::utype2string(DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER));  //CO20230826
+    //CO20230912 - adding MAGMOM=AUTO
+    if(vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.option && 
+        !vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.content_string.empty() &&
+        aurostd::toupper(vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.content_string[0])=='A'){
+      //turn on vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM
+      vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry=true;
+      vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option=true;
+      //turn off vflags.KBIN_VASP_FORCE_OPTION_MAGMOM
+      vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.clear();
+      vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.isentry=false;
+      vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.option=false;
+    }
     // LSCOUPLING AND PRIORITIES  // ON | OFF
     vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.options2entry(AflowIn,_STROPT_+"LSCOUPLING=",DEFAULT_VASP_FORCE_OPTION_LSCOUPLING);
     if(vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option) {
@@ -4943,10 +4956,13 @@ namespace KBIN {
       strstream << "E_atom=" << xvasp.str.qm_E_atom << "  (eV/at)" << endl;
       strstream << "H_cell=" << xvasp.str.qm_H_cell << "  (eV/cell)" << endl; 
       strstream << "H_atom=" << xvasp.str.qm_H_atom << "  (eV/at)" << endl;
+      strstream << "V_cell=" << xvasp.str.qm_V_cell << "  (Angst^3)" << endl;   //CO20230917
+      strstream << "V_atom=" << xvasp.str.qm_V_atom << "  (Angst^3)" << endl;   //CO20230917
       strstream << "PV_cell=" << xvasp.str.qm_PV_cell << "  (eV/cell)" << endl; 
       strstream << "PV_atom=" << xvasp.str.qm_PV_atom << "  (eV/at)" << endl;
       strstream << "mag_cell=" << xvasp.str.qm_mag_cell << "  (mu/cell)" << endl;
       strstream << "mag_atom="<< xvasp.str.qm_mag_atom << "  (mu/at)" << endl;
+      strstream << "mag_decomposition="<< aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xvasp.str.qm_vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),",") << "  (mu)" << endl;
       xstructure qm_str(xvasp.str);    // suck it in !
       // qm_str=xvasp.str;
       qm_str.qm_recycle();

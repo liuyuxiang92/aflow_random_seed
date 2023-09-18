@@ -1095,6 +1095,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::SPIN_REMOVE_RELAX_2")) vlist+="--spin_remove_relax_2 ";  //CO20180214
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::MAGMOM","--magmom=|--MAGMOM=","");  //CO20230823
     if(vpflow.flag("PROTO_AFLOW::MAGMOM")) vlist+="--magmom="+vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM")+" ";             // recursion is GNU's pleasure (SC2014)  //CO20230823
+    vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::MAGMOM_MULT","--magmom_mult=|--MAGMOM_MULT=","");  //CO20230823
+    if(vpflow.flag("PROTO_AFLOW::MAGMOM_MULT")) vlist+="--magmom_mult="+vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM_MULT")+" ";             // recursion is GNU's pleasure (SC2014)  //CO20230823
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::POTIM","--potim=|--POTIM=","");
     if(vpflow.flag("PROTO_AFLOW::POTIM")) vlist+="--potim="+vpflow.getattachedscheme("PROTO_AFLOW::POTIM")+" ";             // recursion is GNU's pleasure (SC2014)
@@ -2164,7 +2166,7 @@ namespace pflow {
       // V
       //[CO20220614 - moved up]if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
-      if(vpflow.flag("VOLUME::GET")) {xstructure a(cin,IOAFLOW_AUTO);cout << a.GetVolume() << " \\AA" << endl; _PROGRAMRUN=true;}  //CO20221228
+      if(vpflow.flag("VOLUME::GET")) {xstructure a(cin,IOAFLOW_AUTO);cout << a.GetVolume() << " \\AA^3" << endl; _PROGRAMRUN=true;}  //CO20221228
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 
@@ -12859,6 +12861,12 @@ namespace pflow {
     PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM",vpflow.flag("PROTO_AFLOW::MAGMOM"));
     if(vpflow.flag("PROTO_AFLOW::MAGMOM")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::MAGMOM",vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM"));
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::MAGMOM\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM") << endl;
+    
+    // check magmom_mult //CO20230823
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK MAGMOM_MULT" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM_MULT",vpflow.flag("PROTO_AFLOW::MAGMOM_MULT"));
+    if(vpflow.flag("PROTO_AFLOW::MAGMOM_MULT")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::MAGMOM_MULT",vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM_MULT"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::MAGMOM_MULT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM_MULT") << endl;
     
     // check ldau
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK LDAU" << endl; 

@@ -989,6 +989,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"FLAG::AVASP_SPIN_REMOVE_RELAX_2\")=" << xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2") << endl;}
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"FLAG::AVASP_RECYCLE_SPIN\")=" << xvasp.aopts.flag("FLAG::AVASP_RECYCLE_SPIN") << endl;}  //CO20230826
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MAGMOM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM") << endl;}  //CO20230823
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MAGMOM_MULT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT") << endl;}  //CO20230823
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"FLAG::AVASP_WAVECAR\")=" << xvasp.aopts.flag("FLAG::AVASP_WAVECAR") << endl;}
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"FLAG::EXTRA_INCAR\")=" << xvasp.aopts.flag("FLAG::EXTRA_INCAR") << endl;}
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"FLAG::IVDW_SET\")=" << xvasp.aopts.flag("FLAG::IVDW_SET") << endl;}
@@ -1277,6 +1278,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MAGMOM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM") << endl;  //CO20230823
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MAGMOM\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM") << endl;  //CO20230823
+  if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MAGMOM_MULT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT") << endl;  //CO20230823
+  if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MAGMOM_MULT\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM_MULT") << endl;  //CO20230823
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::POTIM") << endl;
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::POTIM") << endl;
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " xvasp.aopts.flag(\"AFLOWIN_FLAG::PRECISION\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION") << endl;
@@ -2020,8 +2023,12 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //CO20230823 START - check MAGMOM
   string magmom_vasp_str="";
   string magmom_aflow_str="";
+  string magmom_mult_str=aurostd::utype2string(DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER);
   if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
     magmom_vasp_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM");  //going in the aflow.in setting
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT")){
+      magmom_mult_str=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MAGMOM_MULT");  //going in the aflow.in setting
+    }
     magmom_aflow_str=string(magmom_vasp_str); //going in the directory name
     //spaces will be tricky with non-collinear, consider using double spaces and __, check LNONCOLLINEAR first
     aurostd::StringSubst(magmom_vasp_str,","," ");
@@ -2034,6 +2041,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     //
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m]" << endl;}
     string magmom_add_on=":MAGMOM="+magmom_aflow_str;
+    if(!aurostd::isequal(aurostd::string2utype<double>(magmom_mult_str),AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER)){
+      magmom_add_on+=":MAGMOMx="+magmom_mult_str;
+    }
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " with magmom " << "[12m2] magmom_add_on="  << magmom_add_on << endl;}
     system+=magmom_add_on;directory+=magmom_add_on;xvasp.AVASP_label+=magmom_add_on;
   }
@@ -2476,6 +2486,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM")){
     //use magmom_aflow_str as it is a single clean string
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM="+magmom_aflow_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT")){
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]MAGMOM*="+magmom_mult_str,_AFLOWINPAD_) << " // initial magnetic moment guess, provided as input from command-line" << endl;
+    }
   }
   //CO20230826 STOP - MAGMOM
 
@@ -5105,6 +5118,7 @@ void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp){  //CO20210624 - avoid dup
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::MAGMOM")) {xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MAGMOM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MAGMOM"));} //CO20230823
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MAGMOM_MULT")) {xvasp.aopts.flag("AFLOWIN_FLAG::MAGMOM_MULT",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MAGMOM_MULT",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MAGMOM_MULT"));} //CO20230823
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  

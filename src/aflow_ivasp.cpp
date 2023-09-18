@@ -832,7 +832,7 @@ namespace KBIN {
         }
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         if((vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option) || DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM) {
-          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,0.0,FALSE);
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,1.0,ON);
           xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
         }
       }
@@ -845,7 +845,7 @@ namespace KBIN {
         }
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         if(vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.option) {
-          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.content_string,0,0.0,TRUE);
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM_SVALUE",xvasp,vflags,vflags.KBIN_VASP_FORCE_OPTION_MAGMOM.content_string,0,vflags.KBIN_VASP_FORCE_OPTION_MAGMOM_MULT.content_double,ON);
           xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
         }
       }
@@ -3859,20 +3859,32 @@ namespace KBIN {
 
 namespace KBIN {
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp){  //CO20210315
+    vector<double> vmag;
+    return XVASP_INCAR_Read_MAGMOM(xvasp,vmag);
+  }
+  bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp,vector<double>& vmag){  //CO20210315
     //needs support for LNONCOLLINEAR=.TRUE., add later
-    //order_parameter_value should probably become double, not necessary for now
     if(aurostd::kvpair2bool(xvasp.INCAR,"LNONCOLLINEAR","=") && aurostd::kvpair2string(xvasp.INCAR,"LNONCOLLINEAR","=")==".TRUE."){return false;}
     if(!aurostd::kvpair2bool(xvasp.INCAR,"MAGMOM","=")){return false;}
-    string value=aurostd::kvpair2string(xvasp.INCAR,"MAGMOM","=");
+    string magmoms_str=aurostd::kvpair2string(xvasp.INCAR,"MAGMOM","=");
+    if(!XVASP_INCAR_Read_MAGMOM(magmoms_str,vmag)){return false;}
+    if(vmag.size()!=xvasp.str.atoms.size()){return false;} //check before you apply
+    for(uint i=0;i<vmag.size();i++){
+      xvasp.str.atoms[i].spin_is_given=true;
+      xvasp.str.atoms[i].spin=vmag[i];
+    }
+    return true;
+  }
+  bool XVASP_INCAR_Read_MAGMOM(const string& magmoms_str,vector<double>& vmag){  //CO20210315
+    vmag.clear();
     vector<string> vtokens,vtokens2;
-    vector<int> vmags;
-    aurostd::string2tokens(value,vtokens," ");
+    aurostd::string2tokens(magmoms_str,vtokens," ");
     uint i=0,j=0;
     int natoms=0;
     for(i=0;i<vtokens.size();i++){
       if(vtokens[i].find("*")==string::npos){
         if(!aurostd::isfloat(vtokens[i])){return false;}
-        vmags.push_back(aurostd::string2utype<int>(vtokens[i]));
+        vmag.push_back(aurostd::string2utype<double>(vtokens[i]));
       }else{
         aurostd::string2tokens(vtokens[i],vtokens2,"*");
         if(vtokens2.size()!=2){return false;}
@@ -3880,13 +3892,8 @@ namespace KBIN {
         //assume natoms is first, not last
         natoms=aurostd::string2utype<int>(vtokens2[0]);
         if(natoms<1){return false;}
-        for(j=0;j<(uint)natoms;j++){vmags.push_back(aurostd::string2utype<int>(vtokens2[1]));}
+        for(j=0;j<(uint)natoms;j++){vmag.push_back(aurostd::string2utype<double>(vtokens2[1]));}
       }
-    }
-    if(vmags.size()!=xvasp.str.atoms.size()){return false;} //check before you apply
-    for(i=0;i<vmags.size();i++){
-      xvasp.str.atoms[i].order_parameter_atom=true;
-      xvasp.str.atoms[i].order_parameter_value=vmags[i];
     }
     return true;
   }
@@ -3906,6 +3913,7 @@ namespace KBIN {
     string operation_ivalue=function+"("+command+"="+aurostd::utype2string(ivalue)+")";
     string operation_dvalue=function+"("+command+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_)+")";
     string operation_option=function+"("+command+"="+(OPTION==ON?string("ON"):string("OFF"))+")";
+    string operation_svalue_dvalue=function+"("+command+"=[svalue="+svalue+";dvalue="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_)+"])";
 
     //this function only changes xvasp.INCAR
     //no pre-load of INCAR, i.e., assume current INCAR is inside xvasp.INCAR
@@ -3999,38 +4007,6 @@ namespace KBIN {
           xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_dvalue << endl;
           if(VERBOSE) xvasp.INCAR << "# Performing " << operation_dvalue << " [AFLOW] end" << endl;
         }
-      }
-    }
-    // ***************************************************************************
-
-    // ***************************************************************************
-    // MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM
-    else if(command=="MAGMOM") {
-      keyword="MAGMOM";
-
-      if(Krun){
-        incar_input=keyword+"=";
-        for(uint i=0;i<xvasp.str.atoms.size();i++) {
-          incar_input+=(i>0?" ":"");
-          if(xvasp.str.atoms[i].order_parameter_atom==true){ 
-            incar_input+=aurostd::utype2string(xvasp.str.atoms[i].order_parameter_value);
-          }else{  //xvasp.str.atoms[i].order_parameter_atom==false
-            incar_input+="0";
-          }
-        }
-        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"="); //add space 
-          if(incar_input==incar_input_old){Krun=false;}
-        }
-      }
-
-      if(Krun){
-        //REMOVE LINES
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation,VERBOSE);  //CO20200624
-        //ADD LINES
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] begin" << endl;
-        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << " MAGMOM " << xvasp.str.atoms.size() << " atoms" << endl;
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] end" << endl;
       }
     }
     // ***************************************************************************
@@ -4368,7 +4344,7 @@ namespace KBIN {
 
       if(Krun){
         //REMOVE LINES
-        // strip magmom from incar and make the magmom from the order parameter
+        // strip magmom from incar and make the magmom from the spin
         XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword+",LNONCOLLINEAR,MAGMOM",operation_option,VERBOSE);  //CO20200624
         //ADD LINES
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
@@ -4391,25 +4367,74 @@ namespace KBIN {
     
     // ***************************************************************************
     // MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM MAGMOM
-    else if(command=="MAGMOM") {  //CO20230826
-      keyword=command;
+    else if(command=="MAGMOM"||command=="MAGMOM_SVALUE") {
+      keyword="MAGMOM";
+      
+      //initialize vmag
+      vector<double> vmag;
+      for(uint i=0;i<xvasp.str.atoms.size();i++){vmag.push_back(0.0);}
+
+      //set vmag
+      if(Krun && command=="MAGMOM_SVALUE" && !svalue.empty()){
+        //command=="MAGMOM_SVALUE"; grab from string-type input
+        string _svalue=string(svalue);
+        //spaces will be tricky with non-collinear, consider using double spaces and __, check LNONCOLLINEAR first
+        aurostd::StringSubst(_svalue,","," ");
+        aurostd::StringSubst(_svalue,"_"," ");
+        aurostd::StringSubst(_svalue,"x","*");
+        XVASP_INCAR_Read_MAGMOM(_svalue,vmag);
+        if(vmag.size()!=xvasp.str.atoms.size()){Krun=false;} //check before you apply
+      }
+      if(Krun && command=="MAGMOM"){
+        //command=="MAGMOM"; grab from xvasp.str.atoms.spin
+        for(uint i=0;i<xvasp.str.atoms.size();i++) {
+          if(xvasp.str.atoms[i].spin_is_given==true){
+            vmag[i]=xvasp.str.atoms[i].spin;
+          }
+        }
+      }
+      if(Krun && vmag.empty()){Krun=false;}
+      
+      //multiply if requested
+      if(Krun && !aurostd::isequal(dvalue,1.0)){  //if dvalue is not identity, scale spins as suggested by vasp
+        bool is_neg=false;
+        double spin_multiplier=dvalue; //DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER;
+        for(uint i=0;i<vmag.size();i++){
+          is_neg=std::signbit(vmag[i]);
+          vmag[i]=(is_neg ? -1.0 : 1.0) * spin_multiplier * std::ceil(abs(vmag[i]));  //ceil(abs()) works for negative numbers too, round up and multiply by 1.5 according to vasp: https://www.vasp.at/wiki/index.php/MAGMOM
+        }
+      }
+
+      //consolidate
+      vector<double> vmag_uniq;
+      vector<uint> vmult;
+      if(Krun){
+        if(!KBIN::CONSOLIDATE_MAGMOM(vmag,vmag_uniq,vmult)){Krun=false;}
+      }
 
       if(Krun){
-        incar_input=keyword+"="+svalue;  //space separated vmag
+        //[CO20230913 - BEFORE CONSOLIDATION]incar_input=keyword+"="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM)," ");
+        incar_input=keyword+"=";
+        for(uint i=0;i<vmag_uniq.size();i++){
+          incar_input+=aurostd::utype2string(vmult[i])+"*";
+          incar_input+=aurostd::utype2string(vmag_uniq[i],3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM);
+          if(i<vmag_uniq.size()-1){incar_input+=" ";}
+        }
         if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"="); //add space 
           if(incar_input==incar_input_old){Krun=false;}
         }
-        //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //CO20210315 - remove whitespaces
       }
 
       if(Krun){
         //REMOVE LINES
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation,VERBOSE);  //CO20200624
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation_svalue_dvalue,VERBOSE);  //CO20200624
         //ADD LINES
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] begin" << endl;
-        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << endl;  //no real point trying other values, better to try another fix
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] end" << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_svalue_dvalue << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_svalue_dvalue << " MAGMOM " << xvasp.str.atoms.size() << " atoms" << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_svalue_dvalue << " [AFLOW] end" << endl;
+        //
+        XVASP_INCAR_Read_MAGMOM(xvasp); //CO20230912 - re-read into xvasp.str.atoms.spin in case it was changed
       }
     }
     // ***************************************************************************
@@ -4624,11 +4649,21 @@ namespace KBIN {
         xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << endl;
         if(OPTION==ON){xvasp.INCAR << aurostd::PaddedPOST("ISPIND=2",_incarpad_) << " # " << operation_option << endl;}
         if(OPTION==ON && magmom_already_specified==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
-          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
-          }else{  // otherwise, make the magmom +1
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
+          double magmom_val=1.0;
+          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){magmom_val=5.0;}
+          for(uint i=0;i<xvasp.str.atoms.size();i++){
+            xvasp.str.atoms[i].spin_is_given=true;
+            xvasp.str.atoms[i].spin=magmom_val;
           }
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,1.0,ON);  //CO20230912
+          //CO20230912 - BELOW IS IDENTICAL CODE, only difference is "14*5" will print exactly as "5 5 ..."
+          //[CO20230912 - OBSOLETE]if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
+          //[CO20230912 - OBSOLETE]  xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
+          //[CO20230912 - OBSOLETE]  XVASP_INCAR_Read_MAGMOM(xvasp); //CO20230912 - set atom.order_parameter
+          //[CO20230912 - OBSOLETE]}else{  // otherwise, make the magmom +1
+          //[CO20230912 - OBSOLETE]  xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
+          //[CO20230912 - OBSOLETE]  XVASP_INCAR_Read_MAGMOM(xvasp); //CO20230912 - set atom.order_parameter
+          //[CO20230912 - OBSOLETE]}
         }
         if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
       }
@@ -4780,6 +4815,21 @@ namespace KBIN {
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     return true;
   }
+  bool CONSOLIDATE_MAGMOM(const vector<double>& vmag,vector<double>& vmag_uniq,vector<uint>& vmult){  //CO20230913
+    //consolidate
+    if(vmag.empty()){return false;}
+    vmag_uniq.clear();vmult.clear();
+    vmag_uniq.push_back(vmag[0]);vmult.push_back(1);
+    for(uint i=1;i<vmag.size();i++){
+      if(aurostd::isequal(vmag[i],vmag_uniq.back())){vmult.back()++;}
+      else{
+        vmag_uniq.push_back(vmag[i]);
+        vmult.push_back(1);
+      }
+    }
+    if(vmag_uniq.size()!=vmult.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vmag_uniq.size()["+aurostd::utype2string(vmag_uniq.size())+"]!=vmult.size()["+aurostd::utype2string(vmult.size())+"]",_RUNTIME_ERROR_);}
+    return true;
+  }
 } 
 
 // ***************************************************************************
@@ -4840,11 +4890,15 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_SPIN_FIX_RELAX
 namespace KBIN {
   void XVASP_INCAR_SPIN_FIX_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315 - write_input
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_INCAR_SPIN_FIX_RELAX";
     ostringstream aus;
     bool fix_aflowin=FALSE;
     _kflags kflags;
+    //[do NOT work, OUTCAR has already moved to OUTCAR.relaxXX]if(0){xvasp.str.qm_clear();xvasp.str.qm_load(xvasp.Directory);} //CO20230913 - redo to be safe ?  //CO20230915 - does not work, already moved to OUTCAR.relaxXX
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     if(abs(xvasp.str.qm_mag_atom)<DEFAULT_VASP_SPIN_REMOVE_CUTOFF){ //CO20230826 - non-magnetic system
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " not magnetic" << endl;}
       if(step==1 && vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1) {
         aus << "00000  MESSAGE FORCE SPIN_OFF: [VASP_FORCE_OPTION]SPIN_REMOVE_RELAX_1  SPIN= " << xvasp.str.qm_mag_atom << " - " << Message(__AFLOW_FILE__,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -4859,18 +4913,11 @@ namespace KBIN {
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
         fix_aflowin=TRUE;
       }
-      if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
-        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
-        aurostd::StringstreamClean(xvasp.INCAR_orig); xvasp.INCAR_orig << xvasp.INCAR.str();
-        if(write_incar){ //[CO20210315 - we don't know if there's a static run afterwards]if (step < xvasp.NRELAX)  //ME20200107 - do not write when at the last step or there will be an extra INCAR
-          aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
-        }
-        // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
-      }
       if(fix_aflowin) {
         // fix aflow.in
         KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SPIN=",function); //CO20210315
         KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM=",function); //CO20230826
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM*=",function); //CO20230826
         KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SPIN=OFF",function);  //CO20210315
         //[CO20210315 - OBSOLETE]stringstream aus_exec;
         //[CO20210315 - OBSOLETE]aus_exec << "cd " << xvasp.Directory << endl;
@@ -4884,34 +4931,58 @@ namespace KBIN {
         vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN = false; //CO20230826
       }
     }else{  //CO20230826 - magnetic system
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " magnetic" << endl;}
       if(vflags.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN) {  //CO20230826
-        string svalue="";
-        if(aurostd::FileExist(xvasp.Directory+"/OUTCAR")&&aurostd::FileNotEmpty(xvasp.Directory+"/OUTCAR")){
-          xOUTCAR OUTCAR_SPIN(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
-          vector<double> vmag(OUTCAR_SPIN.vmag);
-          if(!OUTCAR_SPIN.vmag.empty() && OUTCAR_SPIN.vmag.size()==xvasp.str.atoms.size()){
-            bool is_neg=false;
-            for(uint i=0;i<vmag.size();i++){
-              is_neg=std::signbit(vmag[i]);
-              vmag[i]=(is_neg ? -1.0 : 1.0) * DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER * std::ceil(abs(vmag[i]));  //ceil(abs()) works for negative numbers too, round up and multiply by 1.5 according to vasp: https://www.vasp.at/wiki/index.php/MAGMOM
-            }
-            aus << "00000  MESSAGE RECYCLE_SPIN: [VASP_FORCE_OPTION]RECYCLE_SPIN  SPIN= " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(OUTCAR_SPIN.vmag,2,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),",") << " - " << Message(__AFLOW_FILE__,aflags) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            svalue=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vmag,2,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM)," ");
-            bool incar_changed=KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,svalue,0,0.0,ON);  //CO20230826 - keep track of whether it changes, maybe the spin stays the same and we do not need to keep updating the aflow.in
-            if(incar_changed){
-              xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
-              fix_aflowin=TRUE;
-            }
+        //DO NOT LOOK FOR OUTCAR, already moved to OUTCAR.relax..
+        vector<double> vmag_uniq;
+        vector<uint> vmult;
+        if(!xvasp.str.qm_vmag.empty() && xvasp.str.qm_vmag.size()==xvasp.str.atoms.size() && KBIN::CONSOLIDATE_MAGMOM(xvasp.str.qm_vmag,vmag_uniq,vmult)){ //CO20230913
+          aus << "00000  MESSAGE RECYCLE_SPIN: [VASP_FORCE_OPTION]RECYCLE_SPIN  SPIN= ";
+          aus << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xvasp.str.qm_vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM)," ");
+          //[CO20230913 - do not consolidate, spins can differ a bit]for(uint i=0;i<vmag_uniq.size();i++){
+          //[CO20230913 - do not consolidate, spins can differ a bit]  aus << aurostd::utype2string(vmult[i]) << "*";
+          //[CO20230913 - do not consolidate, spins can differ a bit]  aus << aurostd::utype2string(vmag_uniq[i],3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM);
+          //[CO20230913 - do not consolidate, spins can differ a bit]  if(i<vmag_uniq.size()-1){aus << " ";}
+          //[CO20230913 - do not consolidate, spins can differ a bit]}
+          aus << " - " << Message(__AFLOW_FILE__,aflags) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          for(uint i=0;i<xvasp.str.qm_vmag.size();i++){
+            xvasp.str.atoms[i].spin_is_given=true;
+            xvasp.str.atoms[i].spin=xvasp.str.qm_vmag[i];
           }
-          if(fix_aflowin && !vmag.empty()) {
-            svalue=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vmag,2,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),",");  //CO20230826 - create new svalue with commas instead
+          double spin_multiplier=1.0; //CO20230917 - this is for a relaxation, relaxations do NOT change values between relaxations, think VOLUME_MULTIPLY_EQUAL //DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER;
+          bool incar_changed=KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,spin_multiplier,ON);  //CO20230826 - keep track of whether it changes, maybe the spin stays the same and we do not need to keep updating the aflow.in
+          if(incar_changed){
+            xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+            fix_aflowin=TRUE;
+          }
+        }
+        if(fix_aflowin) {
+          vector<double> vmag;
+          XVASP_INCAR_Read_MAGMOM(xvasp,vmag); //CO20230912 - re-read into xvasp.str.atoms.spin in case it was changed
+          if(KBIN::CONSOLIDATE_MAGMOM(vmag,vmag_uniq,vmult)){
+            //[CO20230913 - BEFORE CONSOLIDATION]string svalue=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),"_");  //CO20230826 - create new svalue with commas instead
+            string svalue="";
+            for(uint i=0;i<vmag_uniq.size();i++){
+              svalue+=aurostd::utype2string(vmult[i])+"x";
+              svalue+=aurostd::utype2string(vmag_uniq[i],3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM);
+              if(i<vmag_uniq.size()-1){svalue+="_";}
+            }
             // fix aflow.in
             KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM=",function); //CO20210315
+            KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM*=",function); //CO20210315
             KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]MAGMOM="+svalue,function);  //CO20210315
           }
         }
       }
+    }
+    if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
+      aurostd::StringstreamClean(xvasp.INCAR_orig); xvasp.INCAR_orig << xvasp.INCAR.str();
+      if(write_incar){ //[CO20210315 - we don't know if there's a static run afterwards]if (step < xvasp.NRELAX)  //ME20200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      }
+      // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
     }
   }
 }
@@ -6818,7 +6889,7 @@ namespace KBIN {
       }
       if(Krun){
         //CO20210315 - need to make sure fix magmom too (if it's there)
-        //load into xvasp.str.atoms[i].order_parameter_atom/value, convert to sconv, then print out
+        //load into xvasp.str.atoms[i].spin_is_given/value, convert to sconv, then print out
         VASP_Reread_INCAR(xvasp);  //preload incar - MAGMOM
         bool remove_magmom=aurostd::kvpair2bool(xvasp.INCAR,"MAGMOM","=");
         bool write_magmom=XVASP_INCAR_Read_MAGMOM(xvasp);
@@ -6834,7 +6905,7 @@ namespace KBIN {
         //
         xvasp.str.Standard_Conventional_UnitCellForm(); //CO20210315 - previously missing before
         if(remove_magmom){KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation,vflags.KBIN_VASP_INCAR_VERBOSE);} //CO20200624
-        if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,0.0,FALSE);}
+        if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("MAGMOM",xvasp,vflags,"",0,1.0,ON);}
         if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
           if(remove_magmom || write_magmom){aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}  //write out incar
         }

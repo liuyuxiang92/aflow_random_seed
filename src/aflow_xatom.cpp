@@ -2668,8 +2668,10 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   qm_forces_write=FALSE;
   qm_positions.clear();
   qm_positions_write=FALSE;
-  qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0;
-  qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0; 
+  qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_V_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0; //CO20230917 - volume
+  qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_V_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0;  //CO20230917 - volume
+  qm_vmag.clear();  //CO20230915
+  qm_vmag_write=FALSE;  //CO20230915
   // KPOINTS ---------------------------
   kpoints_k1=0;kpoints_k2=0;kpoints_k3=0;
   kpoints_s1=0;kpoints_s2=0;kpoints_s3=0;
@@ -2980,8 +2982,12 @@ void xstructure::copy(const xstructure& bstr) {
   for(uint i=0;i<bstr.qm_positions.size();i++)
     qm_positions.push_back(bstr.qm_positions.at(i));
   qm_positions_write=bstr.qm_positions_write;
-  qm_E_cell=bstr.qm_E_cell;qm_dE_cell=bstr.qm_dE_cell;qm_H_cell=bstr.qm_H_cell;qm_PV_cell=bstr.qm_PV_cell;qm_mag_cell=bstr.qm_mag_cell;qm_P=bstr.qm_P;
-  qm_E_atom=bstr.qm_E_atom;qm_dE_atom=bstr.qm_dE_atom;qm_H_atom=bstr.qm_H_atom;qm_PV_atom=bstr.qm_PV_atom;qm_mag_atom=bstr.qm_mag_atom;
+  qm_E_cell=bstr.qm_E_cell;qm_dE_cell=bstr.qm_dE_cell;qm_H_cell=bstr.qm_H_cell;qm_V_cell=bstr.qm_V_cell;qm_PV_cell=bstr.qm_PV_cell;qm_mag_cell=bstr.qm_mag_cell;qm_P=bstr.qm_P; //CO20230917 - volume
+  qm_E_atom=bstr.qm_E_atom;qm_dE_atom=bstr.qm_dE_atom;qm_H_atom=bstr.qm_H_atom;qm_V_atom=bstr.qm_V_atom;qm_PV_atom=bstr.qm_PV_atom;qm_mag_atom=bstr.qm_mag_atom;  //CO20230917 - volume
+  qm_vmag.clear();  //CO20230915
+  for(uint i=0;i<bstr.qm_vmag.size();i++) //CO20230915
+    qm_vmag.push_back(bstr.qm_vmag.at(i));  //CO20230915
+  qm_vmag_write=bstr.qm_vmag_write; //CO20230915
   // KPOINTS ---------------------------
   kpoints_k1=bstr.kpoints_k1;kpoints_k2=bstr.kpoints_k2;kpoints_k3=bstr.kpoints_k3;
   kpoints_s1=bstr.kpoints_s1;kpoints_s2=bstr.kpoints_s2;kpoints_s3=bstr.kpoints_s3;
@@ -3430,7 +3436,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     //CO20170630 - fixing for POCC
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO20180705 - repetita iuvant
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO20180705 - this makes it necessary that atoms are properly typed
-    if(a_iomode!=IOVASP_WYCKCAR) { //DX20210611 - do not do for Wyccar, atom count is not the same as number of Wyckoff positiosn
+    if(a_iomode!=IOVASP_WYCKCAR) { //DX20210611 - do not do for Wyccar, atom count is not the same as number of Wyckoff positions
       if(a.partial_occupation_flag==TRUE) {
         //need to figure out the '+'
         uint iatom=0;
@@ -3584,6 +3590,14 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
             if(!std::signbit(a.qm_positions.at(iat)(j))) oss << " ";
             oss << a.qm_positions.at(iat)(j) << " ";
           }
+          oss << ")_   ";
+        }
+        if(a.qm_vmag_write) { //CO20230915
+          if(a.qm_calculated==TRUE)  oss << "M *(";
+          if(a.qm_calculated==FALSE) oss << "M  (";
+          if(abs(a.qm_vmag.at(iat))<10.0) oss << " ";
+          if(!std::signbit(a.qm_vmag.at(iat))) oss << " ";
+          oss << a.qm_vmag.at(iat) << " ";
           oss << ")_   ";
         }
         if(a.write_DEBUG_flag) {
@@ -6943,6 +6957,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     atom.cpos.clear();atom.fpos.clear();
     a.qm_forces.push_back(v);
     a.qm_positions.push_back(v);
+    a.qm_vmag.push_back(0.0); //CO20230915
     a.qm_atoms.push_back(atom);
   }
 
@@ -7001,6 +7016,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.qm_calculated=FALSE;
   a.qm_forces_write=FALSE;
   a.qm_positions_write=FALSE;
+  a.qm_vmag_write=FALSE;  //CO20230915
   // CALCULATED STUFF
   //DX+CO START
   a.dist_nn_min=AUROSTD_NAN;    //CO
@@ -7056,6 +7072,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+  }
+  if(a.atoms.size()!=a.qm_vmag.size()) {
+    message << "a.atoms.size()!=a.qm_vmag.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
     throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
@@ -18947,9 +18968,11 @@ void xstructure::qm_clear(void) {
   qm_origin.clear();
   qm_forces_write=FALSE;
   qm_positions_write=FALSE;
+  qm_vmag_write=FALSE;  //CO20230915
   qm_atoms.clear();
   qm_forces.clear();
   qm_positions.clear();
+  qm_vmag.clear();  //CO20230915
   for(uint iat=0;iat<atoms.size();iat++) {
     qm_atoms.push_back(atoms.at(iat));          // just plug something, then I`ll clean
     qm_atoms.at(iat).cpos.clear();
@@ -18958,13 +18981,15 @@ void xstructure::qm_clear(void) {
     qm_forces.at(iat).clear();
     qm_positions.push_back(atoms.at(iat).cpos); // just plug something, then I`ll clean
     qm_positions.at(iat).clear();
+    qm_vmag.push_back(0.0); //CO20230915
   }
-  qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0;
-  qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0; 
+  qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_V_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0; //CO20230917 - volume
+  qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_V_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0;  //CO20230917 - volume
 
   if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
   if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
   if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
 
 }
 
@@ -18972,6 +18997,7 @@ void xstructure::qm_recycle(void) {
   if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
   if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
   if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
   scale=qm_scale;
   lattice=qm_lattice;
   klattice=qm_klattice;
@@ -19009,12 +19035,15 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
     if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
     if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
     if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
 
     // NEW WITH xOUTCAR
     qm_forces.clear(); for(uint i=0;i<outcar.vforces.size();i++)  qm_forces.push_back(outcar.vforces.at(i)); 
     qm_positions.clear(); for(uint i=0;i<outcar.vpositions_cartesian.size();i++)  qm_positions.push_back(outcar.vpositions_cartesian.at(i)); 
+    qm_vmag.clear(); for(uint i=0;i<outcar.vmag.size();i++)  qm_vmag.push_back(outcar.vmag.at(i));  //CO20230915
     if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
     if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
 
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;
@@ -19040,6 +19069,7 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
     // cerr << "DEBUG: xstructure::qm_clear(void)" << endl;
     // string CONTCAR_string="";
     xstructure b(CONTCAR_stringstream);                               // LOAD it in
+    qm_V_cell=qm_V_atom=b.GetVolume();qm_V_atom/=(double)b.atoms.size();  //CO20230917
     qm_scale=b.scale;
     qm_lattice=b.lattice;
     qm_klattice=b.klattice;

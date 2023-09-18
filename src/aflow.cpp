@@ -237,6 +237,27 @@ int main(int _argc,char **_argv) {
       cout << aurostd::httpGet("https://s4e.ai/API/aflux/?species(Fe,O),density(0*),paging(1,5)") << endl;
       return 0;
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_xvasp")) { //CO20230913
+
+      _xvasp xvasp;xvasp.Directory=".";
+      stringstream straus;aurostd::file2stringstream(xvasp.Directory+"/POSCAR",straus);xvasp.str=xstructure(straus,IOVASP_AUTO);
+      _aflags aflags;aflags.Directory=".";
+      ofstream FileMESSAGE;
+      ostream& oss=cout;
+      
+      //aflow.in
+      string AflowIn_file="",AflowIn="";
+      try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
+      catch(aurostd::xerror& err){
+        pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      }
+      _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
+      _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
+
+      KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,1,true,FileMESSAGE);
+      return 0;
+    }
+
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
