@@ -928,11 +928,47 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+namespace aurostd {  // namespace aurostd
+  template<class utype> bool                             // is xvector == xvector ?
+  identical(const xvector<xcomplex<utype>>& a,const xvector<xcomplex<utype>>& b,const utype& _tol_) {
+    if(a.rows!=b.rows)  {
+      stringstream message;
+      message << "failure in function identical (xvector == xvector)[1]";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    bool output=TRUE;
+    if(a.isfloat || a.iscomplex) {
+      for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
+        if((abs(a[i]-b[ii])/(abs(a[i])+abs(b[ii])+_tol_))>_tol_)  output=FALSE; //SC20180115
+        // output=output*(((abs(a[i]-b[ii]))/(abs(a[i])+abs(b[ii])+_tol_))<=_tol_);//SC20180115
+        // output=output*(abs(a[i]-b[ii])<=_tol_); //SC pre 20180115
+      }
+      if(output==FALSE) return (bool) output;
+    } else {
+      for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
+        if(a[i]!=b[ii]) output=FALSE; //SC20180115
+        // output=output*(a[i]==b[ii]); //SC20180115
+      }
+      if(output==FALSE) return (bool) output;
+    }
+    return (bool) output;
+  }
+}
+
 // check if all entries of an xvector are equal
 namespace aurostd { //namespace aurostd //DX20210503
   template<class utype> bool identical(const xvector<utype>& a, utype tol) {
     for(int i=a.lrows;i<=a.urows;i++){
       if(isdifferent(a[i],a[0],tol)){ return false; }
+    }
+    return true; //includes case when xvector is empty
+  }
+}
+// check if all entries of an xvector are equal
+namespace aurostd { //namespace aurostd //DX20210503
+  template<class utype> bool identical(const xvector<xcomplex<utype>>& a, utype tol) {
+    for(int i=a.lrows;i<=a.urows;i++){
+      if(isdifferent(a.re[i],a.re[0],tol) && isdifferent(a.im[i],a.im[0],tol)){ return false; }
     }
     return true; //includes case when xvector is empty
   }
@@ -975,6 +1011,7 @@ namespace aurostd {  // namespace aurostd
   bool _aurostd_initialize_isequal(const xvector<uint>& a,const xvector<uint>& b,const uint& _tol_) { return isequal(a,b,_tol_);} //CO20180409
   bool _aurostd_initialize_isequal(const xvector<float>& a,const xvector<float>& b,const float& _tol_) { return isequal(a,b,_tol_);}
   bool _aurostd_initialize_isequal(const xvector<double>& a,const xvector<double>& b,const double& _tol_) { return isequal(a,b,_tol_);}
+
 }
 
 namespace aurostd {  // namespace aurostd
@@ -986,6 +1023,16 @@ namespace aurostd {  // namespace aurostd
   bool _aurostd_initialize_isequal(const xvector<uint>& a,const xvector<uint>& b) { return isequal(a,b);} //CO20180409
   bool _aurostd_initialize_isequal(const xvector<float>& a,const xvector<float>& b) { return isequal(a,b);}
   bool _aurostd_initialize_isequal(const xvector<double>& a,const xvector<double>& b) { return isequal(a,b);}
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype> bool                             // is xvector == xvector ?
+  isequal(const xvector<xcomplex<utype>>& a,const xvector<xcomplex<utype>>& b) {
+    return (bool) identical(a,b,(utype) _AUROSTD_XVECTOR_TOLERANCE_IDENTITY_);
+  }
+  template bool isequal(const xvector<xcomplex<double>> &, const xvector<xcomplex<double>> &);
+  template bool isequal(const xvector<xcomplex<float>> &, const xvector<xcomplex<float>> &);
+
 }
 
 namespace aurostd {  // namespace aurostd

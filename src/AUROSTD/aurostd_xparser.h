@@ -133,6 +133,7 @@ namespace aurostd {
       void operator= (bool content);
       void operator= (std::nullptr_t content);
       template<class utype> void operator=(const utype content);
+      template<class utype> void operator=(const xcomplex<utype> & content);
       template<class utype> void operator=(const std::vector<utype> & content);
       template<class utype> void operator=(const std::map<std::string, utype> & content);
       template<class utype> void operator=(const xvector<utype> & content);
@@ -146,34 +147,38 @@ namespace aurostd {
       object(std::nullptr_t content);
       object(object_types create_type);
       template<typename utype> object(const utype content);
+      template<typename utype> object(const xcomplex<utype> &content);
       template<typename utype> object(const vector<utype> & content);
       template<typename utype> object(const std::map<std::string, utype> & content);
       template<typename utype> object(const xvector<utype> & content);
       template<typename utype> object(const xmatrix<utype> & content);
 
       // conversion functions
-      operator bool() const;
-      operator std::string() const;
-      operator double() const;
-      operator float() const;
-      operator long long() const;
-      operator long() const;
-      operator int() const;
-      operator unsigned long long () const;
-      operator unsigned long () const;
-      operator unsigned int () const;
+      explicit operator bool() const;
+      explicit operator std::string() const;
+      explicit operator double() const;
+      explicit operator float() const;
+      explicit operator long long() const;
+      explicit operator long() const;
+      explicit operator int() const;
+      explicit operator unsigned long long () const;
+      explicit operator unsigned long () const;
+      explicit operator unsigned int () const;
       operator std::map<std::string, object> () const;
-      // explicit operator std::vector<object> () const;
+      template<class utype> operator xcomplex<utype>() const;
       template<class utype> operator std::vector<utype>() const;
       template<class utype> operator std::map<std::string, utype>() const;
       template<class utype> operator aurostd::xvector<utype>() const;
       template<class utype> operator aurostd::xmatrix<utype>() const;
       // type specific functions
-      template<class utype> void push_back(const utype content);
+      void push_back(const JSON::object content);
+      size_t size();
+      bool empty();
 
       // conversion helper
       void fromString(const std::string & content);
       template<class utype> void fromNumber(const utype content);
+      template<class utype> void fromComplex(const xcomplex<utype> content);
       template<class utype> void fromVector(const vector<utype> & content);
       template<class utype> void fromMap(const std::map<std::string, utype> & content);
       template<class utype> void fromXvector(const xvector<utype> & content);

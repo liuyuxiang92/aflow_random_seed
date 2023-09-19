@@ -191,6 +191,18 @@ namespace aurostd {
     }
   }
 
+  /// @brief change this JSON::object to a complex representation
+  /// @authors
+  /// @mod{HE,20221118,created}
+  template<class utype>  void JSON::object::fromComplex(const xcomplex<utype> content){
+    std::shared_ptr <JSON::Dictionary> new_dictionary = std::make_shared<JSON::Dictionary>();
+    this->obj = new_dictionary;
+    this->type = object_types::DICTIONARY;
+    new_dictionary->insert({"real", content.re});
+    new_dictionary->insert({"imag", content.im});
+    return;
+  }
+
   /// @brief change this JSON::object to a JSON::object_types::LIST based on a xvector
   /// @authors
   /// @mod{HE,20220926,created}
@@ -267,6 +279,11 @@ namespace aurostd {
     this->fromNumber(content);
   }
 
+  /// @brief converting constructor: set the content of this JSON::object based on a number
+  template<class utype> JSON::object::object(const xcomplex<utype> &content) {
+    this-> fromComplex(content);
+  }
+
   /// @brief converting constructor: set the content of this JSON::object based on a xvector
   template<class utype> JSON::object::object(const xvector<utype> & content) {
     this->fromXvector(content);
@@ -279,6 +296,8 @@ namespace aurostd {
   template JSON::object::object(const xvector<unsigned long long> &);
   template JSON::object::object(const xvector<float> &);
   template JSON::object::object(const xvector<double> &);
+  template JSON::object::object(const xvector<xcomplex<float>> &);
+  template JSON::object::object(const xvector<xcomplex<double>> &);
 
   /// @brief converting constructor: set the content of this JSON::object based on a xmatrix
   template<class utype> JSON::object::object(const xmatrix<utype> & content) {
@@ -291,6 +310,8 @@ namespace aurostd {
   template JSON::object::object(const xmatrix<unsigned long long> &);
   template JSON::object::object(const xmatrix<float> &);
   template JSON::object::object(const xmatrix<double> &);
+  template JSON::object::object(const xmatrix<xcomplex<float>> &);
+  template JSON::object::object(const xmatrix<xcomplex<double>> &);
 
   /// @brief converting constructor: set the content of this JSON::object based on a vector
   template<class utype> JSON::object::object(const vector<utype> & content) {
@@ -303,6 +324,8 @@ namespace aurostd {
   template JSON::object::object(const std::vector<unsigned long long> &);
   template JSON::object::object(const std::vector<float> &);
   template JSON::object::object(const std::vector<double> &);
+  template JSON::object::object(const std::vector<xcomplex<float>> &);
+  template JSON::object::object(const std::vector<xcomplex<double>> &);
   template JSON::object::object(const std::vector<std::string> &);
   template JSON::object::object(const std::vector<std::vector<int>> &);
   template JSON::object::object(const std::vector<std::vector<unsigned int>> &);
@@ -310,6 +333,8 @@ namespace aurostd {
   template JSON::object::object(const std::vector<std::vector<unsigned long long>> &);
   template JSON::object::object(const std::vector<std::vector<float>> &);
   template JSON::object::object(const std::vector<std::vector<double>> &);
+  template JSON::object::object(const std::vector<std::vector<xcomplex<float>>> &);
+  template JSON::object::object(const std::vector<std::vector<xcomplex<double>>> &);
   template JSON::object::object(const std::vector<std::vector<std::string>> &);
 
   /// @brief converting constructor: set the content of this JSON::object based on a map
@@ -323,6 +348,8 @@ namespace aurostd {
   template JSON::object::object(const std::map<std::string, unsigned long long> &);
   template JSON::object::object(const std::map<std::string, float> &);
   template JSON::object::object(const std::map<std::string, double> &);
+  template JSON::object::object(const std::map<std::string, xcomplex<float>> &);
+  template JSON::object::object(const std::map<std::string, xcomplex<double>> &);
   template JSON::object::object(const std::map<std::string, std::string> &);
   template JSON::object::object(const std::map<std::string, std::vector<float>> &);
 
@@ -400,6 +427,13 @@ namespace aurostd {
   template void JSON::object::operator=(const double);
   template void JSON::object::operator=(const float);
 
+  ///@brief assignment operator for xcomplex
+  template<class utype> void JSON::object::operator=(const xcomplex<utype> & content){
+    fromComplex(content);
+  }
+  template void JSON::object::operator=(const xcomplex<float> &);
+  template void JSON::object::operator=(const xcomplex<double> &);
+
   ///@brief assignment operator for xvector
   template<class utype> void JSON::object::operator=(const xvector<utype> & content){
     fromXvector(content);
@@ -411,6 +445,8 @@ namespace aurostd {
   template void JSON::object::operator=(const xvector<unsigned long long> &);
   template void JSON::object::operator=(const xvector<float> &);
   template void JSON::object::operator=(const xvector<double> &);
+  template void JSON::object::operator=(const xvector<xcomplex<float>> &);
+  template void JSON::object::operator=(const xvector<xcomplex<double>> &);
 
   ///@brief assignment operator for xmatrix
   template<class utype> void JSON::object::operator=(const xmatrix<utype> & content){
@@ -423,6 +459,8 @@ namespace aurostd {
   template void JSON::object::operator=(const xmatrix<unsigned long long> &);
   template void JSON::object::operator=(const xmatrix<float> &);
   template void JSON::object::operator=(const xmatrix<double> &);
+  template void JSON::object::operator=(const xmatrix<xcomplex<float>> &);
+  template void JSON::object::operator=(const xmatrix<xcomplex<double>> &);
 
   ///@brief assignment operator for vector
   template<class utype> void JSON::object::operator=(const std::vector<utype> & content){
@@ -435,6 +473,8 @@ namespace aurostd {
   template void JSON::object::operator=(const std::vector<unsigned long long> &);
   template void JSON::object::operator=(const std::vector<float> &);
   template void JSON::object::operator=(const std::vector<double> &);
+  template void JSON::object::operator=(const std::vector<xcomplex<float>> &);
+  template void JSON::object::operator=(const std::vector<xcomplex<double>> &);
   template void JSON::object::operator=(const std::vector<std::string> &);
   template void JSON::object::operator=(const std::vector<vector<int>> &);
   template void JSON::object::operator=(const std::vector<vector<unsigned int>> &);
@@ -442,6 +482,8 @@ namespace aurostd {
   template void JSON::object::operator=(const std::vector<vector<unsigned long long>> &);
   template void JSON::object::operator=(const std::vector<vector<float>> &);
   template void JSON::object::operator=(const std::vector<vector<double>> &);
+  template void JSON::object::operator=(const std::vector<vector<xcomplex<float>>> &);
+  template void JSON::object::operator=(const std::vector<vector<xcomplex<double>>> &);
   template void JSON::object::operator=(const std::vector<vector<std::string>> &);
   template void JSON::object::operator=(const std::vector<xvector<int>> &);
   template void JSON::object::operator=(const std::vector<xvector<unsigned int>> &);
@@ -461,6 +503,8 @@ namespace aurostd {
   template void JSON::object::operator=(const std::map<std::string, unsigned long long> &);
   template void JSON::object::operator=(const std::map<std::string, float> &);
   template void JSON::object::operator=(const std::map<std::string, double> &);
+  template void JSON::object::operator=(const std::map<std::string, xcomplex<float>> &);
+  template void JSON::object::operator=(const std::map<std::string, xcomplex<double>> &);
   template void JSON::object::operator=(const std::map<std::string, std::string> &);
   template void JSON::object::operator=(const std::map<std::string, std::vector<float>> &);
 
@@ -594,6 +638,17 @@ namespace aurostd {
     return (long long) *this;
   }
 
+  ///@brief conversion function for int
+  template<class utype> JSON::object::operator xcomplex<utype>() const {
+    if (type != object_types::DICTIONARY)
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON xcomplex conversion failed: element is not a DICTIONARY: " + (std::string) * this, _VALUE_ILLEGAL_);
+    std::shared_ptr <JSON::Dictionary> content = std::static_pointer_cast<JSON::Dictionary>(obj);
+    return xcomplex<utype>((utype) content->operator[]("real"), (utype) content->operator[]("imag"));
+  }
+  template JSON::object::operator xcomplex<double>() const;
+  template JSON::object::operator xcomplex<float>() const;
+
+
   ///@brief conversion function for string
   JSON::object::operator std::string() const {
     return this->toString(false, false);
@@ -609,17 +664,23 @@ namespace aurostd {
     if (typeid(utype) == typeid(std::string) || typeid(utype) == typeid(bool)) {
       for (const JSON::object &so: *content)
         result.push_back((utype) so); // should be emplace_back - change in cpp14 (error for bool)
+    } else if ((typeid(utype) == typeid(aurostd::xcomplex<double>)) || (typeid(utype) == typeid(aurostd::xcomplex<float>))) {
+      for (const JSON::object &so: *content) {
+        if (so.type == object_types::DICTIONARY) result.push_back((utype) so);
+        else
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a complex number: " + (std::string) so, _VALUE_ILLEGAL_);
+      }
     } else if (std::is_floating_point<utype>::value) {
       for (const JSON::object &so: *content) {
         if (so.type > object_types::STRING) result.push_back((utype) so);
         else
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON vector conversion failed: element is not a number: " + (std::string) * this, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON vector conversion failed: element is not a number: " + (std::string) so, _VALUE_ILLEGAL_);
       }
     } else if (std::numeric_limits<utype>::is_integer) {
       for (const JSON::object &so: *content) {
         if (so.type > object_types::STRING && so.type < object_types::NONE) result.push_back((utype) so);
         else
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON vector conversion failed: element is not a number: " + (std::string) * this, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON vector conversion failed: element is not a number: " + (std::string) so, _VALUE_ILLEGAL_);
       }
     }
     return result;
@@ -634,6 +695,8 @@ namespace aurostd {
   template JSON::object::operator std::vector<int>() const;
   template JSON::object::operator std::vector<uint>() const;
   template JSON::object::operator std::vector<bool>() const;
+  template JSON::object::operator std::vector<xcomplex<float>>() const;
+  template JSON::object::operator std::vector<xcomplex<double>>() const;
 
   ///@brief conversion function for map of JSON::object
   JSON::object::operator std::map<std::string, JSON::object> () const {
@@ -692,18 +755,25 @@ namespace aurostd {
         result[idx] = (utype) so;
         idx++;
       }
+    } else if ((typeid(utype) == typeid(aurostd::xcomplex<double>)) || (typeid(utype) == typeid(aurostd::xcomplex<float>))) {
+      for (const JSON::object &so: *content) {
+        if (so.type == object_types::DICTIONARY) result[idx] = (utype) so;
+        else
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a complex number: " + (std::string) so, _VALUE_ILLEGAL_);
+        idx++;
+      }
     } else if (std::is_floating_point<utype>::value) {
       for (const JSON::object &so: *content) {
         if (so.type > object_types::STRING) result[idx] = (utype) so;
         else
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a number: " + (std::string) * this, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a number: " + (std::string) so, _VALUE_ILLEGAL_);
         idx++;
       }
     } else if (std::numeric_limits<utype>::is_integer) {
       for (const JSON::object &so: *content) {
         if (so.type > object_types::STRING && so.type < object_types::NONE) result[idx] = (utype) so;
         else
-          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a number: " + (std::string) * this, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a number: " + (std::string) so, _VALUE_ILLEGAL_);
         idx++;
       }
     }
@@ -718,6 +788,8 @@ namespace aurostd {
   template JSON::object::operator aurostd::xvector<int>() const;
   template JSON::object::operator aurostd::xvector<uint>() const;
   template JSON::object::operator aurostd::xvector<bool>() const;
+  template JSON::object::operator aurostd::xvector<xcomplex<double>>() const;
+  template JSON::object::operator aurostd::xvector<xcomplex<float>>() const;
 
   ///@brief conversion function for xmatrix
   template<class utype> JSON::object::operator aurostd::xmatrix<utype>() const {
@@ -747,6 +819,15 @@ namespace aurostd {
         std::shared_ptr <JSON::List> row = std::static_pointer_cast<JSON::List>(content->operator[](r - 1).obj);
         for (int c = result.lcols; c <= result.ucols; c++) {
           result[r][c] = (utype) row->operator[](c - 1);
+        }
+      }
+    } else if ((typeid(utype) == typeid(aurostd::xcomplex<double>)) || (typeid(utype) == typeid(aurostd::xcomplex<float>))) {
+      for (int r = result.lrows; r <= result.urows; r++) {
+        std::shared_ptr <JSON::List> row = std::static_pointer_cast<JSON::List>(content->operator[](r - 1).obj);
+        for (int c = result.lcols; c <= result.ucols; c++) {
+          if (row->operator[](c - 1).type == object_types::DICTIONARY) result[r][c] = (utype) row->operator[](c - 1);
+          else
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON conversion failed: element is not a complex number: " + (std::string) row->operator[](c - 1), _VALUE_ILLEGAL_);
         }
       }
     } else if (std::is_floating_point<utype>::value) {
@@ -780,22 +861,50 @@ namespace aurostd {
   template JSON::object::operator aurostd::xmatrix<int>() const;
   template JSON::object::operator aurostd::xmatrix<uint>() const;
   template JSON::object::operator aurostd::xmatrix<bool>() const;
+  template JSON::object::operator aurostd::xmatrix<xcomplex<float>>() const;
+  template JSON::object::operator aurostd::xmatrix<xcomplex<double>>() const;
 
 
   ///@brief allow to append to JSON::object_tpe::LIST
-  template<class utype> void JSON::object::push_back(const utype content){
+  void JSON::object::push_back(const JSON::object content){
     if (type == JSON::object_types::LIST) {
       std::shared_ptr <JSON::List> list_obj = std::static_pointer_cast<JSON::List>(obj);
       list_obj->push_back(content);
     }
     else {
-      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "push_back is just allowed for a JSON LIST ", _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "push_back is just allowed for a JSON LIST", _VALUE_ILLEGAL_);
     }
   }
-  // template instantiation for push_back (things that can be converted into JSON::object can also be used)
-  template void JSON::object::push_back(const JSON::object content);
 
+  ///@brief gives the size of JSON::object_tpe::LIST, JSON::object_tpe::DICTIONARY or JSON::object_tpe::STRING
+  size_t JSON::object::size() {
+    switch (type) {
+      case object_types::DICTIONARY: {
+        std::shared_ptr <JSON::Dictionary> content = std::static_pointer_cast<JSON::Dictionary>(obj);
+        return content->size();
+      }
+      case object_types::LIST: {
+        std::shared_ptr <JSON::List> content = std::static_pointer_cast<JSON::List>(obj);
+        return content->size();
+      }
+      case object_types::STRING: {
+        std::shared_ptr <std::string> content = std::static_pointer_cast<std::string>(obj);
+        return content->size();
+      }
+      default: {
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "size is just allowed for a JSON DICTIONARY, LIST, or STRING", _VALUE_ILLEGAL_);
+      }
+    }
+  }
 
+  ///@brief checks if JSON::object_tpe::LIST, JSON::object_tpe::DICTIONARY or JSON::object_tpe::STRING is empty
+  bool JSON::object::empty(){
+    if ((type == object_types::DICTIONARY) || (type == object_types::LIST) || (type == object_types::STRING)) {
+      return not bool(this);
+    } else {
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "empty is just allowed for a JSON DICTIONARY, LIST, or STRING", _VALUE_ILLEGAL_);
+    }
+  }
 }
 namespace aurostd {
   /// @namespace aurostd::JSON

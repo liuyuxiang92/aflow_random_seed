@@ -1489,7 +1489,7 @@ namespace qca {
     }
     aurostd::JSON::object jo = aurostd::JSON::loadFile(filepath);
     alloyname = (string)jo["Alloy name"];
-    conc_curve = jo["Concentration curve"];
+    conc_curve = bool(jo["Concentration curve"]);
     conc_macro = jo["Macroscopic concentration"];
     temp = jo["Temperature range (K)"];
     binodal_curve = jo["Binodal curve (K)"];

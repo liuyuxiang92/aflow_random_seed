@@ -907,14 +907,14 @@ namespace unittest {
         xvector<double> in_xvecdbl = {1.,3.,9.,8.,4.,7.,0.,2.,1.,9.,8.,3.,7.,4.,1.,0.,2.,8.,9.,7.,3.,4.,0.,1.,7.,8.,7.,6.,4.,3.,8.,7.,1.,2.,6.,4.,8.,1.,2.,0.,9.,3.,4.,8.,8.,7.,8.,1.,5.,3.,8.,3.,7.,4.,6.,1.,2.,8.,3.,4.,1.,9.,8.,3.,6.,4.,8.,7.,1.,6.,2.,4.,3.,0.,9.,7.,1.,2.,3.,4.};
         vec_xvecdbls = aurostd::histogram(in_xvecdbl, 5);
         checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | histogram bins //AZ20230213
         // ---------------------------------------------------------------------------
         check_description = "counts of histogram bins (manual bins)";
         expected_xvecdbl= {16., 18., 12., 15., 19.};
         checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | auto histogram edges (full vector) //AZ20230213
         // ---------------------------------------------------------------------------
@@ -922,7 +922,7 @@ namespace unittest {
         check_description = "automatic histogram bins (large vector)";
         expected_xvecdbl =  {5.,11.,7.,11.,11.,1.,5.,10.,19.};
         checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | auto histogram edges (full vector) //AZ20230213
         // ---------------------------------------------------------------------------
@@ -931,7 +931,7 @@ namespace unittest {
         check_description = "automatic histogram edges (large vector)";
         expected_xvecdbl =  {0.,1.,2.,3.,4.,5.,6.,7.,8.,9.};
         checkEqual(vec_xvecdbls[1], expected_xvecdbl, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | auto histogram bins //AZ20230213
         // ---------------------------------------------------------------------------
@@ -941,7 +941,7 @@ namespace unittest {
         check_description = "automatic histogram bins (small vector)";
         expected_xvecdbl =  {5.,4.,2.,2.,4.};
         checkEqual(vec_xvecdbls[0], expected_xvecdbl, check_function, check_description, passed_checks, results);
-    
+
         check_function = "aurostd::histogram()";
         check_description = "automatic histogram edges (small vector)";
         expected_xvecdbl =  {0., 1.8, 3.6, 5.4, 7.2, 9.};
@@ -974,14 +974,14 @@ namespace unittest {
         expected_xvecint = {1,5,9};
         calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
         checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | column xvector //AZ20220627
         // ---------------------------------------------------------------------------
         check_description = "get column xvector from xmatrix";
         calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
         checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | row xvector //AZ20220627
         // ---------------------------------------------------------------------------
@@ -989,7 +989,7 @@ namespace unittest {
         expected_xvecint = {1,2,3};
         calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
         checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
         // ---------------------------------------------------------------------------
         // Check | 1x1 xvector //AZ20220627
         // ---------------------------------------------------------------------------
@@ -1268,7 +1268,7 @@ namespace unittest {
       vector<string> expected_vstring = {"==48", "==49", "==50"};
       checkEqual(calculated_vstring, expected_vstring, check_function, check_description, passed_checks, results);
     }
-    
+
     // ---------------------------------------------------------------------------
     // Check | substring2strings //CO20230502
     // ---------------------------------------------------------------------------
@@ -1679,6 +1679,16 @@ namespace unittest {
         checkEqual((std::string)so, "null", check_function, check_description + "nullptr", passed_checks, results);
       }
       {
+        xcomplex<double> exp(51.25,0.3485);
+        so = exp;
+        checkEqual((xcomplex<double>)so, exp, check_function, check_description + "xcomplex<double>", passed_checks, results);
+      }
+      {
+        xcomplex<float> exp(51.25,0.3485);
+        so = exp;
+        checkEqual((xcomplex<float>)so, exp, check_function, check_description + "xcomplex<float>", passed_checks, results);
+      }
+      {
         vector<float> exp = {12.33,20.7,34.23454};
         so = exp;
         checkEqual((std::string)so, "[12.33,20.7,34.2345]", check_function, check_description + "vector<float>", passed_checks, results);
@@ -1692,6 +1702,14 @@ namespace unittest {
         xmatrix<float> exp = {{1.0,2.0,3.0,4.0},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
         so = exp;
         checkEqual((std::string)so, "[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]", check_function, check_description + "xmatrix<float>", passed_checks, results);
+      }
+      {
+        xmatrix<xcomplex<float>> exp(3,3,1,1);
+        exp(1,1) = {1.1, 1.11}; exp(1,2) = {1.2, 1.22}; exp(1,3) = {1.3, 1.33};
+        exp(2,1) = {2.1, 2.11}; exp(2,2) = {2.2, 2.22}; exp(2,3) = {2.3, 2.33};
+        exp(3,1) = {3.1, 3.11}; exp(3,2) = {3.2, 3.22}; exp(3,3) = {3.3, 3.33};
+        so = exp;
+        checkEqual((string)so, "[[{\"imag\":1.11,\"real\":1.1},{\"imag\":1.22,\"real\":1.2},{\"imag\":1.33,\"real\":1.3}],[{\"imag\":2.11,\"real\":2.1},{\"imag\":2.22,\"real\":2.2},{\"imag\":2.33,\"real\":2.3}],[{\"imag\":3.11,\"real\":3.1},{\"imag\":3.22,\"real\":3.2},{\"imag\":3.33,\"real\":3.3}]]", check_function, check_description + "xmatrix<xcomplex<float>>", passed_checks, results);
       }
       {
         std::vector<std::vector<std::string>> exp = {{"Hello", "World"}, {"Hello2", "World2"}};
@@ -1708,6 +1726,28 @@ namespace unittest {
         checkEqual((std::string)so, "{\"Hello1\":[12.33,20.7,34.2345],\"Hello2\":[89.6,2.243,76.432]}", check_function, check_description + "vector<vector<string>>", passed_checks, results);
       }
     }
+
+    // check type specific functions
+    {
+      check_function = "JSON";
+      check_description = "type specific function ";
+      aurostd::JSON::object so;
+      size_t expected = 11;
+      so = "Hello World";
+      checkEqual(so.size(), expected, check_function, check_description + "size for string", passed_checks, results);
+      checkEqual(so.empty(), false, check_function, check_description + "empty for string", passed_checks, results);
+      so = vector<int>({1,2,3,4,5,6,7,8,9,10,11});
+      checkEqual(so.size(), expected, check_function, check_description + "size for list", passed_checks, results);
+      checkEqual(so.empty(), false, check_function, check_description + "empty for list", passed_checks, results);
+      so = std::map<string,int>({{"eins",1}, {"zwei", 2}, {"drei", 3}});
+      expected = 3;
+      checkEqual(so.size(), expected, check_function, check_description + "size for dictionary", passed_checks, results);
+      checkEqual(so.empty(), false, check_function, check_description + "empty for dictionary", passed_checks, results);
+
+
+
+    }
+
   }
 }
 
@@ -2104,7 +2144,7 @@ namespace unittest {
     // Check | number of created AEs
     check_description = "number of created AEs";
     checkEqual(uint(AE.size()), uint(6), check_function, check_description, passed_checks, results);
-    
+
     // ---------------------------------------------------------------------------
     // Check | point index mapping
     check_description = "point index mapping";
@@ -2209,7 +2249,7 @@ namespace unittest {
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [1] Parsing CIF file with recognized setting (CrO3)" << std::endl;
     aurostd::StringstreamClean(xstrss);
     xstrss << str_cif;
-    try {xstr_cif = xstructure(xstrss);} 
+    try {xstr_cif = xstructure(xstrss);}
     catch(aurostd::xerror& excpt) {errors.push_back("Could not generate CrO3");}
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " [2] Parsing CIF file with recognized setting (CrO3)" << std::endl;
 
@@ -2521,7 +2561,7 @@ namespace unittest {
     check_function = "xstructure::GetStandardPrimitive()";
     check_description = "resolve primitive cell and find Bravais lattice type";
     xstr_in.GetStandardPrimitive();
-    
+
     expected_bool = true;
     calculated_bool = (xstr_in.bravais_lattice_type=="CUB");
     checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
