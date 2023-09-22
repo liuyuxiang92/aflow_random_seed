@@ -4962,7 +4962,9 @@ namespace KBIN {
       strstream << "PV_atom=" << xvasp.str.qm_PV_atom << "  (eV/at)" << endl;
       strstream << "mag_cell=" << xvasp.str.qm_mag_cell << "  (mu/cell)" << endl;
       strstream << "mag_atom="<< xvasp.str.qm_mag_atom << "  (mu/at)" << endl;
-      strstream << "mag_decomposition="<< aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xvasp.str.qm_vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),",") << "  (mu)" << endl;
+      if(!xvasp.str.qm_vmag.empty()){
+        strstream << "mag_decomposition="<< aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xvasp.str.qm_vmag,3,false,(double)AUROSTD_ROUNDOFF_TOL,FIXED_STREAM),",") << "  (mu)" << endl;
+      }
       xstructure qm_str(xvasp.str);    // suck it in !
       // qm_str=xvasp.str;
       qm_str.qm_recycle();

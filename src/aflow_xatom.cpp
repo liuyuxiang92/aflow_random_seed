@@ -18986,18 +18986,18 @@ void xstructure::qm_clear(void) {
   qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_V_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0; //CO20230917 - volume
   qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_V_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0;  //CO20230917 - volume
 
-  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[4] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
 
 }
 
 void xstructure::qm_recycle(void) {
-  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(qm_vmag.size() && atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[4] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);}  //CO20230915
   scale=qm_scale;
   lattice=qm_lattice;
   klattice=qm_klattice;
@@ -19014,10 +19014,10 @@ void xstructure::qm_recycle(void) {
 
 void xstructure::qm_load(const string& Directory,const string& suffix,int iomode) {
   double data_natoms=double(atoms.size());
-  if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
+  if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
   if(iomode==IOVASP_POSCAR) {
     xOUTCAR outcar;
-    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
 
     outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix); //SD20221019 - don't perform natoms check yet
 
@@ -19027,27 +19027,28 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
       message << "      Directory=" << Directory << endl;
       message << "      suffix=" << suffix << endl;
       message << "      iomode=" << iomode << endl;
-      throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():",message,_FILE_WRONG_FORMAT_);;
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);;
     }
 
     //    cerr << atoms.size() << endl;
     qm_clear();
-    if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
+    if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[4] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
 
     // NEW WITH xOUTCAR
     qm_forces.clear(); for(uint i=0;i<outcar.vforces.size();i++)  qm_forces.push_back(outcar.vforces.at(i)); 
     qm_positions.clear(); for(uint i=0;i<outcar.vpositions_cartesian.size();i++)  qm_positions.push_back(outcar.vpositions_cartesian.at(i)); 
     qm_vmag.clear(); for(uint i=0;i<outcar.vmag.size();i++)  qm_vmag.push_back(outcar.vmag.at(i));  //CO20230915
-    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    //if SPIN=OFF, qm_vmag will be empty
+    if(qm_vmag.size() && atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[6] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
 
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;
-    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Empty vasprun.xml.",_FILE_CORRUPT_);} //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty vasprun.xml.",_FILE_CORRUPT_);} //PN+JJPR FIXED BUG
     //vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml");
     vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PN+JJPR FIXED BUG
     qm_forces.clear(); for(uint i=0;i<vasprunxml.vforces.size();i++)  qm_forces.push_back(vasprunxml.vforces.at(i)); 
