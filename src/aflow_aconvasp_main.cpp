@@ -1097,6 +1097,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::MAGMOM")) vlist+="--magmom="+vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM")+" ";             // recursion is GNU's pleasure (SC2014)  //CO20230823
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::MAGMOM_MULT","--magmom_mult=|--MAGMOM_MULT=","");  //CO20230823
     if(vpflow.flag("PROTO_AFLOW::MAGMOM_MULT")) vlist+="--magmom_mult="+vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM_MULT")+" ";             // recursion is GNU's pleasure (SC2014)  //CO20230823
+    vpflow.flag("PROTO_AFLOW::RECYCLE_SPIN",aurostd::args2flag(argv,cmds,"--recycle_spin")); //CO20230924
+    if(vpflow.flag("PROTO_AFLOW::RECYCLE_SPIN")) vlist+="--recycle_spin ";  //CO20230924
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::POTIM","--potim=|--POTIM=","");
     if(vpflow.flag("PROTO_AFLOW::POTIM")) vlist+="--potim="+vpflow.getattachedscheme("PROTO_AFLOW::POTIM")+" ";             // recursion is GNU's pleasure (SC2014)
@@ -12867,6 +12869,11 @@ namespace pflow {
     PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM_MULT",vpflow.flag("PROTO_AFLOW::MAGMOM_MULT"));
     if(vpflow.flag("PROTO_AFLOW::MAGMOM_MULT")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::MAGMOM_MULT",vpflow.getattachedscheme("PROTO_AFLOW::MAGMOM_MULT"));
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::MAGMOM_MULT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::MAGMOM_MULT") << endl;
+    
+    // check recycle_spin //CO20230924
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK RECYCLE_SPIN" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::RECYCLE_SPIN",vpflow.flag("PROTO_AFLOW::RECYCLE_SPIN"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::RECYCLE_SPIN\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::RECYCLE_SPIN") << endl;
     
     // check ldau
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK LDAU" << endl; 

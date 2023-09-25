@@ -81,6 +81,9 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
          --bader (default: DEFAULT_VASP_FORCE_OPTION_BADER)
          --spin_remove_relax_1 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1)
          --spin_remove_relax_2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2)
+         --recycle_spin (default: DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN)
+         --magmom=2x-3_4x5_8x0
+         --magmom_mult=2 (default: DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER)
          --kscheme=[M | G] (default: DEFAULT_KSCHEME in .aflow.rc) --kscheme_static=[M | G] (default: DEFAULT_KSCHEME_STATIC in .aflow.rc)
 	       --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN (default: DEFAULT_BANDS_GRID in .aflow.rc)
          --enmax_multiply=NNNN (default: DEFAULT_VASP_PREC_ENMAX_HIGH in .aflow.rc, DEFAULT_VASP_PREC_ENMAX_ACCURATE  in .aflow.rc)
@@ -188,6 +191,17 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         With --spin_remove_relax_1 _2, the user can indicate when to avoid a spin-polarized calculation if
         the system's magnetic moment is negligible.
        
+     RECYCLE_SPIN
+        The user can recycle the final spin configuration of the previous run (magnetization in OUTCAR)
+        as the starting configuration for the next run (MAGMOM in INCAR).
+
+      MAGMOM
+        Specify the starting magnetic configuration for the run (MAGMOM in INCAR).
+
+      MAGMOM_MULT
+        Specify the multiplication factor for the starting spins (MAGMOM in INCAR).
+        It is recommended by VASP to start with a larger initial magnetic moment than expected.
+
      KPOINTS SPECIFICATION
         With --kppra=NNN the user can specify a NNN number of kpoints per reciprocal atom.
         Input KPPRA (6,000-10,000 recommended) is the lower bound of the product of the 

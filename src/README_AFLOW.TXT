@@ -998,7 +998,6 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   (DEFAULT_VASP_SPIN_REMOVE_CUTOFF)
  SPIN=RECYCLE_SPIN
   Will read the spin from the previous relaxation and reset MAGMOM for the next one.
-  This is set on by default with --magmom=XX.
   (DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN)
 
  BADER=ON | OFF (default OFF)
@@ -1050,9 +1049,17 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   If you have good INCARs, you do not need to play with these options.
  MAGMOM=2x-3_4x5_8x0
   Sets the MAGMOM for the run. Reads: 2*-3 4*5 8*0.
+  By default, all runs (relaxations/static point) will use this starting magnetic configuration.
+  If the RECYCLE_SPIN setting is specified, it will use this magnetic configuration
+  as the starting point for the first run only, then recycle the final configurations
+  from the previous run for the following run.
  MAGMOM*=1.5
-  Multiplies the MAGMOM by 1.5. It is recommended by VASP to start with a
+  Multiplies the MAGMOM by 1.5.
+  It is recommended by VASP to start with a
   larger MAGMOM: https://www.vasp.at/wiki/index.php/MAGMOM
+  If the RECYCLE_SPIN setting is specified, this only applies for the first run,
+  after which the final spin from the previous run will be recycled as the starting configuration
+  for the next run.
   (DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER)
 
  SYM=ON
