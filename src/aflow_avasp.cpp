@@ -2457,22 +2457,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
   }
 
-  // BADER WRITING
-  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
-  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
-  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
-  if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
-  } else {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
-  }
-  // ELF WRITING
-  if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
-  } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
-  }
-
   // LSCOUPLING WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_LSCOUPLING")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_LSCOUPLING in .aflow.rc)" << endl;
@@ -2497,6 +2481,22 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
   }
   //CO20230826 STOP - MAGMOM
+
+  // BADER WRITING
+  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
+  if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+  } else {
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+  }
+  // ELF WRITING
+  if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
+  } else {
+    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
+  }
 
   // RELAX_TYPE + RELAX WRITING
   //CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
