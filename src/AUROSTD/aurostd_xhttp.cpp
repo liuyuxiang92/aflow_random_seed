@@ -411,7 +411,10 @@ namespace aurostd {
     close(socket_file_descriptor);
 
     bool found_firewall=false;
-    found_firewall=(found_firewall||response.find("blocked due to malicious activity")!=string::npos);
+    found_firewall=(found_firewall||
+        response.find("blocked due to malicious activity")!=string::npos||
+        response.find("SSL-enabled server port")!=string::npos||  //CO+WJ20231006 - adding another firewall message
+        FALSE);
     //add other signatures
     if(found_firewall){ //CO20221209 - curl both leverages certificates and gives raw output
       aurostd::url2stringCUrl(aurostd::httpJoinURL(url),response);
