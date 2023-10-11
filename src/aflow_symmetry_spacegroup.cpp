@@ -2224,6 +2224,9 @@ namespace SYM {
         CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
         candidate_lattice_vectors.push_back(CL);
         candidate_lattice_chars.push_back('t');
+        CL = xvec2xmat(conv_lattice_vec_b, conv_lattice_vec_a, conv_lattice_vec_c); //DX20231010 - check alternative lattice vector order to minimize Wyckoff enumeration
+        candidate_lattice_vectors.push_back(CL); //DX20231010 - check alternative lattice vector order to minimize Wyckoff enumeration
+        candidate_lattice_chars.push_back('t'); //DX20231010 - check alternative lattice vector order to minimize Wyckoff enumeration
       } //DX20210107
     } //DX20210107
 
