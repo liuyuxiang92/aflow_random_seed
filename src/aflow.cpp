@@ -1,11 +1,11 @@
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2021             *
+// *             Stefano Curtarolo - Duke University - 2003-2023             *
 // *                                                                         *
 // ***************************************************************************
 //
-//  Copyright 2003-2021 - Stefano Curtarolo - AFLOW.ORG consortium
+//  Copyright 2003-2023 - Stefano Curtarolo - AFLOW.ORG consortium
 //
 //  This file is part of AFLOW software.
 //
@@ -629,15 +629,15 @@ int AFLOW_main(vector<string> &argv) {
 // ***************************************************************************
 namespace aflow {
   string License_Preamble_aflow(void) {
-    //(C) 2003-2021 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
+    //(C) 2003-2023 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     strstream << endl;
     strstream << "***************************************************************************" << endl;
     strstream << "*                                                                         *" << endl;
-    strstream << "*                    AFLOW - Duke University 2003-2021                    *" << endl; //CO20200502 - SC -> AFLOW consortium
+    strstream << "*                    AFLOW - Duke University 2003-2023                    *" << endl; //CO20200502 - SC -> AFLOW consortium
     strstream << "*                                                                         *" << endl;
     strstream << "***************************************************************************" << endl;
-    strstream << "Copyright 2003-2021 - AFLOW.ORG consortium" << endl;  //CO20200502 - SC -> AFLOW consortium
+    strstream << "Copyright 2003-2023 - AFLOW.ORG consortium" << endl;  //CO20200502 - SC -> AFLOW consortium
     strstream << endl;
     strstream << "This file is part of AFLOW software." << endl;
     strstream << endl;
@@ -667,7 +667,7 @@ namespace aflow {
 // patched by CO20200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_aflow(string x) {
-    //(C) 2003-2021 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
+    //(C) 2003-2023 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     string tab="  ";
     string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //spaces size of x
@@ -891,6 +891,8 @@ namespace aflow {
       oss << "*                                                                                                  *" << endl;
       oss << "*     Use of AFLOW software and repositories welcomes references to the following publications:    *" << endl;
       oss << "*                                                                                                  *" << endl;
+      oss << "*  Esters et al.    Comp. Mat. Sci. 216, 111808 (2023) 10.1016/j.commatsci.2022.111808 (AFLOW.org) *" << endl;
+      oss << "*  Oses et al.      Comp. Mat. Sci. 217, 111889 (2023) 10.1016/j.commatsci.2022.111889 (aflow++)   *" << endl;
       oss << "*  Friedrich et al. npj Comput. Mater. 5, 59 (2019)  10.1038/s41524-019-0192-1       (CCE)         *" << endl;
       oss << "*  Hicks et al.     Comp. Mat. Sci. 161, S1 (2019)   10.1016/j.commatsci.2018.10.043 (ANRL proto2) *" << endl;
       oss << "*  Oses et al.      J. Chem. Inf. Model. (2018)      10.1021/acs.jcim.8b00393        (AFLOW-CHULL) *" << endl;
@@ -921,6 +923,7 @@ namespace aflow {
       oss << "*  2013-2017 Jose J. Plata (AAPL, thermal cond.); 2014-2019 David Hicks (symmetry, structure       *" << endl;
       oss << "*  comparison, prototypes); 2014-2019 Corey Oses (Egap, bader, chull, APL, pocc); 2018-2019 Marco  *" << endl;
       oss << "*  Esters (AAPL, thermal cond.); 2016-2019 Denise Ford (GFA); 2018-2019 Rico Friedrich (CCE);      *" << endl;
+      oss << "*  2021-2023 Simon Divilov (QCA, fitting); 2021-2023 Hagen Eckert (GFA, entry loader, JSON);       *" << endl;
       oss << "*                                                                                                  *" << endl;
       oss << "****************************************************************************************************" << endl;
       oss << "*" << aurostd::PaddedCENTER(string("version "+string(AFLOW_VERSION)+" - g++/gcc "+aurostd::utype2string(__GNUC__)+"."+aurostd::utype2string(__GNUC_MINOR__)+"."+aurostd::utype2string(__GNUC_PATCHLEVEL__)+" - built ["+string(TODAY)+"] - (C) " +XHOST.Copyright_Years),100) << "*" << endl;
@@ -929,7 +932,7 @@ namespace aflow {
     }
     if(type=="BANNER_TINY") {
       // called 63 times
-      oss << "AFLOW VERSION "<<AFLOW_VERSION<<":  [aflow.org consortium - 2003-2021] ";
+      oss << "AFLOW VERSION "<<AFLOW_VERSION<<":  [aflow.org consortium - 2003-2023] ";
       return oss.str();
     }
     if(type == "EXCEPTIONS") {

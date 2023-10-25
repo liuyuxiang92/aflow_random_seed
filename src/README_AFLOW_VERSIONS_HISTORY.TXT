@@ -1,4 +1,4 @@
-3.2.14 - 2022/XX/XX
+3.2.14 - 2023/10/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
         -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
         -- parallelized --chull --alloy (CO)
@@ -27,6 +27,10 @@
         -- added binodal construction module for n-ary alloys (SD)
         -- added XtalFinder primitivization speed up for library runs (DX)
         -- added check for alternative lattice vector choice in tetragonal crystal system to minimize Wyckoff enumeration (DX)
+        -- added fast parallelized POCC tile count estimation (HE+SD)
+        -- transition to C++17 (HE+SD)
+        -- added incbin library for easy raw file inclusion (HE)
+        -- performance improvidence for xmatrix and xvector
 
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz

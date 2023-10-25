@@ -1,6 +1,6 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *                  Simon Divilov - Duke University 2022                   *
 // *                                                                         *
 //****************************************************************************

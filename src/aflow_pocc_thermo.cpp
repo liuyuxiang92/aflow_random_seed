@@ -1,6 +1,6 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow Andriy Smolyanyuk - Duke University 2021-2021           *
 // *                                                                         *
 //****************************************************************************

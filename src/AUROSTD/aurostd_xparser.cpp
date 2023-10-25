@@ -831,7 +831,7 @@ namespace aurostd {
 
 }
 
-#endif // _AUROSTD_XPARSER_CPP_
+#endif // _AUROSTD_XPARSER_CPP_d
 
 // **************************************************************************
 // *                                                                        *

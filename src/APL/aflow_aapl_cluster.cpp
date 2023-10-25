@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *            Aflow MARCO ESTERS - Duke University 2018-2021               *
 // *                                                                         *
 // ***************************************************************************
@@ -2219,7 +2219,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *                Aflow MARCO ESTERS - Duke University 2018-2021           *
 // *                                                                         *
 // ***************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow RICO FRIEDRICH - Duke University 2018-2021              *
 // *                                                                         *
 // ***************************************************************************
@@ -3566,7 +3566,7 @@ namespace cce {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow RICO FRIEDRICH - Duke University 2018-2021              *
 // *                                                                         *
 // ***************************************************************************
