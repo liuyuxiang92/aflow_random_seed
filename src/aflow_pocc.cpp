@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2021         *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2023         *
 // *              AFlow COREY OSES  Duke University 2013-2021                *
 // *                                                                         *
 // ***************************************************************************
@@ -8381,7 +8381,7 @@ ostream& operator<<(ostream& oss, const pocc::POccStructuresFile& psf) {
 
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2021         *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2023         *
 // *              AFlow COREY OSES  Duke University 2013-2021                *
 // *                                                                         *
 // ***************************************************************************

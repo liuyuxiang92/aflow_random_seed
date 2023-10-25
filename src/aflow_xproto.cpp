@@ -2625,7 +2625,7 @@ namespace aflowlib {
 #endif // _AFLOW_XPROTO_CPP
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2021              *
+// *             STEFANO CURTAROLO - Duke University 2003-2023              *
 // *                                                                        *
 // **************************************************************************
 
