@@ -25,6 +25,7 @@
         -- added Newton-Raphson method to solve nonlinear square systems (SD)
         -- added deflation method to find multiple zeros in nonlinear square systems (SD)
         -- added binodal construction module for n-ary alloys (SD)
+        -- added XtalFinder primitivization speed up for library runs (DX)
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)

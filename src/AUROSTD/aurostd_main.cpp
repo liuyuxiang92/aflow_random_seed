@@ -1934,11 +1934,25 @@ namespace aurostd {
   // Function ProcessRenice
   // ***************************************************************************
   //CO20210315
-  void ProcessRenice(const string& process,int nvalue,bool user_specific){ //CO20210315
-    vector<string> vpids=ProcessPIDs(process,user_specific);
-    if(vpids.empty()){return;}
+  bool ProcessRenice(const string& process,int nvalue,bool user_specific,const string& pgid){ //CO20210315 //CO20221029 - void->bool to catch if renice worked and added pgid to renice executable-specific processes
+    vector<string> vpids;
+    if(pgid.empty()){vpids=ProcessPIDs(process,user_specific);} //CO20221028
+    else{string output_syscall="";vpids=ProcessPIDs(process,pgid,output_syscall,user_specific);}  //CO20221028
+    if(vpids.empty()){return false;}
     string command="renice "+aurostd::utype2string(nvalue)+" "+aurostd::joinWDelimiter(vpids," ");
-    aurostd::execute(command);
+    string err=aurostd::execute2string(command,stderr_fsio);
+    return err.empty();
+  }
+  
+  // ***************************************************************************
+  // Function ReniceAvailable
+  // ***************************************************************************
+  //CO20221029 - checks if renice up/down is allowed on the system
+  bool ReniceAvailable(void){
+    aurostd::execute("sleep 10 &"); //to background
+    if(!ProcessRenice("sleep",19,true,aurostd::utype2string(getpgrp()))){return false;}  //try making more nice, this should almost always work
+    if(!ProcessRenice("sleep",0,true,aurostd::utype2string(getpgrp()))){return false;}   //try making default nice, this may not always work: https://superuser.com/questions/88542/why-cant-unix-users-renice-downwards
+    return true;
   }
 
   // ***************************************************************************
