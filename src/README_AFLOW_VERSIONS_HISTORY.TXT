@@ -26,6 +26,8 @@
         -- added deflation method to find multiple zeros in nonlinear square systems (SD)
         -- added binodal construction module for n-ary alloys (SD)
         -- added XtalFinder primitivization speed up for library runs (DX)
+        -- added check for alternative lattice vector choice in tetragonal crystal system to minimize Wyckoff enumeration (DX)
+
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)
