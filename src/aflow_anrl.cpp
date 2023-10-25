@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
@@ -7218,7 +7218,7 @@ namespace anrl {
 // Written by David Hicks (DX) - 2016/2020 (generic prototype generator)
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************

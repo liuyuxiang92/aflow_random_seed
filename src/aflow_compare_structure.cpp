@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
@@ -2156,7 +2156,7 @@ namespace compare {
 // Contributors: Carlo De Santo
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
