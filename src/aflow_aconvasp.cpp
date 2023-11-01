@@ -1460,13 +1460,13 @@ namespace pflow {
 bool never_call_this_function(void) {
   { aurostd::matrix<double> m0(1,1,(double)0),m1(1,1),m2(1),m3;  //CO20200404 pflow::matrix()->aurostd::matrix()
     std::vector<double> v(1);
-    m1.push_back(v);m1[0];m1[0][0];m2=m1; }
+    m1.push_back(v);m1[0].clear();m1[0][0]=(double)0;m2=m1; } //CO20231031
   { aurostd::matrix<int> m0(1,1,(int)0),m1(1,1),m2(1),m3;  //CO20200404 pflow::matrix()->aurostd::matrix()
     std::vector<int> v(1);
-    m1.push_back(v);m1[0];m1[0][0];m2=m1; }
+    m1.push_back(v);m1[0].clear();m1[0][0]=(int)0;m2=m1; } //CO20231031
   { aurostd::matrix<std::complex<double> > m0(1,1,(std::complex<double>)0.0),m1(1,1),m2(1),m3; //CO20200404 pflow::matrix()->aurostd::matrix()
     std::vector<std::complex<double> > v(1);
-    m1.push_back(v);m1[0];m1[0][0];m2=m1;}
+    m1.push_back(v);m1[0].clear();m1[0][0]=(std::complex<double>)0;m2=m1; } //CO20231031
   { aurostd::matrix<double> m0(1,1,(double) 0),m1(1,1),m2(1),m3; //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<aurostd::matrix<double> > mm1(1,1,m0),mm2(1,1,m0); //CO20200404 pflow::matrix()->aurostd::matrix()
     mm2=mm1;}
