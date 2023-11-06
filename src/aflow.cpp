@@ -237,6 +237,14 @@ int main(int _argc,char **_argv) {
       cout << aurostd::httpGet("https://s4e.ai/API/aflux/?species(Fe,O),density(0*),paging(1,5)") << endl;
       return 0;
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_qmvasp")) { //CO20230913
+      string directory=".";
+      stringstream straus;aurostd::file2stringstream(directory+"/POSCAR",straus);
+      xstructure xstr(straus);
+      //cerr << xstr << endl;
+      xstr.qm_load(directory);
+      return 0;
+    }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xvasp")) { //CO20230913
 
       _xvasp xvasp;xvasp.Directory=".";

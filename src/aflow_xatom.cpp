@@ -19044,7 +19044,7 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
     if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
     if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
     //if SPIN=OFF, qm_vmag will be empty
-    if(qm_vmag.size() && atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[6] atoms.size()!=qm_vmag.size().",_VALUE_ERROR_);} //CO20230915
+    if(qm_vmag.size() && atoms.size()!=qm_vmag.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[6] atoms.size()["+aurostd::utype2string(atoms.size())+"]!=qm_vmag.size()["+aurostd::utype2string(qm_vmag.size())+"].",_VALUE_ERROR_);} //CO20230915
 
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;

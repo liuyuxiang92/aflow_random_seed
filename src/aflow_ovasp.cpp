@@ -977,7 +977,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
       if(aurostd::substring2bool(vcontent.at(iline),"(z)")) {
-        mline=iline+4;
+        mline=iline+4;  //CO20231105 - +4 assumes an empty line, string2vectorstring() removes these by default
+        if(!aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline+1)).empty()){mline-=1;} //CO20231105 - string2vectorstring() treats the newlines as one character, reduce the line number
         found_magz_line=true;
         break;
       } 
@@ -997,7 +998,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
       if(aurostd::substring2bool(vcontent.at(iline),"(y)")) {
-        mline=iline+4;
+        mline=iline+4;  //CO20231105 - +4 assumes an empty line, string2vectorstring() removes these by default
+        if(!aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline+1)).empty()){mline-=1;} //CO20231105 - string2vectorstring() treats the newlines as one character, reduce the line number
         found_magy_line=true;
         break;
       } 
@@ -1016,7 +1018,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
       if(aurostd::substring2bool(vcontent.at(iline),"(x)")) {
-        mline=iline+4;
+        mline=iline+4;  //CO20231105 - +4 assumes an empty line, string2vectorstring() removes these by default
+        if(!aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline+1)).empty()){mline-=1;} //CO20231105 - string2vectorstring() treats the newlines as one character, reduce the line number
         found_magx_line=true;
         break;
       } 
