@@ -233,6 +233,10 @@ int main(int _argc,char **_argv) {
       return (ut.runTestSuites(tests)?0:1);
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_http")) {
+      cout << aurostd::httpGet("https://s4e.ai/API/aflux/?species(Fe,O),density(0*),paging(1,5)") << endl;
+      return 0;
+    }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

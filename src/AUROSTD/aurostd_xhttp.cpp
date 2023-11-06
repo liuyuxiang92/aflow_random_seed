@@ -129,7 +129,7 @@ namespace aurostd {
   }
   
   string httpJoinURL(const xURL& url){  //CO20221209
-    return url.scheme+"://"+url.host+url.path+url.query;
+    return url.scheme+"://"+url.host+url.path+url.query;  //CO+WJ20231006 - removing strange characters in the path OR the query
     //deal with port later... need a bool to tell if a port was there originally (:)
   }
 
@@ -408,7 +408,10 @@ namespace aurostd {
     close(socket_file_descriptor);
 
     bool found_firewall=false;
-    found_firewall=(found_firewall||response.find("blocked due to malicious activity")!=string::npos);
+    found_firewall=(found_firewall||
+        response.find("blocked due to malicious activity")!=string::npos||
+        response.find("SSL-enabled server port")!=string::npos||  //CO+WJ20231006 - adding another firewall message
+        FALSE);
     //add other signatures
     if(found_firewall){ //CO20221209 - curl both leverages certificates and gives raw output
       aurostd::url2stringCUrl(aurostd::httpJoinURL(url),response);

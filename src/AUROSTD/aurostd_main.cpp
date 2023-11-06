@@ -4756,23 +4756,50 @@ namespace aurostd {
       return FALSE;
     }
     string _url=url;
+#ifndef _MACOSX_
+    string command_pre="wget --quiet --no-cache -O /dev/stdout";
+#else
+    string command_pre="wget --quiet -O /dev/stdout";
+#endif
+    string command="";
+    
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 1 - original url
+    _url=url;
+    command=command_pre+" '"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true);
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty()){return true;}
+    //////////////////////////////////////////////////////////////////////////
+    
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 2 - treat AURL
+    _url=url;
+    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
+    command=command_pre+" '"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty()){return true;}
+    //////////////////////////////////////////////////////////////////////////
+    
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 3 - try http vs. https
+    _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"https://","");
     aurostd::StringSubst(_url,"//","/");
     string scheme="http";
     if(url.find("aflow.org")!=string::npos){scheme="https";}
-#ifndef _MACOSX_
-    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true);
-#else
-    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true); // _MACOSX_
-#endif
+    if(url.find("s4e.ai")!=string::npos){scheme="https";} //CO20231006
+    command=command_pre+" '"+scheme+"://"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
     if(!stringIN.empty()){return true;}
-    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-#ifndef _MACOSX_
-    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true);
-#else
-    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout "+scheme+"://"+_url,stdout_fsio,true); // _MACOSX_
-#endif
+    //////////////////////////////////////////////////////////////////////////
+
     return (!stringIN.empty());
   }
   bool url2stringCUrl(const string& url,string& stringIN,bool verbose) {  //CO20221209 - curl both leverages certificates and gives raw output
@@ -4782,15 +4809,46 @@ namespace aurostd {
       return FALSE;
     }
     string _url=url;
+    string command_pre="curl -ivs --raw";
+    string command="";
+
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 1 - original url
+    _url=url;
+    command=command_pre+" '"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty()){return true;}
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 2 - treat AURL
+    _url=url;
+    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
+    command=command_pre+" '"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty()){return true;}
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    //ROUND 2 - try http vs. https
+    _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"https://","");
     aurostd::StringSubst(_url,"//","/");
     string scheme="http";
     if(url.find("aflow.org")!=string::npos){scheme="https";}
-    stringIN=aurostd::execute2string("curl -ivs --raw "+scheme+"://"+_url,stdout_fsio,true);
+    if(url.find("s4e.ai")!=string::npos){scheme="https";} //CO20231006
+    command=command_pre+" '"+scheme+"://"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
     if(!stringIN.empty()){return true;}
-    aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-    stringIN=aurostd::execute2string("curl -ivs --raw "+scheme+"://"+_url,stdout_fsio,true);
+    //////////////////////////////////////////////////////////////////////////
+
     return (!stringIN.empty());
   }
 
