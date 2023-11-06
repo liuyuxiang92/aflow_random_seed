@@ -1,4 +1,7 @@
-3.2.14 - 2022/XX/XX
+3.2.15 - 2023/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.15.tar.xz
+        -- patching url2string to be robust to firewalls (CO)
+3.2.14 - 2023/10/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
         -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
         -- parallelized --chull --alloy (CO)
@@ -6,11 +9,14 @@
         -- fixing --npmax and --np=max options (CO)
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
-        -- patching url2string to be robust to firewalls (CO)
+        -- patching AddAtom() types vs. names bug (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
         -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
+        -- fixed printing of Wyccar to check if the space group has been calculated (DX)
+        -- added tie-breaker scheme to choose AFLOW prototype that is most alphabetical from left-to-right (DX)
+        -- fixed atom decoration comparisons with new SetSpecies() function (DX)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)
@@ -22,6 +28,12 @@
         -- added Newton-Raphson method to solve nonlinear square systems (SD)
         -- added deflation method to find multiple zeros in nonlinear square systems (SD)
         -- added binodal construction module for n-ary alloys (SD)
+        -- added XtalFinder primitivization speed up for library runs (DX)
+        -- added check for alternative lattice vector choice in tetragonal crystal system to minimize Wyckoff enumeration (DX)
+        -- added fast parallelized POCC tile count estimation (HE+SD)
+        -- transition to C++17 (HE+SD)
+        -- added incbin library for easy raw file inclusion (HE)
+        -- performance improvidence for xmatrix and xvector
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)
