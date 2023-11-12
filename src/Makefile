@@ -1092,6 +1092,9 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
+	$(MAKE) check_full_1
+	$(MAKE) check_full_2
+check_full_1:
 	$(MAKE) check_aflow_exits
 	$(MAKE) makefile
 	$(MAKE) check_smith
@@ -1103,7 +1106,9 @@ check_full:
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
-	$(MAKE) unit_test
+	$(MAKE) unit_test_1
+check_full_2:
+	$(MAKE) unit_test_2
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1509,6 +1514,13 @@ check_aflow_exits:
 unit_test:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --unit_test
+#CO20231112 - proto runs for a LONG time, make its own test
+unit_test_1:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --unit_test aurostd,database,structure
+unit_test_2:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --unit_test proto
 makefile:
 	./aflow --makefile && $(MAKE) -j 4
 ###################################################################################################
