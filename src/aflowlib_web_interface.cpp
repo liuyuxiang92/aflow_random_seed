@@ -4432,7 +4432,6 @@ namespace aflowlib {
       for(uint i=0;i<vfiles2.size();i++) 
         if(aurostd::FileExist(directory+"/"+vfiles2.at(i)))
           crc=aurostd::crc64(crc,aurostd::efile2string(directory+"/"+vfiles2.at(i))); // DONT TOUCH THIS
-      string prefix="aflow";
       auid=getAUIDPrefix()+":"+aurostd::crc2string(crc);  //CO20230525 - prefix
 
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " [1]" << endl;

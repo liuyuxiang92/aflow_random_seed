@@ -2,6 +2,10 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.15.tar.xz
         -- patching url2string to be robust to firewalls (CO)
         -- patching POSCAR.orig and aflow.qmvasp.out in LIB2LIB() (KT+KC+CO)
+        -- rearranged QHA code to enable calculation of thermodynamic properties if isEOS and isQHA (CO)
+        -- added machine settings for machine005 (CO)
+        -- added --magmom=, --magmom_mult=, and RECYCLE_SPIN to --aflow_proto (CO)
+        -- adding mag_decomposition to qmvasp (CO)
 3.2.14 - 2023/10/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
         -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
@@ -11,10 +15,6 @@
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
         -- patching AddAtom() types vs. names bug (CO)
-        -- rearranged QHA code to enable calculation of thermodynamic properties if isEOS and isQHA (CO)
-        -- added machine settings for machine005 (CO)
-        -- added --magmom=, --magmom_mult=, and RECYCLE_SPIN to --aflow_proto (CO)
-        -- adding mag_decomposition to qmvasp (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)

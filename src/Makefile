@@ -846,8 +846,8 @@ www:	web
 web:	realclean
 	rm -rvf aflow3.tar.xz aflow_test.tar.xz aflow3 ~/aflow3.tar.xz ~/aflow_test.tar.xz ~/aflow3
 	tar Jcfvp ~/aflow3.tar.xz Makefile* *cpp *.h READ* APL* DATA* ANRL* AUROSTD* SQLITE* SYMBOLICCPLUSPLUS*
-# no EXTRA IN SRC	if [ -d $(EXTRA_FREE) ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) ; fi
-# no other SOURCES in SRC	if [ -d SOURCES ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) SOURCES ; fi
+# no EXTRA IN SRC	if [ -d $(EXTRA_FREE) ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) ; fi
+# no other SOURCES in SRC	if [ -d SOURCES ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) SOURCES ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_AEL.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_AGL.TXT /www/AFLOW ; fi
@@ -1521,10 +1521,18 @@ endif
 #CO20231112 - proto runs for a LONG time, make its own test
 unit_test_1:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+ifeq ($(UNAME),Darwin)
 	./aflow --unit_test aurostd,database,structure
+else
+	./aflow --np=$$(($$(grep -c ^processor /proc/cpuinfo)-2)) --unit_test aurostd,database,structure
+endif
 unit_test_2:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+ifeq ($(UNAME),Darwin)
 	./aflow --unit_test proto
+else
+	./aflow --np=$$(($$(grep -c ^processor /proc/cpuinfo)-2)) --unit_test proto
+endif
 makefile:
 	./aflow --makefile && $(MAKE) -j 4
 ###################################################################################################

@@ -917,7 +917,6 @@ namespace aflowlib {
 // will be moved near LI2RAW
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE);
-  uint MULTIPLEXER(int mode,bool VERBOSE);
   uint MAIL2SCAN(string library,bool VERBOSE);
   uint LIB2SCRUB(string library,bool VERBOSE);
   bool LIB2AUID(string entry,bool TEST,bool _VERBOSE);
