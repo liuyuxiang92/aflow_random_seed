@@ -1522,14 +1522,14 @@ endif
 unit_test_1:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 ifeq ($(UNAME),Darwin)
-	./aflow --unit_test aurostd,database,structure
+	./aflow --np=4 --unit_test aurostd,database,structure
 else
 	./aflow --np=$$(($$(grep -c ^processor /proc/cpuinfo)-2)) --unit_test aurostd,database,structure
 endif
 unit_test_2:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 ifeq ($(UNAME),Darwin)
-	./aflow --unit_test proto
+	./aflow --np=4 --unit_test proto
 else
 	./aflow --np=$$(($$(grep -c ^processor /proc/cpuinfo)-2)) --unit_test proto
 endif
