@@ -1411,6 +1411,12 @@ namespace KBIN {
         aus << "00000  MESSAGE POSCAR  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(__AFLOW_FILE__,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " _VASP_POSCAR_MODE_EXPLICIT_START_=" << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl;
+          cerr << __AFLOW_FUNC__ << " _VASP_POSCAR_MODE_EXPLICIT_STOP_=" << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl;
+          cerr << __AFLOW_FUNC__ << " string between: " << endl;
+          cerr << aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1);
+        }
         xvasp.POSCAR.str(aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1));
         //[SD20220520 - OBSOLETE]if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
         //[SD20220520 - OBSOLETE]  if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&

@@ -6220,15 +6220,42 @@ namespace aurostd {
   uint substring2stringInnerLoop(const string& _strline,bool& read,vector<string>& vlines,vector<string>& tokens,const string& strsub1,const string& strsub2,bool RemoveComments,bool trim_edges) { //CO20230502 - helper function for substring2strings()
     bool LDEBUG=false;
     string strline=_strline,strline2="",strline3="";
-    bool found_strsub1=false,found_strsub2=false;
+    bool found_strsub2=false;
     if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
-    if(read==FALSE && strline.find(strsub1)!=string::npos) {
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline.find(strsub1)!=string::npos" << endl;}
-      //CO20230501 - fixing in case strsub1 and strsub2 are in the same line
-      while(strline.find(strsub1)!=string::npos){
+    //CO20230501 - fixing in case strsub1 and strsub2 are in the same line
+    while(!strline.empty()&&(read==TRUE||strline.find(strsub1)!=string::npos||strline.find(strsub2)!=string::npos)){
+      if(LDEBUG){
+        cerr << __AFLOW_FUNC__ << " (WHILE LOOP START)" << endl;
+        cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+      }
+      if(read==TRUE){
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " read==TRUE" << endl;}
+        found_strsub2=(strline.find(strsub2)!=string::npos);
+        strline2=strline;
+        strline="";
+        if(found_strsub2){
+          strline3=strline2.substr(0,strline2.find(strsub2));
+          strline =strline2.substr(strline2.find(strsub2)+strsub2.length());
+          strline2=strline3;
+        }
         if(LDEBUG){
-          cerr << __AFLOW_FUNC__ << " (WHILE LOOP START)" << endl;
-          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;}
+          cerr << __AFLOW_FUNC__ << " strline2=" << strline2 << endl;
+          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
+        }
+        vlines.push_back(strline2);
+        if(found_strsub2){
+          if(trim_edges){trimEmptyEdges(vlines);} //CO20230502
+          tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
+          if(LDEBUG){
+            for(uint i=0;i<vlines.size();i++){cerr << __AFLOW_FUNC__ << " vlines[i=" << i << "]=" << vlines[i] << endl;}
+            for(uint i=0;i<tokens.size();i++){cerr << __AFLOW_FUNC__ << " tokens[i=" << i << "]=" << tokens[i] << endl;}
+          }
+          vlines.clear();
+          read=FALSE;
+        }
+      }
+      if(read==FALSE && strline.find(strsub1)!=string::npos){
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline.find(strsub1)!=string::npos" << endl;}
         strline2=strline.substr(strline.find(strsub1)+strsub1.length());
         strline="";
         if(LDEBUG){
@@ -6252,56 +6279,18 @@ namespace aurostd {
           vlines.push_back(strline2);
           if(trim_edges){trimEmptyEdges(vlines);} //CO20230502
           tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
-          vlines.clear();
-        }
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " (WHILE LOOP END)" << endl;}
-      }
-    }
-    else if(read==TRUE && strline.find(strsub2)!=string::npos) {
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " strline.find(strsub2)!=string::npos)" << endl;}
-      //CO20230501 - fixing in case strsub1 and strsub2 are in the same line
-      while(!strline.empty() || strline.find(strsub2)!=string::npos){
-        if(LDEBUG){
-          cerr << __AFLOW_FUNC__ << " (WHILE LOOP START)" << endl;
-          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
-        }
-        found_strsub2=(strline.find(strsub2)!=string::npos);
-        strline2=strline;
-        strline="";
-        if(found_strsub2){
-          strline3=strline2.substr(0,strline2.find(strsub2));
-          strline =strline2.substr(strline2.find(strsub2)+strsub2.length());
-          strline2=strline3;
-        }
-        if(LDEBUG){
-          cerr << __AFLOW_FUNC__ << " strline2=" << strline2 << endl;
-          cerr << __AFLOW_FUNC__ << " strline=" << strline << endl;
-        }
-        vlines.push_back(strline2);
-        if(found_strsub2){
-          if(trim_edges){trimEmptyEdges(vlines);} //CO20230502
-          tokens.push_back(aurostd::joinWDelimiter(vlines,"\n"));
           if(LDEBUG){
             for(uint i=0;i<vlines.size();i++){cerr << __AFLOW_FUNC__ << " vlines[i=" << i << "]=" << vlines[i] << endl;}
             for(uint i=0;i<tokens.size();i++){cerr << __AFLOW_FUNC__ << " tokens[i=" << i << "]=" << tokens[i] << endl;}
           }
           vlines.clear();
-          if(strline.empty()){read=FALSE;}
-        }
-        if(!strline.empty()){
-          found_strsub1=(strline.find(strsub1)!=string::npos);
-          if(found_strsub1){
-            strline=strline.substr(strline.find(strsub1)+strsub1.length());
-          }
-        }
-        if(LDEBUG){
-          cerr << __AFLOW_FUNC__ << " read=" << read << endl;
-          cerr << __AFLOW_FUNC__ << " (WHILE LOOP END)" << endl;
+          read=FALSE;
         }
       }
-    }
-    else if(read) {
-      vlines.push_back(strline);
+      if(LDEBUG){
+        cerr << __AFLOW_FUNC__ << " read=" << read << endl;
+        cerr << __AFLOW_FUNC__ << " (WHILE LOOP END)" << endl;
+      }
     }
     return tokens.size();
   }
