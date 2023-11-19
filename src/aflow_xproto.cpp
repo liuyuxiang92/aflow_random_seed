@@ -3798,7 +3798,7 @@ namespace aflowlib {
       string sgstring=(SpaceGroupOptionRequired(str.spacegroupnumber)?aurostd::utype2string(str.spacegroupnumber)+"."+aurostd::utype2string(str.spacegroupnumberoption):aurostd::utype2string(str.spacegroupnumber));
       if(mode_load==STRUCTURE_MODE_WYC) {
         label_library="";
-        PARAMS->vatomX.at(0)+PARAMS->vatomX.at(1)+"/"+label_library;
+        //[CO20231119 - does not seem to do anything...]PARAMS->vatomX.at(0)+PARAMS->vatomX.at(1)+"/"+label_library;
       }
 
 

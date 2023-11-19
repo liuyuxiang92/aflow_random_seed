@@ -221,7 +221,7 @@ namespace aurostd {
       split = header_raw.find(':');
       pos_newline_border = header_raw.find(delimiter);
       if (pos_newline_border != std::string::npos) {
-        header_raw.substr(0, split);
+        //[CO2023119 - does nothing, must have been for the key below]header_raw.substr(0, split);
         // Header field name are case-insensitive
         key = aurostd::tolower(header_raw.substr(0, split));
         item = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(header_raw.substr(split + 1, pos_newline_border - split - 1));

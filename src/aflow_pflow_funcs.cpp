@@ -2944,7 +2944,7 @@ namespace pflow {
         string s;
         int id=0;
         getline(outcar_inf,s);
-        aurostd::GetNextVal(s,id).c_str(); // remove an "=" sign.
+        aurostd::GetNextVal(s,id); //[CO20231119 - gave warning, I believe we want to run GetNextVal() to update id without converting to c_str()].c_str(); // remove an "=" sign.
         while (id<(int)s.size()) {
           int n=atoi(aurostd::GetNextVal(s,id).c_str());
           num_each_type.push_back(n);

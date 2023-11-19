@@ -900,7 +900,7 @@ namespace aurostd {
   ///@brief checks if JSON::object_tpe::LIST, JSON::object_tpe::DICTIONARY or JSON::object_tpe::STRING is empty
   bool JSON::object::empty(){
     if ((type == object_types::DICTIONARY) || (type == object_types::LIST) || (type == object_types::STRING)) {
-      return not bool(this);
+      return !bool(*this);  //CO20231119 - originally "return not bool(this)", this gave warning: 'nonnull' argument 'this' compared to NULL [-Wnonnull-compare]
     } else {
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "empty is just allowed for a JSON DICTIONARY, LIST, or STRING", _VALUE_ILLEGAL_);
     }
