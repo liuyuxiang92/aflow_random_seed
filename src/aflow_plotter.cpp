@@ -254,8 +254,12 @@ namespace plotter {
       aurostd::string2tokens(versionstring, vstring);
       pdflatex_version = aurostd::string2utype<uint>(vstring[1]);
     }
+      
+    string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
+    if (format.empty()) format = "pdf";
 
-    string binaries = "gnuplot,convert";
+    string binaries = "gnuplot";  //CO20231106 - not necessarily needed: ",convert"
+    if(format!="pdf"){binaries+=",convert"};  //CO20231106
     // ME20200609 - old pdfatex versions cannot process eps files
     if (pdflatex_version >= 2010) {
       binaries += ",pdflatex,repstopdf";
@@ -276,8 +280,6 @@ namespace plotter {
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " filename=" << filename << endl;}
       string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
       // PDF is default since we use pdflatex to compile
-      string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
-      if (format.empty()) format = "pdf";
       string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
       // Create temp directory
       string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
