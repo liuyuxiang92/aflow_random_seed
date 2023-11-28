@@ -1223,6 +1223,7 @@ namespace KBIN {
     //[CO20221024 - OBSOLETE as above]message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
     //[CO20221024 - OBSOLETE as above]aurostd::execute(aus);
     //[CO20221024 - OBSOLETE as above]aus.clear();aus.str(std::string());
+    if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_+".ORIG")){aurostd::CopyFile(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWIN_+".ORIG");}  //CO20231127 - keep original aflow.in in the directory so it's easy to find
     aurostd::StringstreamClean(aus);
 
     // ---------------------------------------------------------------------------
