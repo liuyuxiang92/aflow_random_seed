@@ -6,6 +6,7 @@
         -- added machine settings for machine005 (CO)
         -- added --magmom=, --magmom_mult=, and RECYCLE_SPIN to --aflow_proto (CO)
         -- adding mag_decomposition to qmvasp (CO)
+        -- adding --extract_poscar_instance=aflow.in,-1 (CO)
 3.2.14 - 2023/10/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
         -- patched aflow.in generation with INCAR_EXPLICIT_START_STOP (TB+RF)
