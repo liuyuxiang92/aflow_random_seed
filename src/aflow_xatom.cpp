@@ -10219,8 +10219,17 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << endl << rlattice << endl << endl << klattice << endl << b1 << endl << b2 << endl << b3 << endl << nb1 << endl << nb2 << endl << nb3 << endl;
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << nb1 << " " << nb2 << " " << nb3 << " " << endl;
+  if(LDEBUG){
+    cerr << __AFLOW_FUNC__ << endl;
+    cerr << "rlattice=" << endl << rlattice << endl;
+    cerr << "klattice=" << endl << klattice << endl;
+    cerr << "b1=" << b1 << endl;
+    cerr << "b2=" << b2 << endl;
+    cerr << "b3=" << b3 << endl;
+    cerr << "||b1||=" << nb1 << endl;
+    cerr << "||b2||=" << nb2 << endl;
+    cerr << "||b3||=" << nb3 << endl;
+  }
   if(NK>1) {
     bool found=FALSE;
     double dkdelta,dk;
@@ -10240,7 +10249,8 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
       kk3=(int) floor((double) nb3/dk);db3=b3/((double) kk3);
       if(kk1+kk2+kk3>iverbose) {
         //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3;
+        aus << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
         iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
@@ -10253,11 +10263,14 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
     k1=1;k2=1;k3=1;
   }
   db1=b1/((double) k1); db2=b2/((double) k2); db3=b3/((double) k3);
-  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
+  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3;
+  aus << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
   return aus.str();
 }
 
 string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& NK) {
+  //CO20231129 - difference with KPPRA() is kdata/kdatagrid and klattice=GetStandardPrimitive(klattice), see below
+  //this seems like a bad idea, klattice may rotate
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream aus("");
   aus.precision(5);
@@ -10274,8 +10287,17 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << endl << rlattice << endl << endl << klattice << endl << b1 << endl << b2 << endl << b3 << endl << nb1 << endl << nb2 << endl << nb3 << endl;
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << nb1 << " " << nb2 << " " << nb3 << " " << endl;
+  if(LDEBUG){
+    cerr << __AFLOW_FUNC__ << endl;
+    cerr << "rlattice=" << endl << rlattice << endl;
+    cerr << "klattice=" << endl << klattice << endl;
+    cerr << "b1=" << b1 << endl;
+    cerr << "b2=" << b2 << endl;
+    cerr << "b3=" << b3 << endl;
+    cerr << "||b1||=" << nb1 << endl;
+    cerr << "||b2||=" << nb2 << endl;
+    cerr << "||b3||=" << nb3 << endl;
+  }
   if(NK>1) {
     bool found=FALSE;
     double dkdelta,dk;
@@ -10297,7 +10319,9 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
 
       if(kk1+kk2+kk3>iverbose) {
         //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "," << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3 << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << ",";
+        aus << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3;
+        aus << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
         iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
@@ -10310,7 +10334,8 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
     k1=1;k2=1;k3=1;
   }
   db1=b1/((double) k1); db2=b2/((double) k2); db3=b3/((double) k3);
-  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
+  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3;
+  aus << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
   return aus.str();
 }
 
@@ -10347,8 +10372,17 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
   b1=klattice(1);nb1=aurostd::modulus(b1);
   b2=klattice(2);nb2=aurostd::modulus(b2);
   b3=klattice(3);nb3=aurostd::modulus(b3);
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << endl << rlattice << endl << endl << klattice << endl << b1 << endl << b2 << endl << b3 << endl << nb1 << endl << nb2 << endl << nb3 << endl;
-  if(LDEBUG) aus << "KPPRA LDEBUG:  " << nb1 << " " << nb2 << " " << nb3 << " " << endl;
+  if(LDEBUG){
+    cerr << __AFLOW_FUNC__ << endl;
+    cerr << "rlattice=" << endl << rlattice << endl;
+    cerr << "klattice=" << endl << klattice << endl;
+    cerr << "b1=" << b1 << endl;
+    cerr << "b2=" << b2 << endl;
+    cerr << "b3=" << b3 << endl;
+    cerr << "||b1||=" << nb1 << endl;
+    cerr << "||b2||=" << nb2 << endl;
+    cerr << "||b3||=" << nb3 << endl;
+  }
   if(DK>1.0e-6) {
     bool found=FALSE;
     double dkdelta,dk;

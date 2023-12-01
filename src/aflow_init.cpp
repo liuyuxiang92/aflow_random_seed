@@ -2330,9 +2330,10 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Initial launch of vasp did not produce an OUTCAR file, tried killing the whole AFLOW startup script",_RUNTIME_ERROR_);
   }
 
-  nloop=0;
+  nloop=-1;
   n_not_running=0;
   while(AFLOW_VASP_instance_running(vasp_pgid) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+    nloop++;
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     //
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
@@ -2340,8 +2341,14 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     vasp_running=VASP_instance_running(vasp_bin,vasp_pgid);
     if(VERBOSE){
-      message << "nloop=" << (nloop++);pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "nloop=" << nloop;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       message << "program \"" << vasp_bin << "\" is " << (vasp_running?"":"NOT ") << "running";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    }
+    if(nloop%NCOUNTS_WAIT_MONITOR==0&&aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){  //print out memory roughly every 10 minutes
+      message << "nloop=" << nloop << Message(__AFLOW_FILE__,aflags) << endl;
+      message << "ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+      message << "swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     }
     if(vasp_running==false){
       n_not_running++;
@@ -2364,6 +2371,14 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       message << "found new instance of \"" << vasp_bin << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       xmonitor.clear(); //new run, clear IGNORE_WARNINGS //we've transitioned from relax1->relax2, etc.
       nexecuting_old=nexecuting;
+    
+      //print out memory (only if we did not just print it out; %!=0)
+      if(nloop%NCOUNTS_WAIT_MONITOR!=0&&aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
+        message << "nloop=" << nloop << Message(__AFLOW_FILE__,aflags) << endl;
+        message << "ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+        message << "swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      }
     
       //CO20221227 - only check for OUTCAR if there is a new instance of vasp found, checking any other time is dangerous (run may have finished legitimately and moved OUTCAR to OUTCAR.relax1)
       //SD20220602 - check that an OUTCAR is produced on the new vasp instance
@@ -2457,12 +2472,18 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
         //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
         if(xwarning.flag("MEMORY")){
+          //print out ERROR with memory
           memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
           if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
             memory_string+=" ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
           }
           memory_string+="\n";
           aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
+        }else{
+          //print out memory anyway. above is ERROR, this is just informational
+          message << "ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+          message << "swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(__AFLOW_FILE__,aflags) << endl;
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
         //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
         message << "issuing kill command for: \"" << vasp_bin << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);

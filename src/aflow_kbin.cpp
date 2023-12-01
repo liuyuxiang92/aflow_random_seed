@@ -1399,6 +1399,16 @@ namespace KBIN {
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn); //CO20181226
 
     _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileLOCK,aflags); //CO20200624 - made separate function for getting kflags
+    
+    // ***************************************************************************
+    // FINALIZE LOCK
+    aus << "XXXXX  KBIN DIRECTORY END (aflow" << string(AFLOW_VERSION) << ")  "  << Message(__AFLOW_FILE__,aflags) << endl;
+    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+    // ***************************************************************************
+    // PREPARE MESSAGE FOR LOG TO BE INTERCEPTED IN COMPRESSION
+    aus << "XXXXX  KBIN_DIRECTORY_END " << aflags.Directory << endl;
+    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+    // ***************************************************************************
 
     if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
       aurostd::stringstream2file(kflags.AFLOW_MODE_PRESCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));

@@ -732,15 +732,6 @@ namespace KBIN {
       aus << "EEEEE  [AFLOW_FROZSL]CALC        is supported "  << Message(__AFLOW_FILE__,aflags) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
     }
-    // ***************************************************************************
-    // FINALIZE LOCK
-    aus << "XXXXX  KBIN DIRECTORY END (aflow" << string(AFLOW_VERSION) << ")  "  << Message(__AFLOW_FILE__,aflags) << endl;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-    // ***************************************************************************
-    // PREPARE MESSAGE FOR LOG TO BE INTERCEPTED IN COMPRESSION
-    aus << "XXXXX  KBIN_DIRECTORY_END " << aflags.Directory << endl;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-    // ***************************************************************************
 
     if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (END)" << endl;
 
