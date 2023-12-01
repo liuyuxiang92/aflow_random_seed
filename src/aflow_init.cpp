@@ -2205,7 +2205,6 @@ void AFLOW_monitor_VASP(){  //CO20210601
   //CO+SD20220602 - if monitor does not find a directory at all, kill the startup script
   if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT")){
     string startup_script_pgid=XHOST.ostrPGID.str();
-    uint n_running=0;
     stringstream message;
     string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
     uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
@@ -2215,6 +2214,7 @@ void AFLOW_monitor_VASP(){  //CO20210601
       message << "monitor did not find a directory to run; killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
       aurostd::ProcessKill(startup_script_name,startup_script_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
       aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
+      uint n_running=0;
       while (aurostd::ProcessRunning(startup_script_name,startup_script_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
         message << "monitor did not find a directory to run; killing (SIGKILL) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(startup_script_name,startup_script_pgid); //send SIGKILL
@@ -2268,7 +2268,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
   //a note about xmonitor: it only controls the amount of output to the LOCK file, it does NOT affect performance
 
-  int nloop=1;
+  int nloop=0;
   uint i=0;
   uint nexecuting=0,nexecuting_old=0;
   uint n_not_running=0,n_running=0;
@@ -2321,6 +2321,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     message << "initial launch of vasp did not produce an OUTCAR file; killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
     aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
+    n_running=0;
     while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
       message << "initial launch of vasp did not produce an OUTCAR file; killing (SIGKILL) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       aurostd::ProcessKill(startup_script_name,vasp_pgid); //send SIGKILL
@@ -2378,6 +2379,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         message << "new vasp instance did not produce an OUTCAR file, killing (SIGTRAP) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
         aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
+        n_running=0;
         while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
           message << "new vasp instance did not produce an OUTCAR file, killing (SIGKILL) the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           aurostd::ProcessKill(startup_script_name,vasp_pgid); //send SIGKILL
