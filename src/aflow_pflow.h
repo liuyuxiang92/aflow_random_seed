@@ -128,6 +128,8 @@ namespace pflow {
   //DX20170818 [OBSOLETE] xstructure EQUIVALENT(_aflags &aflags,istream& input);
   string EQUIVALENT(_aflags &aflags,istream& input, aurostd::xoption& vpflow);
   void EWALD(const string& options,istream& input);
+  string EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(const aurostd::xoption& vpflow);  //CO20231130
+  string EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(const string& aflowin_path,int instance); //CO20231130
   string EXTRACT_xcar(_aflags &aflags,vector<string>,string,string);
   string EXTRACT_Symmetry(_aflags &aflags,vector<string>);
   void FGROUP(_aflags &aflags,istream& input);

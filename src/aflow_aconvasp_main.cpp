@@ -560,6 +560,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
+    
+  vpflow.args2addattachedscheme(argv,cmds,"EXTRACT_POSCAR_INSTANCE","--extract_poscar_instance=",string(_AFLOWIN_)+",-1"); //CO20210315
+  
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   vpflow.flag("EXTRACT_SYMMETRY",aurostd::args2flag(argv,cmds,"--extract_symmetry|--xsymmetry"));
 
@@ -1890,6 +1893,7 @@ namespace pflow {
       //[CO20220614 - moved up]if(vpflow.flag("ELK")) {cout << input2ELKxstr(cin); _PROGRAMRUN=true;} //DX20200313
       if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("EWALD")) {pflow::EWALD(vpflow.getattachedscheme("EWALD"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("EXTRACT_POSCAR_INSTANCE")) {cout << pflow::EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(vpflow); _PROGRAMRUN=true;}
       // F
       if(vpflow.flag("FROZSL_VASPSETUP_AFLOW")) {cout << pflow::FROZSL_VASPSETUP(argv,0); _PROGRAMRUN=true;}
       if(vpflow.flag("FROZSL_VASPSETUP_POSCAR")) {cout << pflow::FROZSL_VASPSETUP(argv,1); _PROGRAMRUN=true;}
@@ -2767,6 +2771,7 @@ namespace pflow {
     strstream << tab << x << " --extract_kpoints|--xkpoints " << _AFLOWIN_ << "" << endl;
     strstream << tab << x << " --extract_incar|--xincar " << _AFLOWIN_ << "" << endl;
     strstream << tab << x << " --extract_poscar|--xposcar " << _AFLOWIN_ << "" << endl;
+    strstream << tab << x << " --extract_poscar_instance=" << _AFLOWIN_ << ",-1" << endl; //CO20231129
     strstream << tab << x << " --extract_potcar|--xpotcar " << _AFLOWIN_ << "" << endl;
     strstream << endl;
     strstream << " CAGES SEARCH" << endl;
@@ -6097,6 +6102,32 @@ namespace pflow {
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
   }
 } // namespace pflow
+
+// ***************************************************************************
+// pflow::EXTRACT_xcar
+// ***************************************************************************
+namespace pflow {
+  string EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(const aurostd::xoption& vpflow) { //CO20231129 - must be explicitly written
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
+    string scheme=vpflow.getattachedscheme("EXTRACT_POSCAR_INSTANCE");
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " scheme=" << scheme << endl;}
+    vector<string> tokens;aurostd::string2tokens(scheme,tokens,",");
+    string aflowin_path=_AFLOWIN_;
+    int instance=-1;
+    if(tokens.size()>0){aflowin_path=tokens[0];}
+    if(tokens.size()>1){instance=aurostd::string2utype<int>(tokens[1]);}
+    if(LDEBUG){
+      cerr << __AFLOW_FUNC__ << " aflowin_path=" << aflowin_path << endl;
+      cerr << __AFLOW_FUNC__ << " instance=" << instance << endl;
+    }
+    return EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(aflowin_path,instance);
+  }
+  string EXTRACT_POSCAR_INSTANCE_FROM_AFLOWIN(const string& aflowin_path,int instance) { //CO20231129 - must be explicitly written
+    string aflowin=""; aurostd::file2string(aflowin_path,aflowin);
+    return aurostd::substring2string(aflowin,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,instance);
+  }
+}
 
 // ***************************************************************************
 // pflow::EXTRACT_xcar
