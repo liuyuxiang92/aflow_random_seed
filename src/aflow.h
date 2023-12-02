@@ -818,6 +818,7 @@ class _kflags {
     int    KBIN_MPI_NCPUS;
     string KBIN_MPI_NCPUS_STRING; //ME20181216
     int    KBIN_MPI_NCPUS_ORIG; //CO20210804 - repurposing
+    int    KBIN_MPI_HOSTLIST_OFFSETS; //CO20210804 - repurposing
     string KBIN_MPI_START;
     string KBIN_MPI_STOP;
     string KBIN_MPI_COMMAND;

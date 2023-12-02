@@ -33,6 +33,7 @@
 #define MACHINE003_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20201005 - MACHINE003
 #define MACHINE004_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20211011 - MACHINE004
 #define MACHINE005_DEFAULT_KILL_MEM_CUTOFF 1.50  //CO20230512 - MACHINE005
+#define MACHINE006_DEFAULT_KILL_MEM_CUTOFF 1.50  //CO20230512 - MACHINE006
 #define CMU_EULER_DEFAULT_KILL_MEM_CUTOFF 1.50   //DX20190107 - CMU EULER
 
 namespace aurostd {
@@ -508,6 +509,11 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005",aurostd::args2flag(argv,"--machine=machine005"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005")) XHOST.maxmem=MACHINE005_DEFAULT_KILL_MEM_CUTOFF;
     //CO20230512 - MACHINE005 - END
+    //CO20230512 - MACHINE006 - START
+    // "MACHINE::MACHINE006"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE006",aurostd::args2flag(argv,"--machine=machine006"));
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE006")) XHOST.maxmem=MACHINE006_DEFAULT_KILL_MEM_CUTOFF;
+    //CO20230512 - MACHINE006 - END
     // DUKE_MATERIALS
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS",aurostd::args2flag(argv,"--machine=materials|--machine=duke_materials"));
     // DUKE_AFLOWLIB
@@ -1074,6 +1080,12 @@ namespace KBIN {
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE003; DX added 20201005
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE004; DX added 20211011
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE005")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE005; //CO20230512
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE006")){   // with MACHINE006; //CO20230512
+          kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+          if(XHOST.vflag_control.flag("MPI_HOSTLIST_OFFSETS")){ //CO20231201
+            kflags.KBIN_MPI_HOSTLIST_OFFSETS=XHOST.vflag_control.getattachedutype<int>("MPI_HOSTLIST_OFFSETS"); //CO20231201
+          }
+        }
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  //DX20190107 - CMU EULER // with CMU_EULER force NCPUS //DX20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;           // MACHINE2 has only NCPUS //CO20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;          // MACHINE1 has only NCPUS //CO20181113
@@ -1268,6 +1280,7 @@ namespace KBIN {
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005") ||  //CO20230512
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE006") ||  //CO20230512
         aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||  //CO20221027
         FALSE)
       ){
@@ -1281,6 +1294,7 @@ namespace KBIN {
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
           aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE005") ||  //CO20230512
+          aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE006") ||  //CO20230512
           FALSE)
           ){
         subdirectory_orig = aurostd::getenv2string("HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003/004)

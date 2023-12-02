@@ -690,6 +690,8 @@ namespace init {
     XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
     XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT",aurostd::args2attachedflag(argv,cmds,"--aflow_startup_script=")); //SD20220502
     XHOST.vflag_control.push_attached("AFLOW_STARTUP_SCRIPT",aurostd::args2attachedstring(argv,"--aflow_startup_script=","")); //SD20220502
+    XHOST.vflag_control.flag("BINARY_RUN_ID",aurostd::args2attachedflag(argv,cmds,"--binary_run_id=")); //CO20231201
+    XHOST.vflag_control.push_attached("BINARY_RUN_ID",aurostd::args2attachedstring(argv,"--binary_run_id=","")); //CO20231201
     //[SD20220402 - OBSOLETE]XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("KILL_VASP_OOM",aurostd::args2flag(argv,cmds,"--kill_vasp_oom|--killvaspoom"));  //CO20210315 - kill vasp if approaching OOM
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
@@ -995,6 +997,10 @@ namespace init {
       if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")||aurostd::toupper(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"))=="MAX"){ //so both --npmax and --np=max work
         XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
       }
+    }
+    XHOST.vflag_control.flag("MPI_HOSTLIST_OFFSETS",aurostd::args2attachedflag(argv,"--mpi_hostlist_offsets="));  //CO20231201
+    if(XHOST.vflag_control.flag("MPI_HOSTLIST_OFFSETS")){ //CO20231201
+      XHOST.vflag_control.push_attached("MPI_HOSTLIST_OFFSETS",aurostd::args2attachedstring(argv,"--mpi_hostlist_offsets=","0")); //CO20231201
     }
     //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
     
