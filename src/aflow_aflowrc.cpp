@@ -2517,13 +2517,13 @@ namespace aflowrc {
     aflowrc << "DEFAULT_XTALFINDER_MISFIT_FAMILY=" << AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY << " // values above this threshold: matched structures do not have similar properties" << endl; //DX20201118
     aflowrc << "DEFAULT_XTALFINDER_SUPERCELL_METHOD=" << AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD << " // // supercell method for comparing (robust, but slow, superceded by transformation method)" << endl; //DX20201223
     aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_DUPLICATE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << " // results file prefix" << endl; //DX20201118
-    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_DUPLICATE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << "\" // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE=\"" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << "\" // results file prefix" << endl; //DX20201118
 
     //DX20200720 - START
     aflowrc << " " << endl;
@@ -2544,7 +2544,7 @@ namespace aflowrc {
     aflowrc << "MEMORY_MAX_USAGE_RAM=" << AFLOWRC_MEMORY_MAX_USAGE_RAM << " // bytes"   << endl;  //CO20201111
     aflowrc << "MEMORY_MAX_USAGE_SWAP=" << AFLOWRC_MEMORY_MAX_USAGE_SWAP << " // bytes"   << endl;  //CO20201111
     aflowrc << "FILE_VASP_MONITOR=\"" << AFLOWRC_FILE_VASP_MONITOR << "\" // monitor file postfix"   << endl;  //CO20201111
-    aflowrc << "INTEL_COMPILER_PATHS=" << AFLOWRC_INTEL_COMPILER_PATHS << " // comma-separated paths to search (for sourcing)"   << endl;  //CO20201111
+    aflowrc << "INTEL_COMPILER_PATHS=\"" << AFLOWRC_INTEL_COMPILER_PATHS << "\" // comma-separated paths to search (for sourcing)"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS MACHINE DEPENDENT MPI" << endl;
