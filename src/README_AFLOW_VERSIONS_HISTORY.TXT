@@ -3,7 +3,7 @@
         -- patching url2string to be robust to firewalls (CO)
         -- patching POSCAR.orig and aflow.qmvasp.out in LIB2LIB() (KT+KC+CO)
         -- rearranged QHA code to enable calculation of thermodynamic properties if isEOS and isQHA (CO)
-        -- added machine settings for machine005 (CO)
+        -- added machine settings for machine101, machine102 (CO)
         -- added --magmom=, --magmom_mult=, and RECYCLE_SPIN to --aflow_proto (CO)
         -- adding mag_decomposition to qmvasp (CO)
         -- adding --extract_poscar_instance=aflow.in,-1 (CO)

@@ -259,7 +259,7 @@ namespace KBIN {
     }
     //DX20211011 - MACHINE004 - END
     //CO20230512 - MACHINE101 - START
-    // machine005
+    // machine101
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE101") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE101") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE101"))   // check MACHINE101
@@ -271,7 +271,7 @@ namespace KBIN {
     }
     //CO20230512 - MACHINE101 - END
     //CO20230512 - MACHINE102 - START
-    // machine006
+    // machine102
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE102") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE102") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE102"))   // check MACHINE102
@@ -4573,7 +4573,9 @@ namespace KBIN {
               //NB: this MUST be done here, since we need the full machine-specific path to the binary
               if(XHOST.vflag_control.flag("BINARY_RUN_ID") && !XHOST.vflag_control.getattachedscheme("BINARY_RUN_ID").empty()){
                 kflags_KBIN_MPI_BIN+="."+XHOST.vflag_control.getattachedscheme("BINARY_RUN_ID");
-                aurostd::execute("ln "+MPI_BINARY_DIR_MACHINE101+kflags.KBIN_MPI_BIN+" "+MPI_BINARY_DIR_MACHINE101+kflags_KBIN_MPI_BIN);
+                if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE101+kflags_KBIN_MPI_BIN)){ //might already exist from the run before
+                  aurostd::execute("ln "+MPI_BINARY_DIR_MACHINE101+kflags.KBIN_MPI_BIN+" "+MPI_BINARY_DIR_MACHINE101+kflags_KBIN_MPI_BIN);
+                }
               }
               //CO20231201 STOP - creating BINARY_RUN_ID variant of binary
               if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE101+kflags_KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE101+kflags_KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
@@ -4598,15 +4600,17 @@ namespace KBIN {
               //CO20231201 START - creating BINARY_RUN_ID variant of binary
               //NB: this MUST be done here, since we need the full machine-specific path to the binary
               if(XHOST.vflag_control.flag("BINARY_RUN_ID") && !XHOST.vflag_control.getattachedscheme("BINARY_RUN_ID").empty()){
-                kflags_KBIN_MPI_BIN+="."+XHOST.vflag_control.getattachedscheme("BINARY_RUN_ID");
-                aurostd::execute("ln "+MPI_BINARY_DIR_MACHINE102+kflags.KBIN_MPI_BIN+" "+MPI_BINARY_DIR_MACHINE102+kflags_KBIN_MPI_BIN);
+                kflags_KBIN_MPI_BIN+=".MULTI_RUN."+XHOST.vflag_control.getattachedscheme("BINARY_RUN_ID");
+                if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE102+kflags_KBIN_MPI_BIN)){ //might already exist from the run before
+                  aurostd::execute("ln "+MPI_BINARY_DIR_MACHINE102+kflags.KBIN_MPI_BIN+" "+MPI_BINARY_DIR_MACHINE102+kflags_KBIN_MPI_BIN);
+                }
               }
               //CO20231201 STOP - creating BINARY_RUN_ID variant of binary
               if(!aurostd::FileExist(MPI_BINARY_DIR_MACHINE102+kflags_KBIN_MPI_BIN)){throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, MPI_BINARY_DIR_MACHINE102+kflags_KBIN_MPI_BIN+" binary cannot be found", _FILE_NOT_FOUND_);} //CO20221217 - node might not be mounted, save wasted cycles
 
               // verbosization
               aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(__AFLOW_FILE__,aflags) << endl; //HE20220309 use machine name
-              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE102 << " " << MPI_BINARY_DIR_MACHINE102 << kflags_KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE102 << " " << kflags.KBIN_MPI_NCPUS << " -o " << kflags.KBIN_MPI_HOSTLIST_OFFSETS << " task_affinity " << MPI_BINARY_DIR_MACHINE102 << kflags_KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(__AFLOW_FILE__,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               // run
               aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
