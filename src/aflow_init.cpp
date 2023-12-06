@@ -998,11 +998,12 @@ namespace init {
         XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
       }
     }
+    //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
     XHOST.vflag_control.flag("MPI_HOSTLIST_OFFSETS",aurostd::args2attachedflag(argv,"--mpi_hostlist_offsets="));  //CO20231201
     if(XHOST.vflag_control.flag("MPI_HOSTLIST_OFFSETS")){ //CO20231201
       XHOST.vflag_control.push_attached("MPI_HOSTLIST_OFFSETS",aurostd::args2attachedstring(argv,"--mpi_hostlist_offsets=","0")); //CO20231201
     }
-    //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " XHOST.vflag_control.getattachedscheme(\"MPI_HOSTLIST_OFFSETS\")=" << XHOST.vflag_control.getattachedscheme("MPI_HOSTLIST_OFFSETS") << endl;}
     
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
