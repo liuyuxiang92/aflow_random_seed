@@ -151,6 +151,7 @@ static const vector<std::string> BRAVAIS_LATTICES = {"BCC","BCT","CUB","FCC","HE
 
 //MONITOR_VASP
 #define VERBOSE_MONITOR_VASP false
+#define VERBOSE_XVASP_AFIX (false || VERBOSE_MONITOR_VASP)
 #define AFLOW_MEMORY_TAG "AFLOW ERROR: AFLOW_MEMORY"
 
 // --------------------------------------------------------------------------
@@ -3247,6 +3248,7 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string BIN2VASPVersion_RunVASP(const string& binfile);  //CO20231206
   string BIN2VASPVersion(const string& binfile);  //SD20220331
   string BIN2VASPVersionNumber(const string& binfile);  //SD20220331
   double BIN2VASPVersionDouble(const string& binfile);  //SD20220331

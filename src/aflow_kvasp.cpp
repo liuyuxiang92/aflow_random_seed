@@ -3175,7 +3175,7 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 
 namespace KBIN {
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){ //CO20210315
-    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_XVASP_AFIX || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
 
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " xRequiresAccuracy.flag(\"" << scheme << "\")=" << xRequiresAccuracy.flag(scheme) << endl;
@@ -3197,7 +3197,7 @@ namespace KBIN {
     return VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE) { //CO20210315
-    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_XVASP_AFIX || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     stringstream aus;
     bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
 
@@ -3902,7 +3902,7 @@ namespace KBIN {
     return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_Error2Fix(const string& error,const string& mode,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_XVASP_AFIX || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     stringstream aus;
 
     if(LDEBUG){aus << __AFLOW_FUNC__ << " [CHECK " << error << " PROBLEMS]" << Message(__AFLOW_FILE__,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -5386,7 +5386,7 @@ namespace KBIN {
     return NELM;
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
-    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_XVASP_AFIX || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     ifstream FileOSZICAR;
     FileOSZICAR.open(oszicar.c_str(),std::ios::in);
     string tmp=aurostd::kvpair2string(FileOSZICAR,"DAV",":",-1);
@@ -5456,7 +5456,7 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {  //CO20210601
     //this function only looks at the last electronic SC step (different than VASP_OSZICARUnconverging, good for STATIC calcs)
     //if it is unconverged, return true
-    bool LDEBUG=(FALSE || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_XVASP_AFIX || (VERBOSE_MONITOR_VASP && XHOST.vflag_control.flag("MONITOR_VASP")==true) || _DEBUG_KVASP_ || XHOST.DEBUG);
     uint NELM=KBIN::VASP_getNELM(outcar);
     uint NSTEPS=KBIN::VASP_getNSTEPS(oszicar);
     if(LDEBUG){
@@ -5600,6 +5600,30 @@ namespace KBIN {
 // ***************************************************************************
 
 namespace KBIN {
+  string BIN2VASPVersion_RunVASP(const string& binfile){  //CO20231206
+    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
+    //CO20231207 - this method should work reliably as long as an empty INCAR, POSCAR, POTCAR, KPOINTS can be offered to vasp and it can be run serially
+    string tmpdir=aurostd::TmpDirectoryCreate("vaspVersion");
+    string work_dir=aurostd::getPWD();
+    chdir(tmpdir.c_str());
+    aurostd::string2file(" ","INCAR");
+    aurostd::string2file(" ","KPOINTS");
+    aurostd::string2file(" ","POSCAR");
+    aurostd::string2file(" ","POTCAR");
+    string output=aurostd::execute2string(binfile,stdouterr_fsio);
+    if(LDEBUG){
+      cerr << __AFLOW_FUNC__ << " output=" << endl << "\"" << output << "\"" << endl;
+      cerr << __AFLOW_FUNC__ << " ls:" << endl << aurostd::execute2string("ls") << endl;
+    }
+    string vaspVersion="";
+    if(aurostd::FileExist("OUTCAR")){vaspVersion=OUTCAR2VASPVersion("OUTCAR");}
+#ifndef _AFLOW_TEMP_PRESERVE_
+    aurostd::RemoveDirectory(tmpdir);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
+    chdir(work_dir.c_str());
+    return vaspVersion;
+  }
+  
   /// @brief gets a string containing the VASP version from binary
   ///
   /// @param binfile absolute path to the binary file
@@ -5613,6 +5637,7 @@ namespace KBIN {
   /// @mod{SD,20220923,updated for vasp6.3}
   /// @mod{SD,20220401,created function based on getVASPVersionString}
   string BIN2VASPVersion(const string& binfile){
+    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     ifstream infile(binfile.c_str(), std::ios::in | std::ios::binary);
     if (!infile.is_open()) {return "";}
     int bufferSize = 1024, i;
@@ -5634,6 +5659,7 @@ namespace KBIN {
       }
       if (found_vasp) {
         buffer_str += std::string(reinterpret_cast<char*>(buffer), bufferSize); // avoid null-terminator
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " buffer_str=" << buffer_str << endl;}
         if (i != 0) { // find("vasp.")
           buffer_str = buffer_str.substr(i); // get the buffer string starting from "vasp."
           i = 0;
@@ -5667,6 +5693,14 @@ namespace KBIN {
         }
       }
       infile.seekg(-10, std::ios::cur); // shift cursor to avoid the case where "vasp." is on the boundary of two buffers
+    }
+    aurostd::StringSubst(vaspVersion,"(",""); //CO20231207 - finding more crap in the binary approach...
+    aurostd::StringSubst(vaspVersion,")",""); //CO20231207 - finding more crap in the binary approach...
+    //CO20231206 - the method above is unreliable; gives 5.2.2 for 5.4.4; also gives 6.3.0 for 6.3.1; also gives 6.3.0 for 6.4.1
+    //however, some report issues compiling vasp6.3+ serially, not sure why...
+    //let's correct where possible and does not conflict with others
+    if(!vaspVersion.empty()&&VASPVersionString2Double(vaspVersion)<6.003){  //CO20231207
+      vaspVersion=BIN2VASPVersion_RunVASP(binfile);
     }
     return vaspVersion;
   }
@@ -5711,8 +5745,8 @@ namespace KBIN {
   }
 
   double OUTCAR2VASPVersionDouble(const string& outcar){  //CO20210315
-    //outcar -> 4.635
-    //outcar -> 5.44
+    //outcar -> 4.006035
+    //outcar -> 5.004004
     return VASPVersionString2Double(OUTCAR2VASPVersion(outcar));
   }
 

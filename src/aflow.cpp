@@ -265,6 +265,15 @@ int main(int _argc,char **_argv) {
       KBIN::XVASP_INCAR_SPIN_FIX_RELAX(xvasp,aflags,vflags,1,true,FileMESSAGE);
       return 0;
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_vaspVersion")) { //CO20230913
+      cerr << __AFLOW_FUNC__ << " getVASPVersion(vasp_std)=" << KBIN::getVASPVersion("vasp_std") << endl;
+      cerr << __AFLOW_FUNC__ << " getVASPVersionDouble(vasp_std)=" << KBIN::getVASPVersionDouble("vasp_std") << endl;
+      cerr << __AFLOW_FUNC__ << " getVASPVersion(vasp_std.6.3.1)=" << KBIN::getVASPVersion("vasp_std.6.3.1") << endl;
+      cerr << __AFLOW_FUNC__ << " getVASPVersionDouble(vasp_std.6.3.1)=" << KBIN::getVASPVersionDouble("vasp_std.6.3.1") << endl;
+      cerr << __AFLOW_FUNC__ << " getVASPVersion(vasp_std.6.4.1)=" << KBIN::getVASPVersion("vasp_std.6.4.1") << endl;
+      cerr << __AFLOW_FUNC__ << " getVASPVersionDouble(vasp_std.6.4.1)=" << KBIN::getVASPVersionDouble("vasp_std.6.4.1") << endl;
+      return 0;
+    }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
