@@ -4525,9 +4525,11 @@ namespace KBIN {
         //REMOVE LINES
         XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation_ivalue,VERBOSE);  //CO20200624
         //ADD LINES
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] begin" << endl;
-        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_ivalue << endl;
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] end" << endl;
+        if(std::signbit(ivalue)==false){  //CO20231207 - use ivalue<0 to remove the key only
+          if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] begin" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_ivalue << endl;
+          if(VERBOSE) xvasp.INCAR << "# Performing " << operation_ivalue << " [AFLOW] end" << endl;
+        }
       }
     }
     // ***************************************************************************
@@ -6702,6 +6704,8 @@ namespace KBIN {
     else if(fix=="EDIFF") { //CO20210315
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
+      double EDIFF_default_VASP=1e-4;
+      double increment_multiple=10; //increase by an order of magnitude
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       if(Krun){
         param_double=AUROSTD_MAX_DOUBLE;
@@ -6714,8 +6718,12 @@ namespace KBIN {
         if(param_double==AUROSTD_MAX_DOUBLE && aurostd::kvpair2bool(xvasp.INCAR,"EDIFF","=")){
           param_double=aurostd::kvpair2utype<double>(xvasp.INCAR,"EDIFF","=");
         }
-        if(param_double==AUROSTD_MAX_DOUBLE){param_double=1e-4;}  //default for vasp
-        param_double*=10; //increase by an order of magnitude
+        if(param_double==AUROSTD_MAX_DOUBLE){param_double=EDIFF_default_VASP;}  //default for vasp
+        param_double*=increment_multiple;
+        if(param_double>EDIFF_default_VASP*increment_multiple){
+          if(Krun && VERBOSE){aus << "MMMMM  MESSAGE EDIFF will fall below " << EDIFF_default_VASP*increment_multiple << ", not smart, skipping" << Message(__AFLOW_FILE__,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+          Krun=false;
+        }
       }
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,param_double,FALSE));
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
@@ -7341,8 +7349,10 @@ namespace KBIN {
     _vflags vflags_orig(vflags);  //keep original, restore later if necessary
 
     vflags.KBIN_VASP_INCAR_VERBOSE=TRUE;  //VERBOSE, will restore original later
-    bool Krun=true;
+    bool Krun=true,Krun1=true,Krun2=true,Krun3=true;
+    bool ignorefix=false,ignorefix1=false,ignorefix2=false;
     int submode_increment=1;
+    string fix_combined="";
 
     string fix="";
     file_error="aflow.error."+aurostd::tolower(mode); //if mode is empty we throw later
@@ -7426,7 +7436,7 @@ namespace KBIN {
       //try first KPAR, erase if it did not work, no harm done
       if(submode==1){  //CO+DB20230822 - try setting KPAR=2; do not worry about NPAR/NCORE, NPAR takes preference according to VASP (https://www.vasp.at/wiki/index.php/NPAR)
         fix="KPAR=2";
-        bool ignorefix=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){  //remove fixes before going to next submode
@@ -7464,16 +7474,16 @@ namespace KBIN {
       //for memory issues, always try to save the CONTCAR, it should be a good starting point for the next calc
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //lower NCPUS
-        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="NCPUS";
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        Krun2=true;fix="NCPUS";
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
         Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
@@ -7484,15 +7494,15 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //lower NBANDS, try before lowering k-points
-        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="NBANDS--";
+        Krun2=true;fix="NBANDS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
         Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
@@ -7501,15 +7511,15 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //lower k-points
-        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="KPOINTS--";
+        Krun2=true;fix="KPOINTS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
         Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
@@ -7533,11 +7543,11 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="MPICH139") {
-      bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+      Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-      bool Krun2=true;fix="KPOINTS-=2";
+      Krun2=true;fix="KPOINTS-=2";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
@@ -7546,12 +7556,12 @@ namespace KBIN {
     else if(mode=="MPICH174") { //CO20210315
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //lower NCPUS
-        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="NCPUS";
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        Krun2=true;fix="NCPUS";
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
@@ -7579,7 +7589,6 @@ namespace KBIN {
     }
     else if(mode=="NELM") { //CSLOSHING solutions should be tried first
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      string fix_combined="";
       //see here for rational for electronic convergence issues: https://www.vasp.at/vasp-workshop/optelectron.pdf
       if(submode==0){ //AMIX/BMIX fixes, helps here: ICSD/LIB/CUB/Pd1Tm1_ICSD_649071
         fix_combined="AMIX=0.1;BMIX=0.01";  //CO20231207 - list alphabetically
@@ -7588,15 +7597,15 @@ namespace KBIN {
           Krun=false;
         }
 
-        bool Krun1=true;fix="AMIX=0.1";
+        Krun1=true;fix="AMIX=0.1";
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
         Krun1=(Krun && Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="BMIX=0.01";
+        Krun2=true;fix="BMIX=0.01";
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun && Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
@@ -7616,15 +7625,15 @@ namespace KBIN {
           Krun=false;
         }
         
-        bool Krun1=true;fix="BMIX=3"; //3.0
+        Krun1=true;fix="BMIX=3"; //3.0
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
         Krun1=(Krun && Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="AMIN=0.01";
+        Krun2=true;fix="AMIN=0.01";
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun && Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         
@@ -7644,15 +7653,15 @@ namespace KBIN {
           Krun=false;
         }
         
-        bool Krun1=true;fix="BMIX=1"; //1.0
+        Krun1=true;fix="BMIX=1"; //1.0
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
         Krun1=(Krun && Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="AMIN=0.01";
+        Krun2=true;fix="AMIN=0.01";
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun && Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         
@@ -7672,15 +7681,15 @@ namespace KBIN {
           Krun=false;
         }
         
-        bool Krun1=true;fix="BMIX_GAMMA"; //adjust with GAMMA value
+        Krun1=true;fix="BMIX_GAMMA"; //adjust with GAMMA value
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
         Krun1=(Krun && Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="AMIN=0.01";
+        Krun2=true;fix="AMIN=0.01";
         xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun && Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         
@@ -7695,24 +7704,31 @@ namespace KBIN {
       }
       if(submode==4){ //desperate attempt, increase NELM  //CO20211017 - do BEFORE you increase KPOINTS (KPOINTS=GAMMA_ODD), as the longer run will be more expensive with more KPOINTS
         fix="NELM";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        ignorefix=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){  //remove fixes before going to next submode, leaving default NELM=60
+          if(!ignorefix){fix="NELM=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==5){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
+        //it is okay to turn off NELM=300 above, we will try Gamma-odd+NELM below, with lower threshold (save cycles)
         fix="KPOINTS=GAMMA_ODD";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==6){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
-        bool Krun1=true;fix="NELM";
-        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+      if(submode==6){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high; since we start at EDIFF=1e-6, this goes to EDIFF=1e-5
+        Krun1=true;fix="NELM";
+        xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        bool Krun2=true;fix="EDIFF";
-        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        Krun2=true;fix="EDIFF"; //further increases
+        xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
@@ -7720,7 +7736,24 @@ namespace KBIN {
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=7){Krun=false;}
+      if(submode==7){ //desperate attempt 3, increase EDIFF again, sometimes the threshold is just a bit too high; since we start at EDIFF=1e-6, this goes to EDIFF=1e-4 (hard floor, do not go below)
+        Krun1=true;fix="NELM"; //this is redundant as above (submode 6), we leave in case another treatment gets injected in between
+        xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
+        ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix1){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun2=true;fix="EDIFF"; //further increases
+        xfixed.flag(fix,false); //CO20230822 - allow for redo for the combination
+        ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=8){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
@@ -7860,16 +7893,16 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="THREADS") {
-      bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+      Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-      bool Krun2=true;fix="NCPUS";
-      bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+      Krun2=true;fix="NCPUS";
+      ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
       if(ignorefix2){Krun2=false;}
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-      bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+      Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
       Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
