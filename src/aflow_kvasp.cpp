@@ -1340,6 +1340,7 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NUM_PROB\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NUM_PROB") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:OUTPUT_LARGE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:OUTPUT_LARGE") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:PSMAXN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:PSMAXN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:PSSYEVX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:PSSYEVX") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:READ_KPOINTS_RD_SYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:READ_KPOINTS_RD_SYM") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:REAL_OPT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:REAL_OPT") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:REAL_OPTLAY_1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:REAL_OPTLAY_1") << endl;
@@ -3586,6 +3587,12 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPT: internal ERROR",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
+    //ERROR in subspace rotation PSSYEVX: not enough eigenvalues found
+    scheme="PSSYEVX"; //CO20231208 - adding some corrections
+    found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"subspace rotation PSSYEVX",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    xwarning.flag(scheme,found_warning);
+    //
     scheme="READ_KPOINTS_RD_SYM";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR in RE_READ_KPOINTS_RD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"switch off symmetry",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ));
@@ -3670,6 +3677,7 @@ namespace KBIN {
       if(wdebug || xwarning.flag("NUM_PROB")) aus << "WWWWW  WARNING xwarning.flag(\"NUM_PROB\")=" << xwarning.flag("NUM_PROB") << endl;  //CO20210315
       if(wdebug || xwarning.flag("OUTPUT_LARGE")) aus << "WWWWW  WARNING xwarning.flag(\"OUTPUT_LARGE\")=" << xwarning.flag("OUTPUT_LARGE") << endl;
       if(wdebug || xwarning.flag("PSMAXN")) aus << "WWWWW  WARNING xwarning.flag(\"PSMAXN\")=" << xwarning.flag("PSMAXN") << endl;
+      if(wdebug || xwarning.flag("PSSYEVX")) aus << "WWWWW  WARNING xwarning.flag(\"PSSYEVX\")=" << xwarning.flag("PSSYEVX") << endl; //CO20231208
       if(wdebug || xwarning.flag("READ_KPOINTS_RD_SYM")) aus << "WWWWW  WARNING xwarning.flag(\"READ_KPOINTS_RD_SYM\")=" << xwarning.flag("READ_KPOINTS_RD_SYM") << endl;
       if(wdebug || xwarning.flag("REAL_OPT")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPT\")=" << xwarning.flag("REAL_OPT") << endl;
       if(wdebug || xwarning.flag("REAL_OPTLAY_1")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPTLAY_1\")=" << xwarning.flag("REAL_OPTLAY_1") << endl;
@@ -3999,6 +4007,7 @@ namespace KBIN {
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NATOMS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("PSMAXN",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("PSSYEVX",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20231208
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));

@@ -3311,7 +3311,7 @@ namespace KBIN {
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB, vector<string> &species_ppsC);
   void XVASP_Get_NPAR_NCORE(const _xvasp& xvasp,const _aflags& aflags,int& NPAR,int& NCORE);  //CO20210315
-  void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
+  void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,bool VERBOSE);  //CO20231208 - adding full vflags
   void XVASP_INCAR_System_Auto(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,_vflags& vflags,int number); // for steps
