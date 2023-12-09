@@ -3298,6 +3298,7 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_Static_ON
 namespace KBIN {
   void XVASP_INCAR_Static_ON(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    bool LDEBUG=(FALSE|| _DEBUG_IVASP_ || XHOST.DEBUG);
     string FileContent,strline;
     FileContent=xvasp.INCAR.str();
     aurostd::StringstreamClean(xvasp.INCAR);
@@ -3328,7 +3329,7 @@ namespace KBIN {
       }
     }
     // xvasp.INCAR << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing STATIC [AFLOW]" << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing STATIC [AFLOW] begin" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && vflags.KBIN_VASP_FORCE_OPTION_BADER.option) xvasp.INCAR << aurostd::PaddedPOST("LAECHG=.TRUE.",_incarpad_) << " # Performing STATIC  (Bader ON)" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && !vflags.KBIN_VASP_FORCE_OPTION_BADER.option) xvasp.INCAR << aurostd::PaddedPOST("LAECHG=.FALSE.",_incarpad_) << " # Performing STATIC  (Bader OFF)" << endl;
     // if(vflags.KBIN_VASP_FORCE_OPTION_BADER.option) xvasp.INCAR << aurostd::PaddedPOST("ADDGRID=.TRUE.",_incarpad_) << " # Performing STATIC  (Bader ON)" << endl;
@@ -3338,6 +3339,25 @@ namespace KBIN {
     xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << " # Performing STATIC" << endl;  //CO20180130 get spinD
     xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << " # Performing STATIC" << endl;  //CO20200624
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "#removing IBRION, NSW, ISIF" << endl;
+    
+    //CO20231209 - restting EDIFF if it was increased earlier
+    bool add_ediff=false;
+    if(!aurostd::kvpair2bool(xvasp.INCAR,"EDIFF","=")){add_ediff=true;}
+    else{
+      string ediff_str=aurostd::kvpair2string(xvasp.INCAR,"EDIFF","=");
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff_str=" << ediff_str << endl;}
+      if(aurostd::isfloat(ediff_str)){
+        double ediff=aurostd::string2utype<double>(ediff_str);
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff=" << ediff << endl;}
+        if(ediff>1e-6){add_ediff=true;} //AFLOW default
+      }
+    }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " add_ediff=" << add_ediff << endl;}
+    if(add_ediff){
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,1e-6,FALSE);
+    }
+    
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing STATIC [AFLOW] end" << endl;
   }
 }
 
@@ -3346,6 +3366,7 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_Relax_Static_ON
 namespace KBIN {
   void XVASP_INCAR_Relax_Static_ON(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    bool LDEBUG=(FALSE|| _DEBUG_IVASP_ || XHOST.DEBUG);
     string FileContent,strline;
     FileContent=xvasp.INCAR.str();
     aurostd::StringstreamClean(xvasp.INCAR);
@@ -3387,7 +3408,7 @@ namespace KBIN {
           }
     }
     // xvasp.INCAR << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC [AFLOW]" << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC [AFLOW] begin" << endl;
     // xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=0",_incarpad_) << " # Performing RELAX_STATIC" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int),_incarpad_) << " # Performing RELAX_STATIC (tetrahedron method with Blochl corrections : wahyu/stefano 2009/10/09)" << endl; //CO20200624
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << aurostd::PaddedPOST("",_incarpad_) << " # with -5 forces are not correct in metals, so it is good" << endl;
@@ -3426,7 +3447,27 @@ namespace KBIN {
     // check for LDA/GGA
     if(xvasp.POTCAR_TYPE=="LDA" || xvasp.POTCAR_TYPE=="GGA") {
       xvasp.INCAR << "#Fixing RWIGS/LORBIG for LDA/GGA" << endl;
-      ofstream oss;KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,oss,ON);}
+      ofstream oss;KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,oss,ON);
+    }
+    
+    //CO20231209 - restting EDIFF if it was increased earlier
+    bool add_ediff=false;
+    if(!aurostd::kvpair2bool(xvasp.INCAR,"EDIFF","=")){add_ediff=true;}
+    else{
+      string ediff_str=aurostd::kvpair2string(xvasp.INCAR,"EDIFF","=");
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff_str=" << ediff_str << endl;}
+      if(aurostd::isfloat(ediff_str)){
+        double ediff=aurostd::string2utype<double>(ediff_str);
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff=" << ediff << endl;}
+        if(ediff>1e-6){add_ediff=true;} //AFLOW default
+      }
+    }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " add_ediff=" << add_ediff << endl;}
+    if(add_ediff){
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,1e-6,FALSE);
+    }
+    
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC [AFLOW] end" << endl;
   }
 }
 
@@ -3435,6 +3476,7 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_Bands_ON
 namespace KBIN {
   void XVASP_INCAR_Bands_ON(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    bool LDEBUG=(FALSE|| _DEBUG_IVASP_ || XHOST.DEBUG);
     string FileContent,strline;
     FileContent=xvasp.INCAR.str();
     aurostd::StringstreamClean(xvasp.INCAR);
@@ -3474,7 +3516,7 @@ namespace KBIN {
           }
     }
     // xvasp.INCAR << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC_BANDS [AFLOW]" << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing BANDS [AFLOW] begin" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_PREC.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("PREC=Accurate",_incarpad_) << " # Performing RELAX_STATIC_BANDS (aleksey)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.content_int),_incarpad_) << " # Performing RELAX_STATIC_BANDS (put back Gauss, use 1 if metals)" << endl; //CO20200624
     // xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=-5",_incarpad_) << " # Performing RELAX_STATIC (tetrahedron method with Blochl corrections : WSETYAWAN+SC20091009)" << endl;
@@ -3508,6 +3550,25 @@ namespace KBIN {
       xvasp.INCAR << "#Fixing RWIGS/LORBIG for LDA/GGA" << endl;
       ofstream oss;KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,oss,ON);
     }
+
+    //CO20231209 - restting EDIFF if it was increased earlier
+    bool add_ediff=false;
+    if(!aurostd::kvpair2bool(xvasp.INCAR,"EDIFF","=")){add_ediff=true;}
+    else{
+      string ediff_str=aurostd::kvpair2string(xvasp.INCAR,"EDIFF","=");
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff_str=" << ediff_str << endl;}
+      if(aurostd::isfloat(ediff_str)){
+        double ediff=aurostd::string2utype<double>(ediff_str);
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " ediff=" << ediff << endl;}
+        if(ediff>1e-6){add_ediff=true;} //AFLOW default
+      }
+    }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " add_ediff=" << add_ediff << endl;}
+    if(add_ediff){
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,1e-6,FALSE);
+    }
+
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing BANDS [AFLOW] end" << endl;
   }
 }
 
@@ -3675,14 +3736,14 @@ namespace KBIN {
       xvasp.INCAR << aurostd::PaddedPOST("PREC=Accurate",_incarpad_) << " # avoid wrap around errors" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ENMAX="+aurostd::utype2string(xvasp.POTCAR_ENMAX*DEFAULT_VASP_PREC_ENMAX_ACCURATE,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # " << DEFAULT_VASP_PREC_ENMAX_ACCURATE << "*ENMAX (" << xvasp.POTCAR_ENMAX << ") of pseudopotentials" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("LREAL=.FALSE.",_incarpad_) << " # reciprocal space projection technique" << endl;
-      xvasp.INCAR << aurostd::PaddedPOST("EDIFF=1e-6",_incarpad_) << " # high accuracy required" << endl; //CO20231207 - change to lowercase 'e' to match how c++ writes out  //CO20231207 - change to lowercase 'e' to match how c++ writes out
+      xvasp.INCAR << aurostd::PaddedPOST("EDIFF=1e-06",_incarpad_) << " # high accuracy required" << endl; //CO20231207 - change to lowercase 'e' and add 0 to match how c++ writes out
       if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("ALGO=Fast",_incarpad_) << " # fast determination of ground state" << endl;  //CO20231208
     };
     if(vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="PHONONS") { 
       xvasp.INCAR << aurostd::PaddedPOST("PREC=Accurate",_incarpad_) << " # avoid wrap around errors" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ENMAX="+aurostd::utype2string(xvasp.POTCAR_ENMAX*DEFAULT_VASP_PREC_ENMAX_ACCURATE,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # " << DEFAULT_VASP_PREC_ENMAX_ACCURATE << "*ENMAX (" << xvasp.POTCAR_ENMAX << ") of pseudopotentials" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("LREAL=.FALSE.",_incarpad_) << " # reciprocal space projection technique" << endl;
-      xvasp.INCAR << aurostd::PaddedPOST("EDIFF=1e-8",_incarpad_) << " # high accuracy required" << endl; //CO20231207 - change to lowercase 'e' to match how c++ writes out
+      xvasp.INCAR << aurostd::PaddedPOST("EDIFF=1e-08",_incarpad_) << " # high accuracy required" << endl; //CO20231207 - change to lowercase 'e' and add 0 to match how c++ writes out
       xvasp.INCAR << aurostd::PaddedPOST("EDIFFG=-0.001",_incarpad_) << " # high accuracy required" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << " # Many electronic steps" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("NELMIN=4",_incarpad_) << " # The forces have to be well converged" << endl;
