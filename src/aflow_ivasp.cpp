@@ -7569,7 +7569,13 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=2){Krun=false;}
+      if(submode==2){ //try ALGO=VERYFAST //CO20200624  //works for Cr_pvO/A2B_oC24_35_abef_de-001.BA
+        fix="ALGO=VERYFAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="DAV" || mode=="EDDDAV") {
