@@ -27,6 +27,8 @@ namespace aurostd{
   int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output);
   int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output, std::map<std::string, std::string> &header);
 
+  bool foundFirewall(const string& response_url); //CO20231211
+
   std::string httpGet(const std::string &url);
   std::string httpGet(const std::string &url, int &status_code);
   std::string httpGet(const std::string &url, int &status_code, std::map<std::string, std::string> &header);

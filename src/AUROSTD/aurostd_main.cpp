@@ -4760,19 +4760,31 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " " << url << " returned " << return_code <<endl;
     return (!stringIN.empty());
   }
-  bool url2stringWGet(const string& url,string& stringIN,bool verbose) {  //CO20221209 - wget is more robust, can leverage certificates
-    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+  bool url2stringWGet(const string& urlIN,string& stringIN,bool verbose) {  //CO20221209 - wget is more robust, can leverage certificates
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << urlIN << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - " << __AFLOW_FUNC__ << " command \"wget\" is necessary" << endl;
       return FALSE;
     }
-    string _url=url;
+    string url=urlIN,_url=urlIN;
 #ifndef _MACOSX_
     string command_pre="wget --quiet --no-cache -O /dev/stdout";
 #else
     string command_pre="wget --quiet -O /dev/stdout";
 #endif
     string command="";
+
+    //CO20231211 - patch http with database requests, avoid firewall issues
+    //do this early so you avoid too many busted queries
+    if(url.find("aflow.org")!=string::npos||
+        url.find("s4e.ai")!=string::npos||
+        TRUE){
+      aurostd::StringSubst(url,"http://","");
+      aurostd::StringSubst(url,"https://","");
+      aurostd::StringSubst(url,"//","/");
+      url="https://"+url;
+      if (verbose) cerr << __AFLOW_FUNC__ << " patching https: url=" << url << endl;
+    }
     
     //////////////////////////////////////////////////////////////////////////
     //ROUND 1 - original url
@@ -4781,7 +4793,7 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true);
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;}  //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
     
     //////////////////////////////////////////////////////////////////////////
@@ -4792,36 +4804,60 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;}  //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
     
+    
     //////////////////////////////////////////////////////////////////////////
-    //ROUND 3 - try http vs. https
+    //ROUNDS 2+3 - try https vs. http
+    string scheme=""; //https vs. http
+    
     _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"https://","");
     aurostd::StringSubst(_url,"//","/");
-    string scheme="http";
-    if(url.find("aflow.org")!=string::npos){scheme="https";}
-    if(url.find("s4e.ai")!=string::npos){scheme="https";} //CO20231006
+    scheme="https";
     command=command_pre+" '"+scheme+"://"+_url+"'";
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
+    
+    _url=url;
+    aurostd::StringSubst(_url,"http://","");
+    aurostd::StringSubst(_url,"https://","");
+    aurostd::StringSubst(_url,"//","/");
+    scheme="http";
+    command=command_pre+" '"+scheme+"://"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
 
-    return (!stringIN.empty());
+    return (!stringIN.empty() && !foundFirewall(stringIN)); //CO20231211 - adding foundFirewall()
   }
-  bool url2stringCUrl(const string& url,string& stringIN,bool verbose) {  //CO20221209 - curl both leverages certificates and gives raw output
-    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+  bool url2stringCUrl(const string& urlIN,string& stringIN,bool verbose) {  //CO20221209 - curl both leverages certificates and gives raw output
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << urlIN << endl;
     if(!aurostd::IsCommandAvailable("curl")) {
       cerr << "ERROR - " << __AFLOW_FUNC__ << " command \"curl\" is necessary" << endl;
       return FALSE;
     }
-    string _url=url;
+    string url=urlIN,_url=urlIN;
     string command_pre="curl -ivs --raw";
     string command="";
+    
+    //CO20231211 - patch http with database requests, avoid firewall issues
+    //do this early so you avoid too many busted queries
+    if(url.find("aflow.org")!=string::npos||
+        url.find("s4e.ai")!=string::npos||
+        TRUE){
+      aurostd::StringSubst(url,"http://","");
+      aurostd::StringSubst(url,"https://","");
+      aurostd::StringSubst(url,"//","/");
+      url="https://"+url;
+      if (verbose) cerr << __AFLOW_FUNC__ << " patching https: url=" << url << endl;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     //ROUND 1 - original url
@@ -4830,7 +4866,7 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
@@ -4841,26 +4877,37 @@ namespace aurostd {
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
-    //ROUND 2 - try http vs. https
+    //ROUNDS 2+3 - try https vs. http
+    string scheme=""; //https vs. http
+    
     _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"https://","");
     aurostd::StringSubst(_url,"//","/");
-    string scheme="http";
-    if(url.find("aflow.org")!=string::npos){scheme="https";}
-    if(url.find("s4e.ai")!=string::npos){scheme="https";} //CO20231006
+    scheme="https";
     command=command_pre+" '"+scheme+"://"+_url+"'";
     if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
     stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
     if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
-    if(!stringIN.empty()){return true;}
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
+    
+    _url=url;
+    aurostd::StringSubst(_url,"http://","");
+    aurostd::StringSubst(_url,"https://","");
+    aurostd::StringSubst(_url,"//","/");
+    scheme="http";
+    command=command_pre+" '"+scheme+"://"+_url+"'";
+    if (verbose) cerr << __AFLOW_FUNC__ << " Command=" << command << endl;
+    stringIN=aurostd::execute2string(command,stdout_fsio,true); // _MACOSX_
+    if (verbose) cerr << __AFLOW_FUNC__ << " Response=" << stringIN << endl;
+    if(!stringIN.empty() && !foundFirewall(stringIN)){return true;} //CO20231211 - adding foundFirewall()
     //////////////////////////////////////////////////////////////////////////
 
-    return (!stringIN.empty());
+    return (!stringIN.empty() && !foundFirewall(stringIN)); //CO20231211 - adding foundFirewall()
   }
 
   // ***************************************************************************

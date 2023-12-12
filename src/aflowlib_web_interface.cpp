@@ -4230,7 +4230,7 @@ namespace aflowlib {
       }
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")){server=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");}
-    else{server="aflowlib.duke.edu";}
+    else{server=AFLOWLIB_SERVER_DEFAULT;}
 
     path_full=server+"/"+path;
     return path_full;

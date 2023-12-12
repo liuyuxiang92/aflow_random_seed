@@ -33,8 +33,8 @@
 #define _AFLOW_CHULL_PRINT_LOGO_2 FALSE
 
 // DEFINITIONS
-const std::string AFLOW_WEB = string("http://" + AFLOWLIB_MATERIALS_SERVER);
-const std::string NOMAD_WEB = string("http://www.nomad-coe.eu/");
+const std::string AFLOW_WEB = string("https://" + AFLOWLIB_MATERIALS_SERVER);
+const std::string NOMAD_WEB = string("https://www.nomad-coe.eu/");
 const std::string ENTRY_PAGE_URL_PREFIX = string(AFLOW_WEB + "/material/?id=");  //"/material.php?id="
 const std::string AFLOW_HULL_ENDPOINT_STRING = "aflow_hull_endpoint";
 const std::string LATEX_DEFAULT_COLORS = "blue,green,red,brown,cyan,lime,magenta,olive,orange,pink,purple,teal,violet,darkgray,gray,lightgray,black,white,yellow"; //putting favorites near beginning, not so good ones in the back
