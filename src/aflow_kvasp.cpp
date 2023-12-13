@@ -3485,7 +3485,7 @@ namespace KBIN {
     //
     scheme="GEOMETRY_START"; //CO20231209 - this happens right at the beginning, before entering electronic SCF steps, suggesting geometry is bad
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && !aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"rms(c)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    found_warning=(found_warning && vasp_still_running==false && xwarning.flag("OUTCAR_INCOMPLETE")==false && !aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"rms(c)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="LRF_COMMUTATOR";   // GET ALL TIMES
