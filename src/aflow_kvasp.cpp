@@ -3483,6 +3483,11 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"shift your grid to Gamma",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));  //CO20190704 - captures both old/new versions of VASP
     xwarning.flag(scheme,found_warning);
     //
+    scheme="GEOMETRY_START"; //CO20231209 - this happens right at the beginning, before entering electronic SCF steps, suggesting geometry is bad
+    found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
+    found_warning=(found_warning && !aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"rms(c)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    xwarning.flag(scheme,found_warning);
+    //
     scheme="LRF_COMMUTATOR";   // GET ALL TIMES
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LRF_COMMUTATOR internal error: the vector",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
@@ -3612,6 +3617,11 @@ namespace KBIN {
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZPOTRF failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
+    //
+    scheme="ZTRTRI";
+    found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZTRTRI failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    xwarning.flag(scheme,found_warning);
     //ALL OTHERS (in alphabetic order) END
 
     //check at the end (only if other warnings are found and can be corrected)
@@ -3656,6 +3666,7 @@ namespace KBIN {
       if(wdebug || xwarning.flag("EFIELD_PEAD")) aus << "WWWWW  WARNING xwarning.flag(\"EFIELD_PEAD\")=" << xwarning.flag("EFIELD_PEAD") << endl;
       if(wdebug || xwarning.flag("EXCCOR")) aus << "WWWWW  WARNING xwarning.flag(\"EXCCOR\")=" << xwarning.flag("EXCCOR") << endl;
       if(wdebug || xwarning.flag("GAMMA_SHIFT")) aus << "WWWWW  WARNING xwarning.flag(\"GAMMA_SHIFT\")=" << xwarning.flag("GAMMA_SHIFT") << endl;
+      if(wdebug || xwarning.flag("GEOMETRY_START")) aus << "WWWWW  WARNING xwarning.flag(\"GEOMETRY_START\")=" << xwarning.flag("GEOMETRY_START") << endl;  //CO20231212
       if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM") && !xmonitor.flag("IGNORING_WARNINGS:IBZKPT") && (wdebug || xwarning.flag("IBZKPT"))) aus << "WWWWW  WARNING xwarning.flag(\"IBZKPT\")=" << xwarning.flag("IBZKPT") << endl;
       if(wdebug || xwarning.flag("INVGRP")) aus << "WWWWW  WARNING xwarning.flag(\"INVGRP\")=" << xwarning.flag("INVGRP") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM") && (wdebug || xwarning.flag("KKSYM"))) aus << "WWWWW  WARNING xwarning.flag(\"KKSYM\")=" << xwarning.flag("KKSYM") << endl;
@@ -3685,6 +3696,7 @@ namespace KBIN {
       if(wdebug || xwarning.flag("SYMPREC")) aus << "WWWWW  WARNING xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
       if(wdebug || xwarning.flag("ZBRENT")) aus << "WWWWW  WARNING xwarning.flag(\"ZBRENT\")=" << xwarning.flag("ZBRENT") << endl;  //CO20210315
       if(wdebug || xwarning.flag("ZPOTRF")) aus << "WWWWW  WARNING xwarning.flag(\"ZPOTRF\")=" << xwarning.flag("ZPOTRF") << endl;
+      if(wdebug || xwarning.flag("ZTRTRI")) aus << "WWWWW  WARNING xwarning.flag(\"ZTRTRI\")=" << xwarning.flag("ZTRTRI") << endl;  //CO20231209
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -3994,6 +4006,9 @@ namespace KBIN {
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR_REMOVE",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
 
+      //fix initial geometry issue next
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("GEOMETRY_START",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+
       //all other fixes, no priority here (alphabetic order)
       // ********* APPLY OTHER FIXES ******************
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("BRMIX",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
@@ -4011,6 +4026,7 @@ namespace KBIN {
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZTRTRI","ZPOTRF",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20231209 - use same treatments as ZPOTRF - https://www.vasp.at/forum/viewtopic.php?t=18294
 
       //patch only if above warnings are not patched first
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NELM",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));

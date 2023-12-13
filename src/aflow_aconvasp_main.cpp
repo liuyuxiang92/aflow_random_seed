@@ -10907,7 +10907,7 @@ namespace pflow {
     } else {
       for(uint itype=0;itype<first_itypes.size();itype++){
         for(uint jtype=itype;jtype<first_itypes.size();jtype++){
-          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl;  //CO20220627
+          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8*2) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl;  //CO20220627  //CO20231209 - double spacing in case pp's are printed
         }
       }
     }

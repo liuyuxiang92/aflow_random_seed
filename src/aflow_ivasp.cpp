@@ -7616,6 +7616,7 @@ namespace KBIN {
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    //CSLOSHING in relaxations is a big problem, because if the electronic SCF does not converge well, the forces will be unphysical and push atoms in the wrong direction - https://www.vasp.at/forum/viewtopic.php?t=18294
     else if(mode=="CSLOSHING") {
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try ALGO=NORMAL //CO20200624
@@ -7674,35 +7675,41 @@ namespace KBIN {
     }
     else if(mode=="EXCCOR") {
       if(submode<0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //try ALGO=VERYFAST //CO20200624
+      if(submode==0){ //CO20200624
         fix="POSCAR_SCALE*=1.2"; //volume*=1.2^3
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      //CO20231206 - putting KPAR fix first, NBANDS can run over and over again
-      //try first KPAR, erase if it did not work, no harm done
-      if(submode==1){  //CO+DB20230822 - try setting KPAR=2; do not worry about NPAR/NCORE, NPAR takes preference according to VASP (https://www.vasp.at/wiki/index.php/NPAR)
-        fix="KPAR=2";
-        ignorefix=XVASP_Afix_IgnoreFix(fix,vflags);
-        if(ignorefix){Krun=false;}
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){  //remove fixes before going to next submode
-          if(!ignorefix){fix="KPAR=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
-        }
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==2){  //CO20210315 - try lowering NBANDS, worked for LIB2/LIB/Ca_svCr_pv/64
+      //[CO20231212 - no evidence this works]//[CO2023]//CO20231206 - putting KPAR fix first, NBANDS can run over and over again
+      //[CO20231212 - no evidence this works]//try first KPAR, erase if it did not work, no harm done
+      //[CO20231212 - no evidence this works]if(submode==1){  //CO+DB20230822 - try setting KPAR=2; do not worry about NPAR/NCORE, NPAR takes preference according to VASP (https://www.vasp.at/wiki/index.php/NPAR)
+      //[CO20231212 - no evidence this works]  fix="KPAR=2";
+      //[CO20231212 - no evidence this works]  ignorefix=XVASP_Afix_IgnoreFix(fix,vflags);
+      //[CO20231212 - no evidence this works]  if(ignorefix){Krun=false;}
+      //[CO20231212 - no evidence this works]  Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      //[CO20231212 - no evidence this works]  if(!Krun){  //remove fixes before going to next submode
+      //[CO20231212 - no evidence this works]    if(!ignorefix){fix="KPAR=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+      //[CO20231212 - no evidence this works]  }
+      //[CO20231212 - no evidence this works]  if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      //[CO20231212 - no evidence this works]}
+      if(submode==1){  //CO20210315 - try lowering NBANDS, worked for LIB2/LIB/Ca_svCr_pv/64
         fix="NBANDS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=3){Krun=false;}
+      if(submode>=2){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {  //CO20210315 - does a simple shift work for IBZKPT? come back
       fix="KPOINTS=GAMMA";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="GEOMETRY_START") {  //CO20231209 - happens right at the beginning, geometry is bad
+      //https://www.researchgate.net/post/Is_there_any_solution_for_LAPACK_Routine_ZPOTRF_failed_and_call_to_ZHEGV_failed
+      fix="POSCAR_SCALE*=2"; //volume*=2^3
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
@@ -7824,7 +7831,7 @@ namespace KBIN {
       if(submode>=1){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
-    else if(mode=="NATOMS") {
+    else if(mode=="NATOMS") { //relaxation might bring atoms too close together, try blowing up. do not redo, might be issues with SCF that is not converging well, try last ditch solutions
       fix="POSCAR_VOLUME*=2";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -7961,7 +7968,7 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==5){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
-        //it is okay to turn off NELM=300 above, we will try Gamma-odd+NELM below, with lower threshold (save cycles)
+        //it is okay to turn off NELM=300 above, we will try GAMMA_ODD+NELM below, with lower threshold (save cycles)
         fix="KPOINTS=GAMMA_ODD";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
