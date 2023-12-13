@@ -407,18 +407,29 @@ namespace aurostd {
     // close the socket
     close(socket_file_descriptor);
 
-    bool found_firewall=false;
-    found_firewall=(found_firewall||
-        response.find("blocked due to malicious activity")!=string::npos||
-        response.find("SSL-enabled server port")!=string::npos||  //CO+WJ20231006 - adding another firewall message
-        FALSE);
+    //[CO20231211 - OBSOLETE]bool found_firewall=false;
+    //[CO20231211 - OBSOLETE]found_firewall=(found_firewall||
+    //[CO20231211 - OBSOLETE]    response.find("blocked due to malicious activity")!=string::npos||
+    //[CO20231211 - OBSOLETE]    response.find("SSL-enabled server port")!=string::npos||  //CO+WJ20231006 - adding another firewall message
+    //[CO20231211 - OBSOLETE]    FALSE);
     //add other signatures
-    if(found_firewall){ //CO20221209 - curl both leverages certificates and gives raw output
-      aurostd::url2stringCUrl(aurostd::httpJoinURL(url),response);
+    if(foundFirewall(response)){ //CO20221209 - curl both leverages certificates and gives raw output
+      aurostd::url2stringCUrl(aurostd::httpJoinURL(url),response,LDEBUG);
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " response:" << endl << "---response begin---" << endl << response << endl << "---response end---" << endl;}
     }
 
     return true;
+  }
+
+  // ***************************************************************************
+  // Function foundFirewall
+  // ***************************************************************************
+  //CO20231211 - some institutions do not allow http queries, must be https
+  //check response to see if it was encountered
+  bool foundFirewall(const string& response_url){
+    if(response_url.find("blocked due to malicious activity")!=string::npos){return true;}
+    if(response_url.find("SSL-enabled server port")!=string::npos){return true;}
+    return false;
   }
 
   /// @brief get the content of a URL
