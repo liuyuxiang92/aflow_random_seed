@@ -3727,7 +3727,7 @@ namespace KBIN {
       }
       uint n_derivative=0;
       vector<string> vwarnings_derivative; //these warnings are derivative: e.g., an incomplete outcar could be the result of many errors, including those requiring xmessage.flag("REACHED_ACCURACY")
-      aurostd::string2tokens("OUTCAR_INCOMPLETE,CALC_FROZEN,OUTPUT_LARGE",vwarnings_derivative,",");
+      aurostd::string2tokens("OUTCAR_INCOMPLETE,CALC_FROZEN,OUTPUT_LARGE,GEOMETRY_START",vwarnings_derivative,",");
       for(i=0;i<vwarnings_derivative.size();i++){
         if(xwarning.flag(vwarnings_derivative[i])){n_derivative++;}
       }
