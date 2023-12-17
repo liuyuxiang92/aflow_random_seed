@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2023           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -8,8 +8,6 @@
 #ifndef _AFLOW_CLASSES_CPP
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
-
-#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO20191112 - this file is not compiled like the rest
 
 // ***************************************************************************
 // ***************************************************************************
@@ -30,6 +28,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   showPID=FALSE;
   showTID=FALSE;
   QUIET=FALSE;
+  QUIET_GLOBAL=FALSE; //CO20220630
   QUIET_CERR=FALSE; // extra quiet SC20210617
   QUIET_COUT=FALSE; // extra quiet SC20210617
   LOGGER_WHITELIST.clear();  //HE+ME20220305
@@ -151,6 +150,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   showPID=b.showPID;
   showTID=b.showTID;
   QUIET=b.QUIET;
+  QUIET_GLOBAL=b.QUIET_GLOBAL;  //CO20220630
   QUIET_CERR=b.QUIET_CERR; // extra quiet SC20210617
   QUIET_COUT=b.QUIET_COUT; // extra quiet SC20210617
   LOGGER_WHITELIST = b.LOGGER_WHITELIST;  //HE+ME20220305
@@ -301,7 +301,6 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy = XPID + "_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
@@ -313,7 +312,7 @@ std::string _XHOST::command(const string& command) {
       return vcmd.at(i);
     }// found before.. only == otherwise cat gets confused with bzcat
   }
-  //next check if we can find the command in PATH or somewher else common //CO20180705
+  //next check if we can find the command in PATH or somewhere else common //CO20180705
   if(aurostd::IsCommandAvailableModify(_command)) {
     pthread_mutex_lock(&mutex_XAFLOW_XHOST);
     // pthread_mutex_unlock(&mutex_XAFLOW_XHOST);
@@ -335,7 +334,7 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 STOP
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
@@ -516,6 +515,7 @@ _kflags::_kflags() {
   KBIN_MPI_NCPUS                                   = 0;
   KBIN_MPI_NCPUS_STRING                            = ""; //ME20181216
   KBIN_MPI_NCPUS_ORIG                              = 0; //CO20210804
+  KBIN_MPI_HOSTLIST_OFFSETS                        = 0; //CO20231201
   KBIN_MPI_START                                   = "";
   KBIN_MPI_STOP                                    = "";
   KBIN_MPI_COMMAND                                 = "";
@@ -627,6 +627,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_MPI_NCPUS                                   = b.KBIN_MPI_NCPUS;
   KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME20181216
   KBIN_MPI_NCPUS_ORIG                              = b.KBIN_MPI_NCPUS_ORIG; //CO20210804
+  KBIN_MPI_HOSTLIST_OFFSETS                        = b.KBIN_MPI_HOSTLIST_OFFSETS; //CO20231201
   KBIN_MPI_START                                   = b.KBIN_MPI_START;
   KBIN_MPI_STOP                                    = b.KBIN_MPI_STOP;
   KBIN_MPI_COMMAND                                 = b.KBIN_MPI_COMMAND;
@@ -827,12 +828,17 @@ void _vflags::free() {
   KBIN_VASP_FORCE_OPTION_SPIN.option                             = DEFAULT_VASP_FORCE_OPTION_SPIN;  // SPIN 
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1                     = DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;  // SPIN_REMOVE_RELAX_1
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2                     = DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2;  // SPIN_REMOVE_RELAX_2
+  KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN                            = DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN;  // RECYCLE_SPIN //CO20230826
   KBIN_VASP_FORCE_OPTION_BADER.clear();                          // BADER
   KBIN_VASP_FORCE_OPTION_BADER.option                            = DEFAULT_VASP_FORCE_OPTION_BADER;  // BADER
   KBIN_VASP_FORCE_OPTION_ELF.clear();                            // ELF
   KBIN_VASP_FORCE_OPTION_ELF.option                              = DEFAULT_VASP_FORCE_OPTION_ELF;  // ELF
   KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.clear();                    // AUTO_MAGMOM
   KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option                      = DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM; // AUTO_MAGMOM
+  KBIN_VASP_FORCE_OPTION_MAGMOM.clear();                         // MAGMOM  //CO20230826
+  KBIN_VASP_FORCE_OPTION_MAGMOM.push("");                        //CO20230826
+  KBIN_VASP_FORCE_OPTION_MAGMOM_MULT.clear();                    // MAGMOM_MULT  //CO20230826
+  KBIN_VASP_FORCE_OPTION_MAGMOM_MULT.push("");                   //CO20230826
   KBIN_VASP_FORCE_OPTION_SYM.clear();                            // SYM
   KBIN_VASP_FORCE_OPTION_SYM.option                              = DEFAULT_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR.clear();                        // WAVECAR
@@ -1020,9 +1026,12 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_SPIN                                    = b.KBIN_VASP_FORCE_OPTION_SPIN; // SPIN
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2; 
+  KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN                            = b.KBIN_VASP_FORCE_OPTION_RECYCLE_SPIN;  //CO20230826
   KBIN_VASP_FORCE_OPTION_BADER                                   = b.KBIN_VASP_FORCE_OPTION_BADER; // BADER
   KBIN_VASP_FORCE_OPTION_ELF                                     = b.KBIN_VASP_FORCE_OPTION_ELF; // ELF
   KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM                             = b.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM; // AUTO_MAGMOM
+  KBIN_VASP_FORCE_OPTION_MAGMOM                                  = b.KBIN_VASP_FORCE_OPTION_MAGMOM; // MAGMOM //CO20230826
+  KBIN_VASP_FORCE_OPTION_MAGMOM_MULT                             = b.KBIN_VASP_FORCE_OPTION_MAGMOM_MULT; // MAGMOM_MULT //CO20230826
   KBIN_VASP_FORCE_OPTION_SYM                                     = b.KBIN_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR                                 = b.KBIN_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR                                  = b.KBIN_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
@@ -1263,10 +1272,13 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::AVASP_SPIN",DEFAULT_VASP_FORCE_OPTION_SPIN);                                 // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1);   // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2);   // DEFAULT VALUES
+  aopts.flag("FLAG::AVASP_RECYCLE_SPIN",DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN);                 // DEFAULT VALUES  //CO20230826
   aopts.flag("FLAG::AVASP_BADER",DEFAULT_VASP_FORCE_OPTION_BADER);                               // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_ELF",DEFAULT_VASP_FORCE_OPTION_ELF);                                   // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_LSCOUPLING",DEFAULT_VASP_FORCE_OPTION_LSCOUPLING);                     // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_AUTO_MAGMOM",DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);                   // DEFAULT VALUES
+  aopts.flag("FLAG::AVASP_MAGMOM",FALSE);                                                        // DEFAULT VALUES  //CO20230826
+  aopts.flag("FLAG::AVASP_MAGMOM_MULT",FALSE);                                                   // DEFAULT VALUES  //CO20230826
   aopts.flag("FLAG::AVASP_SYM",DEFAULT_VASP_FORCE_OPTION_SYM);                   // DEFAULT VALUES //ME20181226
   aopts.flag("FLAG::AVASP_RELAX_FORCES",FALSE);          // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_KPPRA",FALSE);                 // DEFAULT VALUES
@@ -1942,7 +1954,7 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 
 xstructure& _xinput::getXStr() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.str;}
   if(AFLOW_MODE_AIMS) {return xaims.str;}
@@ -1951,7 +1963,7 @@ xstructure& _xinput::getXStr() {
 
 string& _xinput::getDirectory() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.Directory;}
   if(AFLOW_MODE_AIMS) {return xaims.Directory;}
@@ -1961,7 +1973,7 @@ string& _xinput::getDirectory() {
 
 void _xinput::setXStr(const xstructure& str,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
   if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
@@ -1969,7 +1981,7 @@ void _xinput::setXStr(const xstructure& str,bool set_all) {
 
 void _xinput::setDirectory(string Directory,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
   if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}
@@ -2093,6 +2105,6 @@ void xStream::initialize(ofstream& ofs,ostream& oss) {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2021              *
+// *             STEFANO CURTAROLO - Duke University 2003-2023              *
 // *                                                                        *
 // **************************************************************************

@@ -1,0 +1,29 @@
+# WS20230512
+#
+# FULL CHECKS
+#
+# Run check_full_1 when a review is requested to a pull request (allows for manual running of check_full_1)
+#
+
+name: aflow++ inhouse build check_full_PR_1
+#c++ builds: https://github.community/t/conditional-matrices/17206
+#env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
+
+#[CO20230516 - needed?]run-name: Full Checks
+
+on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
+  workflow_dispatch:
+  pull_request:
+    types: [review_requested]
+jobs:
+  check_full_PR_1:
+    runs-on: [self-hosted, Linux, X64]
+    if: ${{ github.event.requested_team.name == 'check_full' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: make
+        run: make -j $((`grep -c ^processor /proc/cpuinfo`-2)) -C src
+      - name: make check_full_1
+        run: |
+          cd src
+          make check_full_1

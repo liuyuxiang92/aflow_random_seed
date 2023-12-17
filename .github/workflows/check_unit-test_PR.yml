@@ -1,0 +1,35 @@
+# WS20230512
+#
+# UNIT TEST
+#
+# Run unit_test when a pull request is edited
+#
+
+name: aflow++ inhouse build check_unit-test_PR
+#c++ builds: https://github.community/t/conditional-matrices/17206
+#env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
+
+#[CO20230516 - needed?]run-name: Unit Test
+
+on: # Run unit_test whenever a pull request is opened or committed to
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+#types: [opened, reopened, synchronize, edited, ready_for_review]
+jobs:
+  check_unit-test_PR:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - uses: actions/checkout@v3
+      - name: make
+        run: make -j $((`grep -c ^processor /proc/cpuinfo`-2)) -C src
+      - name: make unit_test
+        run: |
+          cd src
+          ./aflow --np=$((`grep -c ^processor /proc/cpuinfo`-2)) --unit_test aurostd,database,structure
+#[CO20230516 - too long]          make unit_test
+      - name: recreate makefile
+        run: |
+          cd src
+          ./aflow --makefile
+          make -j $((`grep -c ^processor /proc/cpuinfo`-2))

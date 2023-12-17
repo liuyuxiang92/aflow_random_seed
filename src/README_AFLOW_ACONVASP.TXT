@@ -81,6 +81,9 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
          --bader (default: DEFAULT_VASP_FORCE_OPTION_BADER)
          --spin_remove_relax_1 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1)
          --spin_remove_relax_2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2)
+         --recycle_spin (default: DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN)
+         --magmom=2x-3_4x5_8x0
+         --magmom_mult=2 (default: DEFAULT_VASP_FORCE_OPTION_RECYCLE_SPIN_MULTIPLIER)
          --kscheme=[M | G] (default: DEFAULT_KSCHEME in .aflow.rc) --kscheme_static=[M | G] (default: DEFAULT_KSCHEME_STATIC in .aflow.rc)
 	       --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN (default: DEFAULT_BANDS_GRID in .aflow.rc)
          --enmax_multiply=NNNN (default: DEFAULT_VASP_PREC_ENMAX_HIGH in .aflow.rc, DEFAULT_VASP_PREC_ENMAX_ACCURATE  in .aflow.rc)
@@ -111,6 +114,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
          --qe
          --abinit
          --aims
+         --atat
          --list
          --params=....  { check aflow --readme=anrl }
          --hex          { check aflow --readme=anrl }
@@ -187,6 +191,17 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         With --spin_remove_relax_1 _2, the user can indicate when to avoid a spin-polarized calculation if
         the system's magnetic moment is negligible.
        
+     RECYCLE_SPIN
+        The user can recycle the final spin configuration of the previous run (magnetization in OUTCAR)
+        as the starting configuration for the next run (MAGMOM in INCAR).
+
+      MAGMOM
+        Specify the starting magnetic configuration for the run (MAGMOM in INCAR).
+
+      MAGMOM_MULT
+        Specify the multiplication factor for the starting spins (MAGMOM in INCAR).
+        It is recommended by VASP to start with a larger initial magnetic moment than expected.
+
      KPOINTS SPECIFICATION
         With --kppra=NNN the user can specify a NNN number of kpoints per reciprocal atom.
         Input KPPRA (6,000-10,000 recommended) is the lower bound of the product of the 
@@ -2959,6 +2974,65 @@ LATTICES = (the ones with "")
         Given the current directory (or the one specified by -D), aflow
         produces the file aflow.qmvasp.out containing thermodynamic information
         from relax2 CONTCAR/OSZICAR/OUTCAR (or .static if --static is specified).
+
+  aflow --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]
+        Loads the alloy data from the AFLOW database, calculates the equi-concentration transition
+        temperature, and returns the output as a TXT (default, see --format_data).
+        --quasi_chem_approx|--qca : Necessary argument, enters the mode to use the QCA.
+        --plattice|--plat : Necessary argument, specifies the parent lattice of the alloy. Argument is restricted to
+            only FCC (face centered cubic), BCC (body centered cubic) and HCP (hexagonal closed pack for only binaries).
+        --elements|--elem : Necessary argument, specifies the elements present in the alloy.
+        [--directory=[DIRECTORY]] : Optional argument, specifies the directory where to run the
+            calculation.
+            Default: "./"
+
+        GENERAL OPTIONS:
+        [--usage] : Returns the usage commands and options.
+            Default: OFF
+        [--screen_only] : Outputs directly to screen (stdout) instead of writing to a file.
+            Default: OFF
+        [--image_only|--image] : Reads only the output data and plot the results. Plotting
+            is only implemented for binary alloys.
+            Default: OFF
+        [--aflowlib_directory=|--aflowlib_dir=] : Specifies a directory (including
+            its subdirectories) from where to read additional aflowlib files.
+            Default: ""
+        [--print=|--p=|--output=|--o=txt|json|pdf|eps|png] : Selects the output format.
+            Default: txt
+
+        BINODAL OPTIONS:
+        [--binodal] : Calculates the binodal curve for the given concentration and temperature
+            profiles.
+            Default: OFF
+        [--use_sg] : Uses the space groups for structure comparison.
+            Default: OFF
+        [--aflow_max_num_atoms=4] : Specifies the maximum number of atoms in the unit cell of
+            the AFLOW calculations.
+            Default: 4
+        [--max_num_atoms=|--mna=8] : Specifies the maximum number of atoms in the alloy.
+            Default: 8
+        [--cv_cutoff=|--cv_cut=0.05] : Specifies the cross validation (CV) score cut-off for
+            the cluster expansion. The calculation will terminate prematurely if the CV
+            score is below the cut-off.
+            Default: 0.05
+            Units: eV
+        [--conc_curve_range=|--conc_curve=0,1,1,0] : Specifies the concentration curve
+            to evaluate the equilibria properties. The format of this argument is:
+            <c_1i>,<c_1f>,<c_2i>,<c_2f>,...,<c_[K]i>,<c_[K]f> where K is number
+            of elements, <c_[k]i> is the initial concentration and <c_[k]f> is the
+            final concentration. The concentration is defined on [0,1].
+            Default: NONE
+        [--conc_npts=20] : Specifies the number of points used to determine the sub-division of
+            the concentration profile.
+            Default: 20
+        [--temp_range=|--temp=300,5000] : Specifies the temperature range to evaluate the
+            equilibria properties. The format of this argument is: <T_i>,<T_f>
+            where <T_i> and <T_f> is the initial and final temperature, respectively.
+            Default: 300,2000
+            Units: K
+        [--temp_npts=100] : Specifies the number of points used to determine the sub-division of
+            the temperature profile.
+            Default: 150
 
   aflow --rasmol[=n1[,n2[,n3]]] < POSCAR
         Similar to --xyz. Starts rasmol (must be available) with a file
