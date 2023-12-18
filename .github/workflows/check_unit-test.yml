@@ -1,19 +1,22 @@
 # WS20230512
 #
-# FULL CHECKS
+# UNIT TEST
 #
-# Run check_unit-test when a review is requested to a pull request (allows for manual running of check_unit-test)
+# Run check_unit-test whenever there is a push, or a pull request is opened or committed to
 #
 
 name: aflow++ inhouse build check_unit-test
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-#[CO20230516 - needed?]run-name: Full Checks
+#[CO20230516 - needed?]run-name: Unit Test
 
-on: # Run when a reviewer is requested to a pull request (action performed on GitHub.com)
+on: # Run check_unit-test whenever there is a push, or a pull request is opened or committed to
   workflow_dispatch:
   push:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+#types: [opened, reopened, synchronize, edited, ready_for_review]
 jobs:
   check_unit-test:
     runs-on: [self-hosted, Linux, X64]
