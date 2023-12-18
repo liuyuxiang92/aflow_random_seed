@@ -560,9 +560,9 @@ namespace aflowlib {
       for (int i = 0; i < _N_AUID_TABLES_; i++) {
         stringstream t;
         t << std::setfill('0') << std::setw(2) << std::hex << i;
-        json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+        json_files[i] = aurostd::CleanFileName(data_path + "/" + getAUIDPrefix() + ":" + t.str() + ".jsonl"); //WJ20231217 Changed "aflow" to getAUIDPrefix()
         if (!aurostd::EFileExist(json_files[i]) && !aurostd::FileExist(json_files[i])) {
-          message << data_path << " is not a valid data path. Missing file for aflow:" << t.str() << ".";
+          message << data_path << " is not a valid data path. Missing file for " << getAUIDPrefix() << ":" << t.str() << "."; //WJ20231217 Changed "aflow" to getAUIDPrefix()
           throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
         }
       }
@@ -747,9 +747,9 @@ namespace aflowlib {
     stringstream t;
     t << std::setfill('0') << std::setw(2) << std::hex << i;
     string table = "auid_" + t.str();
-    string auid_prefix = "\"aflow:" + t.str();
+    string auid_prefix = "\"" + getAUIDPrefix() + ":" + t.str(); //WJ20231217 Changed "aflow" to getAUIDPrefix()
 
-    string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+    string jsonfile = aurostd::CleanFileName(data_path + "/" + getAUIDPrefix() + ":" + t.str() + ".jsonl"); //WJ20231217 Changed "aflow" to getAUIDPrefix()
     vector<string> data;
     aurostd::efile2vectorstring(jsonfile, data);
     vector<vector<string> > values;
