@@ -461,6 +461,7 @@ namespace aflowlib {
 
     aurostd::string2file("", lock_file);
     if (copied) aurostd::ChmodFile("444", database_file);
+    aurostd::RemoveFile(lock_file); //CO20231218 - lock file stays, although it is empty
     return copied;
   }
 
