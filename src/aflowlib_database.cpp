@@ -745,6 +745,7 @@ namespace aflowlib {
   //buildTables///////////////////////////////////////////////////////////////
   // Reads a .jsonl files and processes the JSONs for the database writer.
   void AflowDB::buildTable(int i, const vector<string>& columns, const vector<string>& types) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     stringstream t;
     t << std::setfill('0') << std::setw(2) << std::hex << i;
     string table = "auid_" + t.str();
@@ -759,11 +760,15 @@ namespace aflowlib {
     for (uint d = 0; d < ndata; d++) {
       // Filter auids that are in the wrong file
       auid = aurostd::extractJsonValueAflow(data[d], "auid");
-      if (auid.rfind(auid_prefix, 0) != 0) continue;
+      if (auid.rfind(auid_prefix, 0) != 0){
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " skipping line, no auid_prefix found: auid=\"" << auid << "\", auid_prefix=\"" << auid_prefix << "\", line=\"" << data[d] << "\"" << endl;}
+        continue;
+      }
       // Filter non-POCC ARUNs
       aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
       if ((aurl.find("ARUN") != string::npos)
           && (aurl.find("ARUN.POCC") == string::npos)) {
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " skipping line, non ARUN.POCC ARUN found: line=\"" << data[d] << "\"" << endl;}
         continue;
       }
       values.push_back(getDataValues(data[d], columns, types));
