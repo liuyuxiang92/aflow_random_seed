@@ -1343,6 +1343,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // for HTQC
   // xstructure str1[100];_xvasp xvsp[100];
 
+  //CO20231224 - LIB0
+  vector<string> vlabel_parts;
+  bool is_LIB0=(aurostd::substring2bool(xvasp.AVASP_label,"ATOM")&&aurostd::string2tokens(xvasp.AVASP_label,vlabel_parts,"_")==2);
+  if(is_LIB0){
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Do NOT create aflow.in with 'ATOM' prototype, use ANRL designation instead",_VALUE_ILLEGAL_);
+  }
+
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " " << "[1]" << endl;
   //clean up name
   xvasp.AVASP_label=aurostd::RemoveSubString(xvasp.AVASP_label,"/");
