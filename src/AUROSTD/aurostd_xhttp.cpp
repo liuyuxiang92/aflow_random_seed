@@ -312,7 +312,7 @@ namespace aurostd {
     response.clear();
 
     char buffer[BUFSIZ];
-    char request_template[] = "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: aflow/%s (https://aflow.org)\r\n\r\n";
+    char request_template[] = "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: s4e/%s (https://s4e.ai)\r\n\r\n";
 
     struct protoent *protocol_entry;
     struct hostent *host_entry;
