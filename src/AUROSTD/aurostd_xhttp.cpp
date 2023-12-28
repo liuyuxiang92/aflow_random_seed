@@ -238,6 +238,7 @@ namespace aurostd {
 
     // in HTTP1.1 data is mostly sent in chunks
     if (isChunked) {
+      output.clear(); //WJ20231025 Clear output var (otherwise response gets added twice later)
       size_t chuck_length = 0;
       while (!response.empty() && chunk_length_octet != "0") {
         pos_newline_border = response.find(delimiter);
@@ -312,7 +313,7 @@ namespace aurostd {
     response.clear();
 
     char buffer[BUFSIZ];
-    char request_template[] = "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: aflow/%s (https://aflow.org)\r\n\r\n";
+    char request_template[] = "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: s4e/%s (https://s4e.ai)\r\n\r\n";
 
     struct protoent *protocol_entry;
     struct hostent *host_entry;
@@ -327,7 +328,7 @@ namespace aurostd {
     unsigned long loaded_bytes = 0;
 
     // build request and save its length
-    request_len = asprintf(&request, request_template, (url.path + url.query).c_str(), url.host.c_str(), AFLOW_VERSION);
+    request_len = asprintf(&request, request_template, (url.path + url.query).c_str(), url.host.c_str(), AFLOW_VERSION);  //CO20231228 - valgrind reports memory leak here because there is no free(request)
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " request:" << endl << "---request begin---" << endl << request << endl << "---request end---" << endl;}
 
@@ -335,6 +336,7 @@ namespace aurostd {
     protocol_entry = getprotobyname("tcp");
     if (protocol_entry == nullptr) {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to get TCP protocol entry!" << endl;
+      free(request);  //CO20231228 - freeing memory from asprintf() above
       return false;
     }
 
@@ -342,6 +344,7 @@ namespace aurostd {
     socket_file_descriptor = socket(AF_INET, SOCK_STREAM, protocol_entry->p_proto);
     if (socket_file_descriptor == -1) {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to open socket!" << endl;
+      free(request);  //CO20231228 - freeing memory from asprintf() above
       return false;
     }
 
@@ -349,6 +352,7 @@ namespace aurostd {
     host_entry = gethostbyname(url.host.c_str());
     if (host_entry == nullptr) {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to find information on '" << url.host << "'!" << endl;
+      free(request);  //CO20231228 - freeing memory from asprintf() above
       return false;
     }
 
@@ -360,6 +364,7 @@ namespace aurostd {
     socket_entry.sin_family = AF_INET;
     if (url.port > 65535) {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to connect to " << url.host << " as port is out of range (" << url.port << ">65535)" << endl;
+      free(request);  //CO20231228 - freeing memory from asprintf() above
       return false;
     }
     socket_entry.sin_port = htons((short) url.port);
@@ -367,6 +372,7 @@ namespace aurostd {
     // start connection
     if (connect(socket_file_descriptor, (struct sockaddr *) &socket_entry, sizeof(socket_entry)) == -1) {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to connect to " << url.host << " (" << ip_address_str << ":" << url.port << ")" << endl;
+      free(request);  //CO20231228 - freeing memory from asprintf() above
       return false;
     }
     if (LDEBUG)
@@ -378,11 +384,14 @@ namespace aurostd {
       nbytes_last = write(socket_file_descriptor, request + nbytes_total, request_len - nbytes_total);
       if (nbytes_last == -1) {
         if (LDEBUG) cerr << __AFLOW_FUNC__ << " Failed to send the request to " << url.host << "( " << ip_address_str << ":" << url.port << ")" << endl;
+        free(request);  //CO20231228 - freeing memory from asprintf() above
         return false;
       }
       nbytes_total += nbytes_last;
     }
     if (LDEBUG) cerr << __AFLOW_FUNC__ << " Request written (" << nbytes_total << " bytes)" << endl;
+
+    free(request);  //CO20231228 - freeing memory from asprintf() above, should be completely safe here
 
     // read the response
     if (LDEBUG) cerr << __AFLOW_FUNC__ << " Start reading response:";
