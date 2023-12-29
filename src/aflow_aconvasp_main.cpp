@@ -1156,6 +1156,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::BANDS_GRID","--bands_grid=|--BANDS_GRID=","");
     if(vpflow.flag("PROTO_AFLOW::BANDS_GRID")) vlist+="--bands_grid="+vpflow.getattachedscheme("PROTO_AFLOW::BANDS_GRID")+" ";   // recursion is GNU's pleasure (SC2017)
 
+    vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::ISMEAR","--ismear=|--ISMEAR=","");  //CO20231229
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR")) vlist+="--ismear="+vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR")+" ";  //CO20231229
+    vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::ISMEAR_STATIC","--ismear_static=|--ISMEAR_STATIC=",""); //CO20231229
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR_STATIC")) vlist+="--ismear_static="+vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR_STATIC")+" "; //CO20231229
+    vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::ISMEAR_BANDS","--ismear_bands=|--ISMEAR_BANDS=","");  //CO20231229
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR_BANDS")) vlist+="--ismear_bands="+vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR_BANDS")+" ";  //CO20231229
+
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::ENMAX_MULTIPLY","--enmax_multiply=|--ENMAX_MULTIPLY=","");
     if(vpflow.flag("PROTO_AFLOW::ENMAX_MULTIPLY")) vlist+="--enmax_multiply="+vpflow.getattachedscheme("PROTO_AFLOW::ENMAX_MULTIPLY")+" ";   // recursion is GNU's pleasure (SC2017)
 
@@ -2737,7 +2744,8 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --spin_remove_relax_1 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1)" << endl;
     strstream << tab << xspaces << " " << "              --spin_remove_relax_2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2)" << endl;
     strstream << tab << xspaces << " " << "              --kscheme=[M|G] (default: DEFAULT_KSCHEME in .aflow.rc) --kscheme_static=[M|G] (default: DEFAULT_KSCHEME_STATIC in .aflow.rc)" << endl;
-    strstream << tab << xspaces << " " << "              --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN  (default: DEFAULT_BANDS_GRID in .aflow.rc )" << endl;
+    strstream << tab << xspaces << " " << "              --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN  (default: DEFAULT_BANDS_GRID in .aflow.rc)" << endl;
+    strstream << tab << xspaces << " " << "              --ismear=N (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME in .aflow.rc) --ismear_static=N (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME in .aflow.rc) --ismear_bands=N  (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME in .aflow.rc)" << endl;
     strstream << tab << xspaces << " " << "              --enmax_multiply=NNNN (default: VASP_PREC_ENMAX_XXXX in .aflow.rc)" << endl;
     strstream << tab << xspaces << " " << "              --pressure=0,1,2 (kB) (default:0.0)" << endl;
     strstream << tab << xspaces << " " << "              --potim=XXX (default 0.05) (VASP)" << endl;
@@ -12785,6 +12793,7 @@ namespace pflow {
             "                --spin_remove_relax_2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2)",
             "                --kscheme=[M | G] (default: DEFAULT_KSCHEME in .aflow.rc) --kscheme_static=[M | G] (default: DEFAULT_KSCHEME_STATIC in .aflow.rc)",
             "                --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN (default: DEFAULT_BANDS_GRID in .aflow.rc)",
+            "                --ismear=N (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME in .aflow.rc) --ismear_static=N (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME in .aflow.rc) --ismear_bands=N (default: DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME in .aflow.rc)",
             "                --enmax_multiply=NNNN (default:VASP_PREC_ENMAX_XXXX in .aflow.rc)", 
             "                --pressure=0,1,2 (kB) (default:0.0)",
             "                --potim=XXX (default 0.05)  (VASP) ",
@@ -13076,6 +13085,26 @@ namespace pflow {
     PARAMS.vparams.flag("AFLOWIN_FLAG::BANDS_GRID",vpflow.flag("PROTO_AFLOW::BANDS_GRID"));
     if(vpflow.flag("PROTO_AFLOW::BANDS_GRID")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::BANDS_GRID",vpflow.getattachedscheme("PROTO_AFLOW::BANDS_GRID"));
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;
+    
+    //CO20231229 START - ISMEAR
+    // check ismear
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK ISMEAR" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR",vpflow.flag("PROTO_AFLOW::ISMEAR"));
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::ISMEAR",vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ISMEAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR") << endl;
+    
+    // check ismear_static
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK ISMEAR_STATIC" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR_STATIC",vpflow.flag("PROTO_AFLOW::ISMEAR_STATIC"));
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR_STATIC")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::ISMEAR_STATIC",vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR_STATIC"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ISMEAR_STATIC\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR_STATIC") << endl;
+    
+    // check ismear_bands
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK ISMEAR_BANDS" << endl;
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR_BANDS",vpflow.flag("PROTO_AFLOW::ISMEAR_BANDS"));
+    if(vpflow.flag("PROTO_AFLOW::ISMEAR_BANDS")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::ISMEAR_BANDS",vpflow.getattachedscheme("PROTO_AFLOW::ISMEAR_BANDS"));
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ISMEAR_BANDS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ISMEAR_BANDS") << endl;
+    //CO20231229 STOP - ISMEAR
 
     // check enmax_multiply
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " CHECK ENMAX_MULTIPLY" << endl;
