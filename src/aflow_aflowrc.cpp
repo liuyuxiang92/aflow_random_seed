@@ -180,17 +180,17 @@
 #define         MPI_NCPUS_MAX                           XHOST.adefault.getattachedutype<int>("MPI_NCPUS_MAX")
 
 // BINARY    // DONE
-#define AFLOWRC_DEFAULT_VASP_GAMMA_BIN                  string("vasp46s_gamma")
+#define AFLOWRC_DEFAULT_VASP_GAMMA_BIN                  string("vasp_gam")  //[CO20231230 - OBSOLETE]string("vasp46s_gamma")
 #define         DEFAULT_VASP_GAMMA_BIN                  XHOST.adefault.getattachedscheme("DEFAULT_VASP_GAMMA_BIN")
-#define AFLOWRC_DEFAULT_VASP_GAMMA_MPI_BIN              string("mpivasp46s_gamma")
+#define AFLOWRC_DEFAULT_VASP_GAMMA_MPI_BIN              string("vasp_gam")  //[CO20231230 - OBSOLETE]string("mpivasp46s_gamma")
 #define         DEFAULT_VASP_GAMMA_MPI_BIN              XHOST.adefault.getattachedscheme("DEFAULT_VASP_GAMMA_MPI_BIN")
-#define AFLOWRC_DEFAULT_VASP_BIN                        string("vasp46s")
+#define AFLOWRC_DEFAULT_VASP_BIN                        string("vasp_std")  //[CO20231230 - OBSOLETE]string("vasp46s")
 #define         DEFAULT_VASP_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_VASP_BIN")
-#define AFLOWRC_DEFAULT_VASP_MPI_BIN                    string("mpivasp46s")
+#define AFLOWRC_DEFAULT_VASP_MPI_BIN                    string("vasp_std")  //[CO20231230 - OBSOLETE]string("mpivasp46s")
 #define         DEFAULT_VASP_MPI_BIN                    XHOST.adefault.getattachedscheme("DEFAULT_VASP_MPI_BIN")
-#define AFLOWRC_DEFAULT_VASP5_BIN                       string("vasp54s")
+#define AFLOWRC_DEFAULT_VASP5_BIN                       string("vasp_std")  //[CO20231230 - OBSOLETE]string("vasp54s")
 #define         DEFAULT_VASP5_BIN                       XHOST.adefault.getattachedscheme("DEFAULT_VASP5_BIN")
-#define AFLOWRC_DEFAULT_VASP5_MPI_BIN                   string("mpivasp54s")
+#define AFLOWRC_DEFAULT_VASP5_MPI_BIN                   string("vasp_std")  //[CO20231230 - OBSOLETE]string("mpivasp54s")
 #define         DEFAULT_VASP5_MPI_BIN                   XHOST.adefault.getattachedscheme("DEFAULT_VASP5_MPI_BIN")
 //aims
 #define AFLOWRC_DEFAULT_AIMS_BIN                        string("aims")
@@ -2487,16 +2487,16 @@ namespace aflowrc {
     //SD20220323 - QCA START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS QCA " << endl;
-    aflowrc << "DEFAULT_QCA_MIN_SLEEP_SECONDS" << AFLOWRC_DEFAULT_QCA_MIN_SLEEP_SECONDS << endl;
-    aflowrc << "DEFAULT_QCA_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_QCA_MAX_NUM_ATOMS << endl;
-    aflowrc << "DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS << endl;
-    aflowrc << "DEFAULT_QCA_CV_CUTOFF" << AFLOWRC_DEFAULT_QCA_CV_CUTOFF << endl;
-    aflowrc << "DEFAULT_QCA_CONC_NPTS" << AFLOWRC_DEFAULT_QCA_CONC_NPTS << endl;
-    aflowrc << "DEFAULT_QCA_TEMP_NPTS" << AFLOWRC_DEFAULT_QCA_TEMP_NPTS << endl;
-    aflowrc << "DEFAULT_QCA_TEMP_MIN" << AFLOWRC_DEFAULT_QCA_TEMP_MIN << endl;
-    aflowrc << "DEFAULT_QCA_TEMP_MAX" << AFLOWRC_DEFAULT_QCA_TEMP_MAX << endl;
-    aflowrc << "DEFAULT_QCA_TEMP_MIN_LIMIT" << AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT << endl;
-    aflowrc << "DEFAULT_QCA_PRINT" << AFLOWRC_DEFAULT_QCA_PRINT << endl;
+    aflowrc << "DEFAULT_QCA_MIN_SLEEP_SECONDS=" << AFLOWRC_DEFAULT_QCA_MIN_SLEEP_SECONDS << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_MAX_NUM_ATOMS=" << AFLOWRC_DEFAULT_QCA_MAX_NUM_ATOMS << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS=" << AFLOWRC_DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_CV_CUTOFF=" << AFLOWRC_DEFAULT_QCA_CV_CUTOFF << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_CONC_NPTS=" << AFLOWRC_DEFAULT_QCA_CONC_NPTS << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_TEMP_NPTS=" << AFLOWRC_DEFAULT_QCA_TEMP_NPTS << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_TEMP_MIN=" << AFLOWRC_DEFAULT_QCA_TEMP_MIN << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_TEMP_MAX=" << AFLOWRC_DEFAULT_QCA_TEMP_MAX << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_TEMP_MIN_LIMIT=" << AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT << endl; //CO20231230
+    aflowrc << "DEFAULT_QCA_PRINT=\"" << AFLOWRC_DEFAULT_QCA_PRINT << "\"" << endl; //CO20231230
     //SD20220323 - QCA END
 
     //RF20200413 START
