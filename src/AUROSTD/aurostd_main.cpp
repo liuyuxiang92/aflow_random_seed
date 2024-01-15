@@ -5782,11 +5782,11 @@ namespace aurostd {
     //keyword="ALGO,delim="=": kvpair2bool will return false
     //kvpair2bool must match KEY exactly! skips the rest
     //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    bool LDEBUG=true; //FALSE;//TRUE;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << _strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return false;
     if(RemoveComments){ //SD20220403 - substring exists, but now check if it exists outside of comments 
       vector<string> tokens;
