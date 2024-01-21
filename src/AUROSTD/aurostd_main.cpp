@@ -5782,7 +5782,7 @@ namespace aurostd {
     //keyword="ALGO,delim="=": kvpair2bool will return false
     //kvpair2bool must match KEY exactly! skips the rest
     //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
-    bool LDEBUG=true; //FALSE;//TRUE;
+    bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
